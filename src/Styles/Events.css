@@ -1,0 +1,33 @@
+a {
+  text-decoration: none;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.cardGrid {
+  display: grid;
+  /* grid-template-columns: 250px 250px 250px auto; */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  /* grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); */
+  grid-template-rows: auto;
+  grid-row-gap: 2.5%;
+  grid-column-gap: 2.5%;
+  /* width: auto; */
+  height: 100vh;
+  /* padding: 75px 255px; */
+  padding: 5% 10%;
+  background-image: url("../images/events-background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: scroll;
+  /* width: 100vw; */
+  /* height: 100vh; */
+}
+
+.box {
+  min-height: 200px;
+}

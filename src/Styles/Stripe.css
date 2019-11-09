@@ -1,0 +1,17 @@
+a {
+  text-decoration: none;
+}
+​ .checkout {
+  background: #282526;
+  color: #666;
+  padding: 25px;
+  width: 275px;
+  margin: 120 auto;
+  border: 5px white solid;
+  border-radius: 8px;
+  position: absolute;
+  margin-top: 15px;
+  line-height: 1.75em;
+  box-shadow: 0 2px 200px rgba(0, 0, 0, 0.5);
+  opacity: 0.9;
+}

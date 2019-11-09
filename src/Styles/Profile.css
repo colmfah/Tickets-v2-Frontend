@@ -1,0 +1,66 @@
+.background-grid {
+  background-image: url("../images/ferriswheel.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: auto;
+  height: 120vh;
+}
+.user1 {
+  font-family: "Varela Round", sans-serif;
+  height: auto;
+  background-color: #666;
+  border-radius: 7px;
+  color: black;
+  box-shadow: 5px 5px 5px black;
+  min-width: 150px;
+  width: 375px;
+  display: grid;
+  justify-content: center;
+  padding: 25px 10px;
+  overflow: visible;
+  margin: 90px auto;
+  grid-template-columns: 100px auto;
+  grid-template-rows: auto;
+}
+.eventGrid {
+  margin: 8% auto;
+  font-family: "Varela Round", sans-serif;
+  height: auto;
+  background-color: #666;
+  border-radius: 15px;
+  color: black;
+  box-shadow: 5px 5px 5px black;
+  resize: both;
+  min-width: 250px;
+  max-width: 650px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-rows: 350px auto;
+  justify-content: center;
+  overflow: scroll;
+  padding-bottom: 4%;
+}
+.logo-profile {
+  left: -30px;
+}
+.gridLabel {
+  margin: 0.75em;
+}
+.upcomingEvents {
+  max-height: 325px;
+  overflow: scroll;
+  margin: 5%;
+}
+.pastEvents {
+  max-height: 325px;
+  overflow: scroll;
+  margin: 5%;
+}
+.title1 {
+  line-height: 1.5em;
+  color: #282526;
+}
+.logo4 {
+  left: -15px;
+}
