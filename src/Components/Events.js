@@ -4,8 +4,7 @@ import axios from "axios";
 import moment from "moment";
 import Nav from "./Nav";
 import Card from "./Card";
-import "../Styles/Events.css";
-import backgroundEvents from "../images/events-background.jpg";
+
 
 class Events extends React.Component {
   state = {
@@ -33,10 +32,10 @@ class Events extends React.Component {
       <>
         <Nav />
 
-        <div className="cardGrid">
+        <div>
           {this.state.events.map((e, i) => {
             return (
-              <Link to={`/events/${e._id}`} style={{ marginTop: "50px" }}>
+              <Link to={`/events/${e._id}`}>
                 <Card
                   name={e.title}
                   location={e.location}

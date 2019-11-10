@@ -1,12 +1,8 @@
 import React from "react"
 import {Link} from 'react-router-dom'
 import { withRouter } from 'react-router-dom'
-import '../Styles/Nav.css'
 
 class Nav extends React.Component {
-
-
-
 
 
 tokenCheck = () => {
@@ -31,77 +27,35 @@ logout = () => {
     return (
 
 			<nav>
-          <div id="wrapper">
-            <input
-              type="checkbox"
-              id="menu"
-              name="menu"
-              className="menu-checkbox"
-            />
-            <div className="menu">
-              <label className="menu-toggle" htmlFor="menu">
-                <span>Toggle</span>
-              </label>
-              <ul>
-                <li>
-                  <div className="logo-container">
-                    <i className="fas fa-ticket-alt" id="ticket"></i>
-                  </div>
-                </li>
-								<Link to={`/events`} style={{ textDecoration: 'none' }}>
-								<li>
-									<label>Events</label>
-									<input type="checkbox" className="menu-checkbox" />
-								</li>
-								</Link>
+				<Link to={`/events`}>
+					Events
+				</Link>
 
-									{this.tokenCheck() ?
-										<div>
-											<Link to={`/profile`} style={{ textDecoration: 'none' }}>
-											<li>
-												<label>Your Profile</label>
-												<input type="checkbox" className="menu-checkbox" />
-											</li>
-											</Link>
-											<Link to={`/createevent`} style={{ textDecoration: 'none' }}>
-											<li>
-												<label>Create Event</label>
-												<input type="checkbox" className="menu-checkbox" />
-											</li>
-											</Link>
-											<li>
-												<label onClick={this.logout}>Log Out</label>
-												<input type="checkbox" className="menu-checkbox" />
-											</li>
-										</div>
+				{this.tokenCheck() ?
+					<div>
+					<Link to={`/profile`}>
+							Your Profile
+					</Link>
 
-									 :
-									 <div>
-										 <Link to={`/signup`} style={{ textDecoration: 'none' }}>
-										 <li>
-											 <label>Sign Up</label>
-											 <input type="checkbox" className="menu-checkbox" />
-										 </li>
-										 </Link>
-										 <Link to={`/login`} style={{ textDecoration: 'none' }}>
-										 <li>
-											 <label>Login</label>
-											 <input type="checkbox" className="menu-checkbox" />
-										 </li>
-										 </Link>
-									 </div>
-									}
-              </ul>
-            </div>
-            <div className="titlebar">
-              <i className="fas fa-ticket-alt ticketTitle"></i>
-              Eventzilla
-            </div>
-          </div>
+					<Link to={`/createevent`}>
+						Create Event
+					</Link>
+
+					<div onClick={this.logout}>Log Out</div>
+					</div>
+					:
+					<div>
+						<Link to={`/signup`}>
+							Sign Up
+						</Link>
+
+						<Link to={`/login`}>
+							Login
+						</Link>
+					</div>
+				}
       </nav>
-
-
-    );
+    )
   }
 }
 

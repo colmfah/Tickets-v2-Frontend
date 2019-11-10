@@ -1,10 +1,8 @@
 import React from "react";
 import axios from "axios";
-import "../Styles/Form.css";
 import { Link } from "react-router-dom";
 import Nav from "./Nav";
-import "../Styles/Form.css";
-import bground3 from "../images/bground3.jpg";
+
 
 class SignUp extends React.Component {
   state = {
@@ -54,60 +52,30 @@ class SignUp extends React.Component {
   render() {
     return (
       <>
-        <div
-          className="b-ground"
-          style={{
-            backgroundImage: `url(${bground3})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            width: "100%",
-            minHeight: "100vh"
-          }}
-        >
-          <div
-            className="page-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto 1fr "
-            }}
-          >
-            <Nav />
-            <form onSubmit={this.signup}>
-              <div className="content">
-                <h1 className="heading">Sign up to Eventzilla</h1>
-                <div className="group logo3">
-                  <i className="fas fa-ticket-alt logo group logo3 ticket-form"></i>
+      	<Nav />
+					<form onSubmit={this.signup}>
+						<h1>Sign up</h1>
+						{this.state.formFields.map((e, i) => (
+							<div key={i}>
+								<label>{e.label}</label>
+								<input
+									value={this.state.user[e.value]}
+									required
+									onChange={event => this.changeField(event, e.value)}
+									type={e.type}
+									/>
+								</div>
+							))}
 
-                  <div className="form-info">
-                    {this.state.formFields.map((e, i) => (
-                      <div className="group" key={i}>
-                        <label>{e.label}</label>
-                        <input
-                          value={this.state.user[e.value]}
-                          required
-                          onChange={event => this.changeField(event, e.value)}
-                          type={e.type}
-                        />
-                      </div>
-                    ))}
+							<button>Signup</button>
 
-                    <button className="primary group logo3">
-                      <strong>Signup</strong>
-                    </button>
-                  </div>
-
-                  <p className="footer">
-                    {this.state.errorMsg}{" "}
-                    <Link to="/login" style={{ color: "#ef5a00" }}>
+                  <p>
+                    {this.state.errorMsg}
+                    <Link to="/login">
                       Login
                     </Link>
                   </p>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
+				</form>
       </>
     );
   }

@@ -90,10 +90,10 @@ class CheckoutForm extends Component {
 
   render() {
     return (
-      <div className="checkout">
+      <div>
         <p>{this.state.message}</p>
         <CardElement />
-        <button className="primary" onClick={this.submit}>
+        <button onClick={this.submit}>
           Purchase
         </button>
       </div>

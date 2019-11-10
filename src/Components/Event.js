@@ -4,9 +4,7 @@ import moment from "moment";
 import { Elements, StripeProvider } from "react-stripe-elements";
 import CheckoutForm from "./CheckoutForm";
 import Nav from "./Nav";
-import "../Styles/Stripe.css";
-import "../Styles/Event.css";
-import eventImage from "../images/eventImage-default.jpg";
+
 
 class Event extends React.Component {
   state = {
@@ -74,7 +72,6 @@ class Event extends React.Component {
 
 	displaySubTotal = () => {
 		return (this.state.numTicketsSought * this.state.event.price)
-
 	}
 
 	displayAdminFee = () => {
@@ -96,62 +93,28 @@ class Event extends React.Component {
     return (
       <>
         <Nav />
-        <div className="backgroundGrid">
-          <div className="contentGrid">
-            <div
-              className="eventImage"
-              style={{
-                backgroundImage: `url(${this.state.event.imageURL})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                width: "50vw",
-                height: "50vh",
-                minmax: "200px auto"
-              }}
-            ></div>
-
-            <div className="logoBox">
-              <i className="fas fa-ticket-alt"></i>
-            </div>
-            <div className="eventInfo">
               <h3>{this.state.event.organiser.name} Presents:</h3>
-              <h1 className="title">{this.state.event.title}</h1>
+              <h1>{this.state.event.title}</h1>
               <h3>
-                <i
-                  className="far fa-calendar-check"
-                  style={{ color: "#EF5A00" }}
-                ></i>{" "}
                 Date: {moment(this.state.event.startDetails).format("D MMMM")}
               </h3>
               <h3>
-                <i className="fas fa-dollar-sign" style={{ color: "#EF5A00" }}>
-                  {" "}
-                </i>{" "}
                 Price: {this.state.currency[this.state.event.currency]}
                 {this.state.event.price} {this.state.event.currency}
               </h3>
               <h3>
-                <i
-                  className="fas fa-map-marker-alt"
-                  style={{ color: "#EF5A00" }}
-                >
-                  {" "}
-                </i>{" "}
                 Venue: {this.state.event.location}
               </h3>
               <h3>
-                <i className="fas fa-clock" style={{ color: "#EF5A00" }}></i>{" "}
                 Doors: {moment(this.state.event.startDetails).format("HH:mm")}
               </h3>
-            </div>
-            <div className="description">
-              <p>
-                <h3> Description: </h3>
-                {this.state.event.description}
-              </p>
-            </div>
-            <form onSubmit={this.buyTickets} className="buyTix">
+
+
+              <h3> Description: </h3>
+              <p>{this.state.event.description}</p>
+
+
+            <form onSubmit={this.buyTickets}>
               {this.state.formFields.map((e, i) => (
                 <div key={i}>
                   <label>{e.label}</label>
@@ -169,13 +132,12 @@ class Event extends React.Component {
                   />
                 </div>
               ))}
+							
               <div>
                 {`Price: `} {this.state.currency[this.state.event.currency]}{this.displaySubTotal()}
-              </div>
-              <div>
+
                 {`Admin Fee: `}{this.state.currency[this.state.event.currency]}{this.displayAdminFee()}
-              </div>
-              <div>
+
                 {`Total: `}
                 {this.state.currency[this.state.event.currency]}{this.displayTotal()}
               </div>
@@ -184,8 +146,8 @@ class Event extends React.Component {
 
 
               <StripeProvider
-                className="checkout"
-                apiKey="pk_test_RFZrPP1Ez6Bq8WArOADRk3gy0070dfs07P"
+
+                apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
               >
                 <div>
                   <Elements>
@@ -204,9 +166,6 @@ class Event extends React.Component {
               </StripeProvider>
             </form>
 
-            {/*onClick="/CheckoutForm"*/}
-          </div>
-        </div>
       </>
     );
   }

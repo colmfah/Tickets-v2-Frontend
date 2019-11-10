@@ -1,8 +1,6 @@
 import React from "react";
 import axios from "axios";
 import Nav from "./Nav";
-import backgroundDefault from "../images/background-default.jpg";
-import "../Styles/Form.css";
 import { Link } from "react-router-dom";
 
 class LogIn extends React.Component {
@@ -54,63 +52,30 @@ class LogIn extends React.Component {
   render() {
     return (
       <>
-        <div
-          className="b-ground"
-          style={{
-            backgroundImage: `url(${backgroundDefault})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            width: "100%",
-            minHeight: "100vh"
-          }}
-        >
-          <div
-            className="page-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto 1fr "
-            }}
-          >
-            <Nav />
+      	<Nav />
+				<form onSubmit={this.login}>
+					<h1>Login</h1>
 
-            <form onSubmit={this.login}>
-              <div className="content">
-                <h1 className="heading">Login to Eventzilla</h1>
-                <div className="group logo3">
-                  <i className="fas fa-ticket-alt logo group logo3 ticket-form"></i>
+					{this.state.formFields.map((e, i) => (
+            <div key={i}>
+            <label>{e.label}</label>
+            <input
+							value={this.state.user[e.value]}
+							required
+							onChange={event => this.changeField(event, e.value)}
+							type={e.type}
+						/>
+            </div>
+            ))}
 
-                  <div className="form-info">
-                    {this.state.formFields.map((e, i) => (
-                      <div className="group" key={i}>
-                        <label>{e.label}</label>
-                        <input
-                          value={this.state.user[e.value]}
-                          required
-                          onChange={event => this.changeField(event, e.value)}
-                          type={e.type}
-                        />
-                      </div>
-                    ))}
-
-                    <button className="primary group logo3">
-                      <strong>Log In</strong>
-                    </button>
-                  </div>
-
-                  <span>{this.state.errorMsg}</span>
-
-                  <p className="footer">
-                    Don't have an account?{" "}
-                    <Link to="/signup" style={{ color: "#ef5a00" }}>
-                      Sign Up
-                    </Link>
-                  </p>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
+					<button>Log In</button>
+					<span>{this.state.errorMsg}</span>
+					<p>Don't have an account?
+						<Link to="/signup">
+							Sign Up
+						</Link>
+					</p>
+				</form>
       </>
     );
   }

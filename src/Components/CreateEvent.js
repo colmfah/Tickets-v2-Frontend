@@ -5,8 +5,6 @@ import moment from "moment";
 import DatePicker from "react-datepicker";
 import Nav from "./Nav";
 import "react-datepicker/dist/react-datepicker.css";
-import colourfulBground from "../images/colourfulBground.jpg";
-// import "../Styles/Form.css";
 
 class CreateEvent extends React.Component {
   state = {
@@ -120,112 +118,71 @@ class CreateEvent extends React.Component {
   render() {
     return (
       <>
-        <div
-          className="b-ground"
-          style={{
-            backgroundImage: `url(${colourfulBground})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            width: "100%",
-            minHeight: "100vh"
-          }}
-        >
-          <div
-            className="page-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto 1fr "
-            }}
-          >
-            <Nav />
+				<Nav />
+				<form
+					onSubmit={this.createEvent}>
+					<h2>Create Event</h2>
+					<div>
+						{this.state.formFields.map((e, i) => (
+							<div key={i}>
+							<input
+								value={this.state.userEvent[e.value]}
+								required
+								onChange={event => this.changeField(event, e.value)}
+								type={e.type}
+								placeholder={e.label}
+								/>
+							</div>
+							))}
 
-            <form
-              onSubmit={this.createEvent}
-              style={{ fontFamily: "Varela Round" }}
-            >
-              <div className="content">
-                <h2 className="h2">Create Eventzilla Event</h2>
-                <div className="group logo3">
-                  <i className="fas fa-ticket-alt logo group logo3 ticket-form"></i>
+							<select
+								required
+								value={this.state.userEvent.currency}
+								onChange={event => this.changeField(event, "currency")}
+              >
+								<option value="EUR">EUR</option>
+								<option value="USD">USD</option>
+								<option value="NZD">NZD</option>
+							</select>
 
-                  <div className="form-info">
-                    {this.state.formFields.map((e, i) => (
-                      <div className="group2" key={i}>
-                        <input
-                          value={this.state.userEvent[e.value]}
-                          required
-                          onChange={event => this.changeField(event, e.value)}
-                          type={e.type}
-                          placeholder={e.label}
-                          style={{ fontFamily: "Varela Round" }}
-                        />
-                      </div>
-                    ))}
+              <div required>
+								Date & Time Event Starts:
+								<DatePicker
+									timeIntervals={15}
+									selected={this.state.userEvent.startDetails}
+									onChange={event =>
+									this.changeField(event, "startDetails")
+  								}
+									showTimeSelect
+									dateFormat="Pp"
+									required
+								/>
+								</div>
 
-                    <select
-                      className="group2"
-                      required
-                      style={{
-                        textAlign: "left",
-                        backgroundColor: "#888888",
-                        border: "none",
-                        color: "#282526"
-                      }}
-                      value={this.state.userEvent.currency}
-                      onChange={event => this.changeField(event, "currency")}
-                    >
-                      <option value="EUR">EUR</option>
-                      <option value="USD">USD</option>
-                      <option value="NZD">NZD</option>
-                    </select>
-                    <div
-                      required
-                      className="group2"
-                      style={{ color: "#282526" }}
-                    >
-                      Date & Time Event Starts:{" "}
-                      <DatePicker
-                        timeIntervals={15}
-                        selected={this.state.userEvent.startDetails}
-                        onChange={event =>
-                          this.changeField(event, "startDetails")
-                        }
-                        showTimeSelect
-                        dateFormat="Pp"
-                        required
-                      />
-                    </div>
-                    <div className="group2" style={{ color: "#282526" }}>
-                      Date & Time Event Ends:{" "}
-                      <DatePicker
-                        timeIntervals={15}
-                        selected={this.state.userEvent.endDetails}
-                        onChange={event =>
-                          this.changeField(event, "endDetails")
-                        }
-                        showTimeSelect
-                        dateFormat="Pp"
-                        required
-                      />
+								<div>
+									Date & Time Event Ends:
+									<DatePicker
+										timeIntervals={15}
+										selected={this.state.userEvent.endDetails}
+										onChange={event =>
+											this.changeField(event, "endDetails")
+										}
+										showTimeSelect
+										dateFormat="Pp"
+										required
+										/>
                     </div>
                     <input
-                      id="picUpload"
                       type="file"
                       onChange={event => this.changeField(event, "image")}
                     />
-                    <label for="picUpload">Upload an image</label>
+                    Upload an image
 
                     <div>{this.state.errorMsg}</div>
-                    <button className="primary group logo3">
-                      <strong>Create</strong>
-                    </button>
+                    <button>Create</button>
                   </div>
-                </div>
-              </div>
+
             </form>
-          </div>
-        </div>
       </>
     );
   }
