@@ -11,15 +11,32 @@ class CreateEvent extends React.Component {
     formFields: [
       { label: "Title", type: "text", value: "title" },
       { label: "Location", type: "text", value: "location" },
-      { label: "Number of Tickets", type: "number", value: "ticketNo" },
-      { label: "Description", type: "text", value: "description" },
-      { label: "Price", type: "number", value: "price" }
+      { label: "Description", type: "text", value: "description" }
     ],
 
-    eventToSend: {},
+		ticketFields: [
+			{ name: 'Ticket Type', label: "Early Bird, General Admission...", type: "text", value: "ticketType" },
+			{ name: 'Currency', label: "€", type: "text", value: "currency" },
+			{ name: 'Price', label: "15", type: "number", value: "price" },
+			{ name: 'Number of Tickets', label: "100", type: "number", value: "numberOfTickets" },
+			{ name: 'Start Selling Tickets', label: "Now", type: "Date", value: "startSelling" },
+			{ name: 'Number of Tickets', label: "100", type: "number", value: "numberOfTickets" },
+		],
 
-    userEvent: {},
-    errorMsg: ""
+    eventToSend: {},
+    userEvent: {
+			title: "",
+			location: "",
+			ticketNo: "",
+			price: "",
+			description: "",
+			startDetails: "",
+			endDetails: "",
+			organiser: "",
+			currency: "EUR",
+			tickets: []
+		},
+    errorMsg: "",
   };
 
   componentDidMount() {
@@ -38,13 +55,29 @@ class CreateEvent extends React.Component {
         startDetails: "",
         endDetails: "",
         organiser: res.data._id,
-        currency: "EUR"
+        currency: "EUR",
+				tickets: []
       };
       this.setState({
         userEvent: userEvent
       });
     });
   }
+
+	changeTicketDetails = (e, field, ticketNumber) => {
+		console.log('field', field)
+		console.log('ticketNumber', ticketNumber)
+		console.log('Date?', e instanceof Date)
+		let userEvent = this.state.userEvent
+		if(e instanceof Date){
+			userEvent.tickets[ticketNumber][field] = e
+		}else{
+			userEvent.tickets[ticketNumber][field] = e.target.value
+		}
+		this.setState({ userEvent })
+	}
+
+
 
   changeField = (e, field) => {
     let userEvent = this.state.userEvent;
@@ -77,7 +110,27 @@ class CreateEvent extends React.Component {
       userEvent[field] = e.target.value;
     }
     this.setState({ userEvent });
-  };
+  }
+
+
+	addTicket = (e) => {
+		e.preventDefault()
+		let tickets = this.state.userEvent.tickets
+		tickets.push({
+			ticketType: '',
+			price: '',
+			numberOfTickets: '',
+			startSelling: '',
+			stopSelling: ''
+		})
+		this.setState({
+			tickets: tickets
+		})
+	}
+
+
+
+
 
   createEvent = e => {
     e.preventDefault()
@@ -119,10 +172,11 @@ class CreateEvent extends React.Component {
     return (
       <>
 				<Nav />
+				<h1>Event Details</h1>
 				<form
 					onSubmit={this.createEvent}>
-					<h2>Create Event</h2>
-					<div>
+
+					<h2>Event Details</h2>
 						{this.state.formFields.map((e, i) => (
 							<div key={i}>
 							<input
@@ -134,16 +188,6 @@ class CreateEvent extends React.Component {
 								/>
 							</div>
 							))}
-
-							<select
-								required
-								value={this.state.userEvent.currency}
-								onChange={event => this.changeField(event, "currency")}
-              >
-								<option value="EUR">EUR</option>
-								<option value="USD">USD</option>
-								<option value="NZD">NZD</option>
-							</select>
 
               <div required>
 								Date & Time Event Starts:
@@ -178,10 +222,131 @@ class CreateEvent extends React.Component {
                     />
                     Upload an image
 
-                    <div>{this.state.errorMsg}</div>
-                    <button>Create</button>
-                  </div>
+										<select
+											required
+											value={this.state.userEvent.currency}
+											onChange={event => this.changeField(event, "currency")}
+										>
+											<option value="EUR">EUR</option>
+											<option value="USD">USD</option>
+											<option value="NZD">NZD</option>
+										</select>
 
+										<h1>Create Tickets</h1>
+
+										<button onClick={this.addTicket}>Add Ticket</button>
+
+
+										{this.state.userEvent.tickets.map((e, i) => {
+											return (
+												<div key={i}>
+												Ticket Number {i}:
+													<label>
+									          Ticket Type:
+									          <input
+															type="text"
+															value={this.state.userEvent.tickets[i].ticketType}
+															onChange={event => this.changeTicketDetails(event, 'ticketType', i)}
+															placeholder="Early Bird, General Admission..."/>
+									        </label>
+
+
+
+													<label>
+														{`Price (${this.state.userEvent.currency})`}
+														<input
+															type="number"
+															value={this.state.userEvent.tickets[i].price}
+															onChange={event => this.changeTicketDetails(event, 'price', i)}
+															placeholder="10"/>
+													</label>
+
+													<label>
+														Number of Tickets
+														<input
+															type="number"
+															value={this.state.userEvent.tickets[i].numberOfTickets}
+															onChange={event => this.changeTicketDetails(event, 'numberOfTickets', i)}
+															placeholder="100"/>
+													</label>
+
+													<label>
+									          Start Selling Tickets:
+									          <select
+														required value={(this.state.userEvent.tickets[i].startSelling instanceof Date) ? 'specific' : this.state.userEvent.tickets[i].startSelling}onChange={event => this.changeTicketDetails(event, 'startSelling', i)} >
+									            <option value="now">Now</option>
+									            <option value="specific">Specific Date & Time</option>
+									            <option value="whenPreviousSoldOut" disabled={i=0}>When Previous Tickets Are Sold Out</option>
+									          </select>
+									        </label>
+
+
+													{(this.state.userEvent.tickets[i].startSelling == 'specific' || this.state.userEvent.tickets[i].startSelling instanceof Date) &&
+													<label>
+														Start Selling Tickets at:
+														<DatePicker
+															timeIntervals={15}
+															onChange={event => this.changeTicketDetails(event, 'startSelling', i)}
+															selected={(this.state.userEvent.tickets[i].startSelling instanceof Date) ? this.state.userEvent.tickets[i].startSelling : this.state.userEvent.startDetails}
+															showTimeSelect
+															dateFormat="Pp"
+															required
+															/>
+														</label>
+													}
+
+
+													<label>
+														Stop Selling Tickets:
+														<select
+														required value={this.state.userEvent.tickets[i].stopSelling}onChange={event => this.changeTicketDetails(event, 'stopSelling', i)} >
+															<option value="eventBegins">When Event Begins</option>
+															<option value="eventEnds">When Event Ends</option>
+															<option value="specific">At Specific Date and Time</option>
+														</select>
+													</label>
+
+													{(this.state.userEvent.tickets[i].stopSelling == 'specific' || this.state.userEvent.tickets[i].stopSelling instanceof Date) &&
+													<label>
+														Stop Selling Tickets at:
+														<DatePicker
+															timeIntervals={15}
+															onChange={event => this.changeTicketDetails(event, 'stopSelling', i)}
+															selected={(this.state.userEvent.tickets[i].stopSelling instanceof Date) ? this.state.userEvent.tickets[i].stopSelling : this.state.userEvent.startDetails}
+															showTimeSelect
+															dateFormat="Pp"
+															required
+															/>
+														</label>
+													}
+
+													<button>Remove</button>
+													<hr />
+
+												</div>)
+
+										})}
+
+
+										{/*ticketFields: [
+											{ name: 'Ticket Type', label: "Early Bird, General Admission...", type: "text", value: "ticketType" },
+											{ name: 'Currency', label: "€", type: "text", value: "currency" },
+											{ name: 'Price', label: "15", type: "number", value: "price" },
+											{ name: 'Number of Tickets', label: "100", type: "number", value: "numberOfTickets" },
+											{ name: 'Start Selling Tickets', label: "Now", type: "Date", value: "startSelling" },
+											{ name: 'Number of Tickets', label: "100", type: "number", value: "numberOfTickets" },
+										],*/}
+
+										<h1>Refund Policy</h1>
+
+
+
+
+
+
+
+                    <div>{this.state.errorMsg}</div>
+                    <button>Publish</button>
             </form>
       </>
     );

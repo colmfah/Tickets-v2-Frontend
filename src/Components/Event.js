@@ -21,7 +21,10 @@ class Event extends React.Component {
       endDetails: {},
       organiser: {
         _id: "",
-        name: ""
+        name: "",
+				fixedCharge: 0,
+				variableCharge: 0,
+				lowFixedCharge: 0
       },
       currency: "",
       ticketsRemaining: 0,
@@ -75,18 +78,23 @@ class Event extends React.Component {
 	}
 
 	displayAdminFee = () => {
-		return           (
-                  0.69 +
-                  0.055 * this.state.numTicketsSought * this.state.event.price
-                ).toFixed(2)
+
+		if(this.state.event.price <= 10){
+			return (this.state.event.organiser.lowFixedCharge * 1.23).toFixed(2)
+		} else {
+			return           (
+										((this.state.event.organiser.fixedCharge * this.state.numTicketsSought) +
+										(this.state.event.organiser.variableCharge * this.state.numTicketsSought * this.state.event.price))*1.23
+									).toFixed(2)
+		}
+
+
 	}
 
 	displayTotal = () => {
 		return (
-			this.state.numTicketsSought * this.state.event.price +
-			0.69 +
-			0.055 * this.state.numTicketsSought * this.state.event.price
-		).toFixed(2)
+			Number(this.displaySubTotal()) + Number(this.displayAdminFee())
+		)
 	}
 
   render() {
@@ -132,7 +140,7 @@ class Event extends React.Component {
                   />
                 </div>
               ))}
-							
+
               <div>
                 {`Price: `} {this.state.currency[this.state.event.currency]}{this.displaySubTotal()}
 
