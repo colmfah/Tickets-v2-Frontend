@@ -20,12 +20,17 @@ class CreateEvent extends React.Component {
 
   state = {
 		showMap: false,
-		currencySymbols: {
+		currencyOptions: {
 			'EUR': '€',
-			'GBP': '£'
+			'GBP': '£',
+			dublin: 'EUR',
+			cork: 'EUR',
+			belfast : 'GBP',
+			london: 'GBP',
+			other: 'EUR'
 		},
     userEvent: {
-			region: '',
+			region: 'dublin',
 			lat: 53.34723555464459,
 			lng: -6.258907671241786,
 			title: "",
@@ -43,20 +48,24 @@ class CreateEvent extends React.Component {
 			globalRefundPolicy: true,
 			globalRefundOptions: {}
 		},
-		errors: {event:{
+		errors: {
 			startDateInPast: false,
 			endDateInPast: false,
 			eventEndsBeforeItBegins: false,
-		}
+			startSellingAfterEventBegins: false,
+			sellingTicketsWhenEventIsOver: false,
+			sellingStopsBeforeStarts: false
 	},
-    errorMsg: {event: {
-			startDateInPast: 'Event must begin in the future!',
-			endDateInPast: 'Event must end in the future!',
-			eventEndsBeforeItBegins: 'Event must start before it ends!'
+    errorMsg: {
+			startDateInPast: 'Event must begin in the future',
+			endDateInPast: 'Event must end in the future',
+			eventEndsBeforeItBegins: 'Event must start before it ends!',
+			startSellingAfterEventBegins: 'You must start selling tickets before the event begins',
+			sellingTicketsWhenEventIsOver: 'You cannot sell tickets after the event has ended',
+			sellingStopsBeforeStarts: 'You cannot stop selling tickets before you have started selling them'
+		},
+		onBlurFired: 0
 		}
-	}
-  }
-
 
 
 
@@ -70,25 +79,51 @@ class CreateEvent extends React.Component {
     axios.post(`${process.env.REACT_APP_API}/auth`, objectToSend).then(res => {
 			let userEvent = this.state.userEvent
 			userEvent.organiser = res.data._id
+			userEvent.globalRefundOptions=this.generateRefundPolicyOptions()
 			this.setState({ userEvent })
     })
-
 		this.addTicket('not relevant', false)
-		let userEvent = this.state.userEvent
-		userEvent.globalRefundOptions=this.generateRefundPolicyOptions()
   }
 
-	isTimeInPast = (e, field) => {
-		console.log('e', e)
+
+
+	errorIfSecondTimeIsAfterFirstTime = (firstTime, secondTime, field) => {
 		console.log('field', field)
+		console.log('firstTime', moment(Date.parse(firstTime)).format('DDMMYY HH:mm'))
+		console.log('secondTime', moment(Date.parse(secondTime)).format('DDMMYY HH:mm'))
 		let errors = this.state.errors
-		if (moment().isAfter(e)) {
+		let onBlurFired = this.state.onBlurFired
+		onBlurFired += 1
+		console.log('ONBLURFIRED', onBlurFired)
+		if(Date.parse(firstTime) < Date.parse(secondTime)){
 			errors[field] = true
-		} else {
+			console.log('second time is after first time - error')
+		}  else{
 			errors[field] = false
+			console.log('second timeisnot after first time - no error')
+			console.log('-------------------')
 		}
-		this.setState({ errors })
+		this.setState({ onBlurFired, errors })
 	}
+
+
+
+	changeRegion = (e) => {
+		e.preventDefault()
+		let userEvent = this.state.userEvent
+		let currencyOptions=this.state.currencyOptions
+			console.log(e.target.value)
+			userEvent.region=e.target.value
+			userEvent.currency=currencyOptions[e.target.value]
+
+			this.setState({ userEvent })
+
+	}
+
+
+
+
+
 
 	changeTicketDetails = (e, field, ticketNumber) => {
 		let userEvent = this.state.userEvent
@@ -146,16 +181,10 @@ class CreateEvent extends React.Component {
         eventToSend: data
       });
     } else if (field === "startDetails" || field === "endDetails") {
- 		if (
-        field === "endDetails" &&
-        moment(e).isBefore(this.state.startDetails)
-      ) {
-        this.setState({
-          errorMsg: "Event must end after it starts!"
-        });
-      } else {
+
+
         userEvent[field] = e;
-      }
+
     } else {
       userEvent[field] = e.target.value;
     }
@@ -180,6 +209,8 @@ class CreateEvent extends React.Component {
 			numberOfTickets: '',
 			startSelling: '',
 			stopSelling: '',
+			startSellingTime: '',
+			stopSellingTime: '',
 			ticketDescription: '',
 			refunds: this.generateRefundPolicyOptions()
 		})
@@ -226,12 +257,13 @@ class CreateEvent extends React.Component {
 		e.preventDefault()
 		let userEvent = this.state.userEvent
 		let showMap = this.state.showMap
+		showMap = true
 		Geocode.fromAddress(`${userEvent.venue}, ${userEvent.address1}, ${userEvent.address2}, ${userEvent.address3}, ${userEvent.address4}`).then(
   	response => {
     const { lat, lng } = response.results[0].geometry.location;
     userEvent.lat = lat
 		userEvent.lng = lng
-		this.setState({ userEvent })
+		this.setState({ showMap, userEvent })
   },
   error => {
     console.error(error)
@@ -298,14 +330,14 @@ class CreateEvent extends React.Component {
 				Select Region to post event
 				<select
 					required
-					value={this.state.userEvent.currency}
-					onChange={event => this.changeField(event, 'region')}
+					value={this.state.userEvent.region}
+					onChange={event=>this.changeRegion(event)}
 				>
-					<option value="Dublin">Dublin</option>
-					<option value="Cork">Cork</option>
-					<option value="Belfast">Belfast</option>
-					<option value="London">London</option>
-					<option value="Other">Other</option>
+					<option value="dublin">Dublin</option>
+					<option value="cork">Cork</option>
+					<option value="belfast">Belfast</option>
+					<option value="london">London</option>
+					<option value="other">Other</option>
 				</select>
 				</div>
 
@@ -362,6 +394,9 @@ class CreateEvent extends React.Component {
 					/>
 				</div>
 
+
+				{this.state.showMap === true &&
+					<div>
 					<Map
 							 google={this.props.google}
 							 center={{lat: this.state.userEvent.lat, lng: this.state.userEvent.lng}}
@@ -369,6 +404,9 @@ class CreateEvent extends React.Component {
 							 zoom={15}
 							 getLatLngAfterDrag={this.getLatLngAfterDrag}
 							/>
+					</div>
+				}
+
 
 
 
@@ -379,7 +417,7 @@ class CreateEvent extends React.Component {
 						onChange={event =>
 						this.changeField(event, "startDetails")
 						}
-						onBlur={event => this.isTimeInPast(event, 'startDateInPast')}
+						onBlur={event => this.errorIfSecondTimeIsAfterFirstTime(event.target.value, moment(), 'startDateInPast')}
 						showTimeSelect
 						dateFormat="Pp"
 						required
@@ -387,7 +425,7 @@ class CreateEvent extends React.Component {
 					/>
 					</div>
 
-					{this.state.errors.startDateInPast == true && <div>{this.state.errorMsg.event.startDateInPast}</div>}
+					{this.state.errors.startDateInPast === true && <div className='warning'>{this.state.errorMsg.startDateInPast}</div>}
 
 					<div>
 						<DatePicker
@@ -396,29 +434,38 @@ class CreateEvent extends React.Component {
 							onChange={event =>
 								this.changeField(event, "endDetails")
 							}
+							onBlur={(event) => {this.errorIfSecondTimeIsAfterFirstTime(event.target.value, moment(), 'endDateInPast'); this.errorIfSecondTimeIsAfterFirstTime(event.target.value, this.state.userEvent.startDetails, 'eventEndsBeforeItBegins')}}
 							showTimeSelect
 							dateFormat="Pp"
 							required
 							placeholderText='Date & Time Event Ends'
 							/>
               </div>
+
+
+							{this.state.errors.endDateInPast === true && <div className='warning'>{this.state.errorMsg.endDateInPast}</div>}
+
+							{this.state.errors.eventEndsBeforeItBegins === true && <div className='warning'>{this.state.errorMsg.eventEndsBeforeItBegins}</div>}
+
+
 							Upload an image
               <input
                 type="file"
                 onChange={event => this.changeField(event, "image")}
               />
 
-							<div>
-							Select currency to charge in
-							<select
-								required
-								value={this.state.userEvent.currency}
-								onChange={event => this.changeField(event, "currency")}
-							>
-								<option value="EUR">EUR</option>
-								<option value="GBP">GBP</option>
-							</select>
-							</div>
+							{this.state.userEvent.region === 'other' && <div>
+								Currency:
+								<select
+									required
+									value={this.state.userEvent.currency}
+									onChange={event => this.changeField(event, "currency")}
+								>
+									<option value="EUR">EUR</option>
+									<option value="GBP">GBP</option>
+								</select>
+								</div>}
+
 
 							<h1>Create Tickets</h1>
 
@@ -454,7 +501,7 @@ class CreateEvent extends React.Component {
 
 										<div>
 										<label>
-											{`Price: ${this.state.currencySymbols[this.state.userEvent.currency]}`}
+											{`Price: ${this.state.currencyOptions[this.state.userEvent.currency]}`}
 											<input
 												required
 												type="number"
@@ -490,15 +537,15 @@ class CreateEvent extends React.Component {
 										</div>
 
 
-										{(this.state.userEvent.tickets[i].startSelling == 'specific' || this.state.userEvent.tickets[i].startSelling instanceof Date) &&
+										{this.state.userEvent.tickets[i].startSelling == 'specific' &&
 										<div>
 										<label>
-											Start Selling Tickets at:
 											<DatePicker
 												timeIntervals={15}
-												onChange={event => this.changeTicketDetails(event, 'startSelling', i)}
-												selected={(this.state.userEvent.tickets[i].startSelling instanceof Date) ? this.state.userEvent.tickets[i].startSelling : ''}
-												placeholderText='Select Date'
+												onChange={event => this.changeTicketDetails(event, 'startSellingTime', i)}
+												onBlur={event => this.errorIfSecondTimeIsAfterFirstTime(this.state.userEvent.startDetails, event.target.value, 'startSellingAfterEventBegins')}
+												selected={this.state.userEvent.tickets[i].startSellingTime}
+												placeholderText='Select Date & Time'
 												showTimeSelect
 												dateFormat="Pp"
 												required
@@ -507,44 +554,59 @@ class CreateEvent extends React.Component {
 											</div>
 										}
 
-										<div>
-										<label>
-											Stop Selling Tickets:
-											<select
-											required value={this.state.userEvent.tickets[i].stopSelling}onChange={event => this.changeTicketDetails(event, 'stopSelling', i)} >
-												<option value="eventBegins">When Event Begins</option>
-												<option value="eventEnds">When Event Ends</option>
-												<option value="specific">At Specific Date and Time</option>
-											</select>
-										</label>
-										</div>
+						{this.state.errors.startSellingAfterEventBegins === true && <div className='warning'>{this.state.errorMsg.startSellingAfterEventBegins}</div>}
 
-										{(this.state.userEvent.tickets[i].stopSelling == 'specific' || this.state.userEvent.tickets[i].stopSelling instanceof Date) &&
-										<div>
-										<label>
-											Stop Selling Tickets at:
-											<DatePicker
-												timeIntervals={15}
-												onChange={event => this.changeTicketDetails(event, 'stopSelling', i)}
-												selected={(this.state.userEvent.tickets[i].stopSelling instanceof Date) ? this.state.userEvent.tickets[i].stopSelling : this.state.userEvent.startDetails}
-												placeholderText='Select Date'
-												showTimeSelect
-												dateFormat="Pp"
-												required
-												/>
-											</label>
-											</div>
-										}
+{/*
+onBlur={(event) => {this.errorIfSecondTimeIsAfterFirstTime(event.target.value, moment(), 'endDateInPast'); this.errorIfSecondTimeIsAfterFirstTime(event.target.value, this.state.userEvent.startDetails, 'eventEndsBeforeItBegins')}}
+
+
+
+	onBlur={(event) => {this.errorIfSecondTimeIsAfterFirstTime(this.state.userEvent.endDetails, event.target.value, 'sellingTicketsWhenEventIsOver'); this.errorIfSecondTimeIsAfterFirstTime(event.target.value, this.state.userEvent.startDetails, 'sellingStopsBeforeStarts')}}
+
+	*/}
+
+
+
+<div>
+<label>
+Stop Selling Tickets:
+<select
+required value={this.state.userEvent.tickets[i].stopSelling}
+onChange={event => this.changeTicketDetails(event, 'stopSelling', i)}
+>
+<option value="eventBegins">When Event Begins</option>
+<option value="eventEnds">When Event Ends</option>
+<option value="specific">At Specific Date and Time</option>
+</select>
+</label>
+</div>
+
+{this.state.userEvent.tickets[i].stopSelling == 'specific'  &&
+<div>
+<label>
+<DatePicker
+timeIntervals={15}
+onChange={event => this.changeTicketDetails(event, 'stopSellingTime', i)}
+onBlur={(event) => {this.errorIfSecondTimeIsAfterFirstTime(this.state.userEvent.endDetails, event.target.value, 'sellingTicketsWhenEventIsOver'); this.errorIfSecondTimeIsAfterFirstTime(event.target.value, this.state.userEvent.startDetails, 'sellingStopsBeforeStarts')}}
+selected={this.state.userEvent.tickets[i].stopSellingTime}
+placeholderText='Select Date & Time'
+showTimeSelect
+dateFormat="Pp"
+required
+/>
+</label>
+</div>
+}
+
+								{this.state.errors.sellingTicketsWhenEventIsOver === true && <div className='warning'>{this.state.errorMsg.sellingTicketsWhenEventIsOver}</div>}
+
+								{this.state.errors.sellingStopsBeforeStarts === true && <div className='warning'>{this.state.errorMsg.sellingStopsBeforeStarts}</div>}
 
 
 										{this.state.userEvent.tickets.length > 1 &&
 											<button onClick={event => this.deleteTicket(event, i)}>Delete Ticket</button>}
-
-
 										<hr />
-
 									</div>)
-
 							})}
 
 							<button onClick={(e) => this.addTicket(e, true)}>Create Another Ticket</button>
@@ -581,7 +643,7 @@ class CreateEvent extends React.Component {
 			ticketName={'Refunded Tickets'}
 			minimumPrice={this.state.userEvent.tickets.minimumPrice}
 			highestPricedTicket={this.highestPricedTicket()}
-			currencySymbol={this.state.currencySymbols[this.state.userEvent.currency]}
+			currencySymbol={this.state.currencyOptions[this.state.userEvent.currency]}
 			nameOfResoldTickets={this.state.userEvent.globalRefundOptions.nameOfResoldTickets}
 			originalNames={`Use Original Names - ${this.getTicketNames()[0]}, ${this.getTicketNames()[1]} etc. `}
 			numberOfTickets={this.state.userEvent.tickets.length}
@@ -600,7 +662,7 @@ class CreateEvent extends React.Component {
 				textForAuctionAndSpecific={'The original price was'}
 				minimumPrice={e.minimumPrice}
 				highestPricedTicket={e.price}
-				currencySymbol={this.state.currencySymbols[this.state.userEvent.currency]}
+				currencySymbol={this.state.currencyOptions[this.state.userEvent.currency]}
 				nameOfResoldTickets={this.state.userEvent.tickets[i].refunds.nameOfResoldTickets}
 				originalNames={`Use Original Name - ${e.ticketType}`}
 				numberOfTickets={this.state.userEvent.tickets.length}
