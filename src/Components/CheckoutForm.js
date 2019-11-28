@@ -10,23 +10,24 @@ class CheckoutForm extends Component {
 
   state = {
     message: "Would you like to complete the purchase?"
-  };
+  }
+
 
   submit = e => {
     e.preventDefault();
     if (this.props.purchaser === "") {
       this.setState({
         message: "You must log in to purchase tickets"
-      });
+      })
     } else {
       this.setState({
-        message: `Checking if ${this.props.numTicketsSought} tickets are still available`
+        message: `Checking if tickets are still available`
       });
 
       let checkForTicketsObject = {
-        event: this.props.event,
+        userEvent: this.props.userEvent,
         numTicketsSought: this.props.numTicketsSought
-      };
+      }
 
       axios
         .post(
@@ -52,7 +53,8 @@ class CheckoutForm extends Component {
                 let objectToSend = {
                   amount: this.props.total,
                   currency: this.props.currency,
-                  description: this.props.description,
+                  eventTitle: this.props.eventTitle,
+									// changed from description to eventTitle - change at backend
                   source: res.token.id
                 };
 
@@ -66,7 +68,8 @@ class CheckoutForm extends Component {
 
                     let objectToSend = {
                       purchaser: this.props.purchaser,
-                      event: this.props.event,
+                      userEvent: this.props.userEvent,
+											// changed from event to userEvent - change at backend
                       numTicketsSought: this.props.numTicketsSought
                     };
 
