@@ -37,6 +37,7 @@ class Event extends React.Component {
 			currency: "EUR",
 			tickets: [{
 				ticketType: '',
+				ticketTypeID: '',
 				price: '',
 				numberOfTickets: '',
 				sellWhenPrevSoldOut: '',
@@ -141,7 +142,7 @@ class Event extends React.Component {
 
   changeNumTickets = (e, i) => {
 		let userEvent = this.state.userEvent
-		userEvent.tickets[i].buy.numTicketsSought = e.target.value
+		userEvent.tickets[i].buy.numTicketsSought = Number(e.target.value)
     this.setState({
       userEvent: userEvent
     })
@@ -201,7 +202,7 @@ return(
 												value={e.buy.numTicketsSought}
 												required
 												onChange={(event) => {this.changeNumTickets(event, i); this.calculateTotals()}}
-												type='number'
+												type="number"
 												min={0}
 												max={10}
 												// change to take account of when there are less tickets
@@ -243,9 +244,10 @@ return(
 								currency={this.state.userEvent.currency}
 								eventTitle={this.state.userEvent.title}
 								purchaser={this.state.purchaser}
-								userEvent={this.state.userEvent._id}
+								userEvent={this.state.userEvent}
 								numTicketsSought={this.state.userEvent.tickets.filter( e => {return e.buy.numTicketsSought > 0}).map(	e => {return ({
 									ticketType: e.ticketType,
+									ticketTypeID: e.ticketTypeID,
 									numTicketsSought: e.buy.numTicketsSought
 								})
 							}	)}

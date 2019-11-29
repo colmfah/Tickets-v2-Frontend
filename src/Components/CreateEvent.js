@@ -45,8 +45,10 @@ class CreateEvent extends React.Component {
 			endDetails: "",
 			organiser: "",
 			currency: "EUR",
+			totalTicketsCreated: 1,
 			tickets: [{
 				ticketType: '',
+				ticketTypeID: 1,
 				price: '',
 				numberOfTickets: '',
 				sellWhenPrevSoldOut: false,
@@ -269,6 +271,7 @@ class CreateEvent extends React.Component {
 		let userEvent = this.state.userEvent
 		userEvent.tickets.push({
 			ticketType: '',
+			ticketTypeID: userEvent.totalTicketsCreated + 1,
 			price: '',
 			numberOfTickets: '',
 			sellWhenPrevSoldOut: false,
@@ -285,6 +288,7 @@ class CreateEvent extends React.Component {
 							nameOfResoldTickets: 'lastMinuteTickets'}
 		}
 		)
+		userEvent.totalTicketsCreated += 1
 		this.setState({ userEvent })
 	}
 

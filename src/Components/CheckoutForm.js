@@ -25,7 +25,7 @@ class CheckoutForm extends Component {
       });
 
       let checkForTicketsObject = {
-        userEvent: this.props.userEvent,
+        userEvent: this.props.userEvent._id,
         numTicketsSought: this.props.numTicketsSought
       }
 
@@ -41,40 +41,37 @@ class CheckoutForm extends Component {
           if (!res.data.insufficientTickets) {
             this.setState({
               message: "Processing Payment. Please Wait...."
-            });
-
+            })
             this.props.stripe.createToken({}).then(res => {
               if (!res.token) {
                 this.setState({
                   message:
-                    "Invalid Credit Card. Your tickets have not been booked. You have not been charged."
-                });
+                    "Invalid Credit Card. Your tickets have not been booked. You have not been charged"
+                })
               } else {
-                let objectToSend = {
+                let stripeData = {
                   amount: this.props.total,
                   currency: this.props.currency,
-                  eventTitle: this.props.eventTitle,
-									// changed from description to eventTitle - change at backend
+                  description: this.props.eventTitle,
                   source: res.token.id
-                };
+                }
 
                 axios
-                  .post(`${process.env.REACT_APP_API}/pay`, objectToSend)
+                  .post(`${process.env.REACT_APP_API}/pay`, stripeData)
                   .then(res => {
                     this.setState({
                       message:
                         "Payment Successful. Your tickets will be emailed in the next few minutes"
-                    });
+                    })
 
-                    let objectToSend = {
+                    let createTicketData = {
                       purchaser: this.props.purchaser,
                       userEvent: this.props.userEvent,
-											// changed from event to userEvent - change at backend
                       numTicketsSought: this.props.numTicketsSought
                     };
 
                     axios
-                      .post(`${process.env.REACT_APP_API}/ticket`, objectToSend)
+                      .post(`${process.env.REACT_APP_API}/ticket`, createTicketData)
                       .then()
                       .catch(err => console.log(err));
                   })
