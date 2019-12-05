@@ -100,6 +100,30 @@ class Event extends React.Component {
     }
   }
 
+	relevantPrevTicketSoldOut = () => {
+		let userEvent = this.state.userEvent
+
+		userEvent.tickets.filter(	(e,i) => {return(
+
+			userEvent.tickets.forEach(f => {
+				if(e.sellWhenTicketNumberSoldOut === f.ticketTypeID && f.ticketsAvailable < 1){
+
+				}
+			})
+
+		)})
+
+	}
+
+
+
+
+	return5 = () =>{
+		return 5
+	}
+
+
+
 	calculateTotals = () => {
 			let subTotal = 0
 			let fixedCharge = 0
@@ -164,6 +188,7 @@ return(
     return (
       <>
         <Nav />
+				<button onClick={this.relevantPrevTicketSoldOut}>Do Test</button>
               <h3>{this.state.userEvent.organiser.name} Presents:</h3>
               <h1>{this.state.userEvent.title}</h1>
               <h3>
@@ -185,28 +210,39 @@ return(
 
 							<h4>Purchase Tickets</h4>
 
-							{this.state.userEvent.tickets.filter(	(e,i) => {return(
-								// need condition for if prevTicketsSoldOut selected
-								moment(e.startSellingTime).isSameOrBefore(moment())
-								 && moment(e.stopSellingTime).isAfter(moment())
-							 )
 
-								}).map(	(e,i) => {return (
-								<div key={i}>
-									<h5>{e.ticketType}</h5>
-									<div>{e.ticketDescription}</div>
-									<div>{this.state.userEvent.currency}{e.price}</div>
-									<div>
-											<label>How Many Tickets?</label>
-											<input
-												value={e.buy.numTicketsSought}
-												required
-												onChange={(event) => {this.changeNumTickets(event, i); this.calculateTotals()}}
-												type="number"
-												min={0}
-												max={10}
-												// change to take account of when there are less tickets
-											/>
+<button onClick={this.relevantPrevTicketSoldOut}>Do Test</button>
+<div>{this.relevantPrevTicketSoldOut()}</div>
+
+
+
+			{this.state.userEvent.tickets.filter(	e => {return(
+				(moment(e.startSellingTime).isSameOrBefore(moment())
+				 && moment(e.stopSellingTime).isAfter(moment()))||
+				e.sellWhenPrevSoldOut && this.state.userEvent.tickets.find(f => {
+					if(e.sellWhenTicketNumberSoldOut === f.ticketTypeID && f.ticketsAvailable < 1){
+						return true
+					}
+				} ))}).map(	(e,i) => {return (
+				<div key={i}>
+					<h5>{e.ticketType}</h5>
+					<div>{e.ticketDescription}</div>
+					<div>{this.state.userEvent.currency}{e.price}</div>
+					<div>
+
+			{e.ticketsAvailable < 1 ? <div>Sold Out</div> : <div>
+						<label>How Many Tickets?</label>
+						<input
+							value={e.buy.numTicketsSought}
+							required
+							onChange={(event) => {this.changeNumTickets(event, i); this.calculateTotals()}}
+							type="number"
+							min={0}
+							max={10}
+							// change to take account of when there are less tickets
+						/>
+						</div>}
+
 									</div>
 									<hr />
 								</div>
@@ -255,60 +291,6 @@ return(
 						</Elements>
 					</div>
 				</StripeProvider>
-
-
-{/*
-            <form onSubmit={this.buyTickets}>
-              {this.state.formFields.map((e, i) => (
-                <div key={i}>
-                  <label>{e.label}</label>
-                  <input
-                    value={this.state.numTicketsSought}
-                    required
-                    onChange={this.changeNumTickets}
-                    type={e.type}
-                    min={1}
-                    max={
-                      this.state.event.ticketsRemaining < 10
-                        ? this.state.event.ticketsRemaining
-                        : 10
-                    }
-                  />
-                </div>
-              ))}
-
-              <div>
-                {`Price: `} {this.state.currency[this.state.event.currency]}{this.displaySubTotal()}
-
-                {`Admin Fee: `}{this.state.currency[this.state.event.currency]}{this.displayAdminFee()}
-
-                {`Total: `}
-                {this.state.currency[this.state.event.currency]}{this.displayTotal()}
-              </div>
-
-              <p>{this.state.errorMsg}</p>
-
-
-              <StripeProvider
-
-                apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
-              >
-                <div>
-                  <Elements>
-                    <CheckoutForm
-                      total={
-                        this.displayTotal()
-                      }
-                      currency={this.state.event.currency}
-                      description={this.state.event.title}
-                      purchaser={this.state.purchaser}
-                      event={this.state.event._id}
-                      numTicketsSought={this.state.numTicketsSought}
-                    />
-                  </Elements>
-                </div>
-              </StripeProvider>
-            </form>*/}
 
       </>
     );

@@ -51,7 +51,6 @@ class CreateEvent extends React.Component {
 				ticketTypeID: 1,
 				price: '',
 				numberOfTickets: '',
-				sellWhenPrevSoldOut: false,
 				startSelling: 'now',
 				stopSelling: 'eventEnds',
 				startSellingTime: Date.now(),
@@ -78,14 +77,15 @@ class CreateEvent extends React.Component {
 			eventEndsBeforeItBegins: false,
 			startSellingAfterEventBegins: false,
 			sellingTicketsWhenEventIsOver: false,
-			sellingStopsBeforeStarts: false
+			sellingStopsBeforeStarts: false,
 	},
     errorMsg: {
 			startDateInPast: 'Event must begin in the future',
 			eventEndsBeforeItBegins: 'Event must end after it starts',
 			startSellingAfterEventBegins: 'You must start selling tickets before the event begins',
 			sellingTicketsWhenEventIsOver: 'You cannot sell tickets after the event has ended',
-			sellingStopsBeforeStarts: 'You cannot stop selling tickets before you have started selling them'
+			sellingStopsBeforeStarts: 'You cannot stop selling tickets before you have started selling them',
+			waitingForTicketThatDoesntExistToSellOut: 'The ticket you have selected no longer exists'
 		},
 		onBlurFired: 0
 		}
@@ -105,6 +105,38 @@ class CreateEvent extends React.Component {
 			this.setState({ userEvent })
     })
   }
+
+validTicketCheck = (e, i) => {
+	let userEvent = this.state.userEvent
+	console.log('e.target.value', e.target.value)
+	console.log('i', i)
+	if(e.target.value !== ''){
+		userEvent.tickets[i].waitingForTicketThatDoesntExistToSellOut = false
+	}
+	this.setState({ userEvent })
+}
+
+
+	waitingForTicketThatDoesntExistToSellOut = (e) => {
+		let userEvent = this.state.userEvent
+		let validTicketTypeIDs = this.state.userEvent.tickets.map(e=>e.ticketTypeID)
+		console.log('validTicketTypeIDs', validTicketTypeIDs)
+		let ticketsWaitingOnSellOut = userEvent.tickets.filter(e=>{return e.sellWhenPrevSoldOut === true})
+		console.log('ticketsWaitingOnSellOut', ticketsWaitingOnSellOut)
+
+		let numProblemTickets = ticketsWaitingOnSellOut.filter(e => {if(!validTicketTypeIDs.includes(Number(e.sellWhenTicketNumberSoldOut))){return e}} )
+
+		let numProblemTicketsArray = numProblemTickets.map(e => e.ticketTypeID)
+
+		if(numProblemTickets.length > 0){
+			userEvent.tickets.forEach( e => {if(numProblemTicketsArray.includes(Number(e.ticketTypeID))){
+				e.waitingForTicketThatDoesntExistToSellOut = true
+			}
+			})
+			this.setState({ userEvent})
+		}
+	}
+
 
 
 	createEvent = e => {
@@ -275,6 +307,7 @@ class CreateEvent extends React.Component {
 			price: '',
 			numberOfTickets: '',
 			sellWhenPrevSoldOut: false,
+			sellWhenTicketNumberSoldOut: '',
 			startSelling: 'now',
 			stopSelling: 'eventEnds',
 			startSellingTime: Date.now(),
@@ -571,18 +604,45 @@ class CreateEvent extends React.Component {
 										</div>
 
 										<div>
-										<label>
-						          Start Selling Tickets:
+											<label>
+							          Start Selling Tickets:
+											</label>
 						          <select
 											required value={this.state.userEvent.tickets[i].startSelling}
 											onChange={event => this.changeSellingTimes(event, 'startSelling', i, 'startSellingTime')}
 											 >
 						            <option value="now">Now</option>
 						            <option value="specific">Specific Date & Time</option>
-						            <option value="whenPreviousSoldOut" disabled={i==0}>When Previous Tickets Are Sold Out</option>
+						            <option value="whenPreviousSoldOut" disabled={i==0}>When A Previous Ticket Is Sold Out</option>
 						          </select>
-						        </label>
+
 										</div>
+
+										{this.state.userEvent.tickets[i].startSelling == 'whenPreviousSoldOut' &&
+										<div>
+											<label>
+												When Which Ticket is sold out?
+											</label>
+											<select
+											required
+											value={this.state.userEvent.tickets[i].sellWhenTicketNumberSoldOut}
+											onChange={(event) => {this.changeTicketDetails(event, 'sellWhenTicketNumberSoldOut', i); this.validTicketCheck(event, i)}}
+											>
+
+											<option value=''>select ticket</option>
+											{this.state.userEvent.tickets.filter((e, ind) => ind<i).map(	(e, index) => {return (
+												<option key={index} value={e.ticketTypeID}>
+													{e.ticketType}
+												</option>)
+											}	)}
+											</select>
+
+											{this.state.userEvent.tickets[i].waitingForTicketThatDoesntExistToSellOut === true &&
+												<div className='error'>
+													Please select a valid ticket
+												</div>}
+
+										</div>}
 
 
 										{this.state.userEvent.tickets[i].startSelling == 'specific' &&
@@ -601,6 +661,8 @@ class CreateEvent extends React.Component {
 											</label>
 											</div>
 										}
+
+
 
 						{this.state.errors.startSellingAfterEventBegins === true && this.state.userEvent.tickets[i].startSelling === 'specific' && <div className='warning'>{this.state.errorMsg.startSellingAfterEventBegins}</div>}
 
@@ -643,12 +705,13 @@ required
 
 
 										{this.state.userEvent.tickets.length > 1 &&
-											<button onClick={event => this.deleteTicket(event, i)}>Delete Ticket</button>}
+											<button onClick={(event )=> {this.deleteTicket(event, i); this.waitingForTicketThatDoesntExistToSellOut()} }>Delete Ticket</button>}
 										<hr />
 									</div>)
 							})}
 
 							<button onClick={(e) => this.addTicket(e, true)}>Create Another Ticket</button>
+
 
 
 		<h1>Refund Policy</h1>
