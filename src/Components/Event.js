@@ -75,6 +75,9 @@ class Event extends React.Component {
   };
 
   componentDidMount() {
+
+		console.log('this.props', this.props)
+
     axios
       .get(`${process.env.REACT_APP_API}/event/${this.props.match.params.id}`)
       .then(res => {

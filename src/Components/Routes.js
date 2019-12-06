@@ -7,6 +7,7 @@ import Events from './Events'
 import Event from './Event'
 import Profile from './Profile'
 import ShowQRCode from './QRCode'
+import StripeConnectSignUp from './StripeConnectSignUp'
 
 class Routes extends React.Component {
 
@@ -35,12 +36,14 @@ class Routes extends React.Component {
 					<Route path='/profile' render={ () => this.tokenCheck() ? <Profile /> : <Redirect to="/login" /> }/>
 					<Route path='/qr/:id' component={ShowQRCode} />
 					<Route path='/signup' component={SignUp} />
+					<Route path='/stripeConnectSignUp' render={ () => this.tokenCheck() ? <StripeConnectSignUp /> : <Redirect to="/login" /> }/>
 					<Route path='/' component={Events} />
 				</Switch>
 			</BrowserRouter>
 		)
 }
 }
+
 
 
 

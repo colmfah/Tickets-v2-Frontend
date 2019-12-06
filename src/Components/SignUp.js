@@ -17,7 +17,8 @@ class SignUp extends React.Component {
       name: "",
       email: "",
       password: "",
-      location: ""
+      location: "",
+			sell: false
     },
 
     errorMsg: "Already have an account?"
@@ -38,10 +39,19 @@ class SignUp extends React.Component {
           console.log(res.data);
           this.setState({ errorMsg: "You have already registered" });
         } else {
-          localStorage.setItem("token", res.data);
-          this.props.history.push({
-            pathname: "/events"
-          });
+					localStorage.setItem("token", res.data)
+					if(this.state.user.sell === false){
+						this.props.history.push({
+							pathname: "/events"
+						})
+					}
+					else {
+						this.props.history.push({
+							pathname: "/stripeConnectSignUp"
+						})
+					}
+
+
         }
       })
       .catch(err => {
@@ -66,6 +76,20 @@ class SignUp extends React.Component {
 									/>
 								</div>
 							))}
+
+							<div>
+							<label>
+							Do you want to sell tickets?
+							</label>
+							<select
+								required
+								value={this.state.user.sell}
+								onChange={event => this.changeField(event, 'sell')}
+							>
+								<option value="false">No</option>
+								<option value="true">Yes</option>
+							</select>
+							</div>
 
 							<button>Signup</button>
 
