@@ -1,5 +1,6 @@
 import React from "react";
 import Nav from "./Nav";
+import UsersUpcomingEvents from './UsersUpcomingEvents'
 import { Link } from "react-router-dom";
 import QrReader from "react-qr-reader";
 import axios from "axios";
@@ -96,44 +97,25 @@ class Profile extends React.Component {
 
   render() {
     return (
-      <>
-        <Nav />
+<>
+  <Nav />
 
-              <p>{this.state.user.name}</p>
+  <p>{this.state.user.name}</p>
+	<p>{this.state.user.email}</p>
 
-            <h2>Your Upcoming Events</h2>
-
-            {this.state.user.ticketsBought.length > 0 ? (
-              <div>
-                {this.state.user.ticketsBought.map((e, i) => {
-                  return (
-                    <div key={i}>
-
-                        <p>location: {e.event.location}</p>
-                        <p>title {e.event.title}</p>
-                        <p>startDetails
-												{moment(e.event.startDetails).format("D MMMM")} {moment(e.event.startDetails).format("HH:mm")}
-												</p>
-
-											<Link
-												to={`/qr/${e.event.randomNumber}`}
-											>
-												<p>Click here to access your QR code to enter the event</p>
-											</Link>
-
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div></div>
-            )}
-
+  {this.state.user.ticketsBought.length > 0 &&
+		<div>
+		<h2>Your Upcoming Events</h2>
+			<UsersUpcomingEvents
+				ticketsBought={this.state.user.ticketsBought}
+			/>
+		</div>
+		}
 
 
 
 						<h2>Events you are organising</h2>
-          {this.state.user.usersEvents.map((e, i) => {
+          {/*this.state.user.usersEvents.map((e, i) => {
             return (
               <div key={i}>
 
@@ -164,7 +146,7 @@ class Profile extends React.Component {
                     )}
                   </div>
             )
-          })}
+          */})}
 </>
 		    )
 		  }

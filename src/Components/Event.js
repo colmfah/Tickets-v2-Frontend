@@ -75,9 +75,6 @@ class Event extends React.Component {
   };
 
   componentDidMount() {
-
-		console.log('this.props', this.props)
-
     axios
       .get(`${process.env.REACT_APP_API}/event/${this.props.match.params.id}`)
       .then(res => {
@@ -157,16 +154,6 @@ class Event extends React.Component {
 	}
 
 
-
-	prevTicketsSoldOut = (i) => {/*
-			let prevTicketsSoldOut = []
-			for (j = 0; j < i; j++){
-				prevTicketsSoldOut.push(this.state.event.tickets[j].numberOfTickets - this.state.event.tickets[j].ticketsSold + this.state.event.tickets[j].ticketsRefunded)
-			}
-			const isEqualZero = (currentValue) => currentValue = 0
-			return prevTicketsSoldOut.every(isEqualZero)
-	*/}
-
   changeNumTickets = (e, i) => {
 		let userEvent = this.state.userEvent
 		userEvent.tickets[i].buy.numTicketsSought = Number(e.target.value)
@@ -191,7 +178,6 @@ return(
     return (
       <>
         <Nav />
-				<button onClick={this.relevantPrevTicketSoldOut}>Do Test</button>
               <h3>{this.state.userEvent.organiser.name} Presents:</h3>
               <h1>{this.state.userEvent.title}</h1>
               <h3>
@@ -212,10 +198,6 @@ return(
 							<img src={this.state.userEvent.imageURL}/>
 
 							<h4>Purchase Tickets</h4>
-
-
-<button onClick={this.relevantPrevTicketSoldOut}>Do Test</button>
-<div>{this.relevantPrevTicketSoldOut()}</div>
 
 
 
@@ -280,6 +262,7 @@ return(
 								total={
 									this.displayTotal()
 								}
+								moneyForColm={this.displayAdminFee()}
 								currency={this.state.userEvent.currency}
 								eventTitle={this.state.userEvent.title}
 								purchaser={this.state.purchaser}

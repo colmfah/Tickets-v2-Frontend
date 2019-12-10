@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { CardElement, injectStripe } from "react-stripe-elements";
+import { Stripe, CardElement, injectStripe } from "react-stripe-elements";
 import axios from "axios";
 
 class CheckoutForm extends Component {
@@ -22,7 +22,7 @@ class CheckoutForm extends Component {
     } else {
       this.setState({
         message: `Checking if tickets are still available`
-      });
+      })
 
       let checkForTicketsObject = {
         userEvent: this.props.userEvent._id,
@@ -42,51 +42,69 @@ class CheckoutForm extends Component {
             this.setState({
               message: "Processing Payment. Please Wait...."
             })
-            this.props.stripe.createToken({}).then(res => {
-              if (!res.token) {
-                this.setState({
-                  message:
-                    "Invalid Credit Card. Your tickets have not been booked. You have not been charged"
-                })
-              } else {
-                let stripeData = {
-                  amount: this.props.total,
-                  currency: this.props.currency,
-                  description: this.props.eventTitle,
-                  source: res.token.id
-                }
 
-                axios
-                  .post(`${process.env.REACT_APP_API}/pay`, stripeData)
-                  .then(res => {
-                    this.setState({
-                      message:
-                        "Payment Successful. Your tickets will be emailed in the next few minutes"
-                    })
+							let stripeData = {
+							  amount: this.props.total,
+							  currency: this.props.currency,
+								seller: this.props.userEvent.organiser._id,
+								description: this.props.eventTitle,
+								moneyForColm: this.props.moneyForColm
+							}
 
-                    let createTicketData = {
-                      purchaser: this.props.purchaser,
-                      userEvent: this.props.userEvent,
-                      numTicketsSought: this.props.numTicketsSought
-                    };
+axios.post(`${process.env.REACT_APP_API}/paymentIntent`, stripeData).then(res => {
 
-                    axios
-                      .post(`${process.env.REACT_APP_API}/ticket`, createTicketData)
-                      .then()
-                      .catch(err => console.log(err));
-                  })
-                  .catch(err => {
-                    this.setState({
-                      message:
-                        "Payment Failure. You have not booked tickets for this event. Your card has not been charged"
-                    });
-                  });
-              }
-            });
-          }
-        });
+{/*console.log('res.data.clientSecret', res.data.clientSecret)
+
+	console.log('res.data.sellersStripeDetails', res.data.sellerStripeAccountID)
+
+var stripe = Stripe(process.env.REACT_APP_API_STRIPE_PUBLISH, { stripeAccount: res.data.sellerStripeAccountID})*/}
+
+
+
+		this.props.stripe.handleCardPayment(res.data.clientSecret, {}).then( paymentRes => {
+			if(paymentRes.error){
+				this.setState({
+					message: paymentRes.error.message
+				})
+			}
+			else if(paymentRes.paymentIntent.status === 'succeeded'){
+
+
+
+
+			let createTicketData = {
+							purchaser: this.props.purchaser,
+							userEvent: this.props.userEvent,
+							numTicketsSought: this.props.numTicketsSought
+						}
+
+			axios.post(`${process.env.REACT_APP_API}/ticket`, createTicketData)
+			.then(res => {this.setState({
+					message:"Payment Successful. Your tickets will be emailed to you shortly"
+						})
+					}).catch(err => console.log('create tickets err', err))
+
+		} else {
+			this.setState({
+				message: "Payment Failed. You have not been charged"
+			})
+			console.log('payment failed', paymentRes)
+		}
+
+
+
+
+	})
+
+		})
+
+	}})
     }
-  };
+
+  }
+
+
+
 
   render() {
     return (
