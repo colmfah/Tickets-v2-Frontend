@@ -15,6 +15,7 @@ class Event extends React.Component {
 
 
   state = {
+		stripe: null,
     formFields: [
       { label: "Number to Buy", type: "number", value: "price" }
     ],
@@ -33,7 +34,7 @@ class Event extends React.Component {
 			description: "",
 			startDetails: "",
 			endDetails: "",
-			organiser: "",
+			organiser: {_id: '', name: '', stripeAccountID: ''},
 			currency: "EUR",
 			tickets: [{
 				ticketType: '',
@@ -71,8 +72,7 @@ class Event extends React.Component {
 			variableCharge: 0,
 			vatOnCharges: 0,
 		}
-
-  };
+  }
 
   componentDidMount() {
     axios
@@ -99,6 +99,7 @@ class Event extends React.Component {
         .catch(err => console.log(err));
     }
   }
+
 
 	relevantPrevTicketSoldOut = () => {
 		let userEvent = this.state.userEvent
@@ -251,32 +252,36 @@ return(
 								Grand Total: {this.displayTotal()}
 								</div>
 
+								<div>Stripe Account ID {this.state.userEvent.organiser.stripeAccountID}</div>
 
-				<StripeProvider
+{this.state.userEvent.organiser.stripeAccountID !== '' && 				<StripeProvider
+	apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
+	stripeAccount={this.state.userEvent.organiser.stripeAccountID}
+>
+	<div>
+		<Elements>
+			<CheckoutForm
+				total={
+					this.displayTotal()
+				}
+				moneyForColm={this.displayAdminFee()}
+				currency={this.state.userEvent.currency}
+				eventTitle={this.state.userEvent.title}
+				purchaser={this.state.purchaser}
+				userEvent={this.state.userEvent}
+				numTicketsSought={this.state.userEvent.tickets.filter( e => {return e.buy.numTicketsSought > 0}).map(	e => {return ({
+					ticketType: e.ticketType,
+					ticketTypeID: e.ticketTypeID,
+					numTicketsSought: e.buy.numTicketsSought
+				})
+			}	)}
+			/>
+		</Elements>
+	</div>
+</StripeProvider>
+}
 
-					apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
-				>
-					<div>
-						<Elements>
-							<CheckoutForm
-								total={
-									this.displayTotal()
-								}
-								moneyForColm={this.displayAdminFee()}
-								currency={this.state.userEvent.currency}
-								eventTitle={this.state.userEvent.title}
-								purchaser={this.state.purchaser}
-								userEvent={this.state.userEvent}
-								numTicketsSought={this.state.userEvent.tickets.filter( e => {return e.buy.numTicketsSought > 0}).map(	e => {return ({
-									ticketType: e.ticketType,
-									ticketTypeID: e.ticketTypeID,
-									numTicketsSought: e.buy.numTicketsSought
-								})
-							}	)}
-							/>
-						</Elements>
-					</div>
-				</StripeProvider>
+
 
       </>
     );

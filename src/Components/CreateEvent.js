@@ -144,7 +144,6 @@ validTicketCheck = (e, i) => {
 
 		let data = this.state.userEvent.image
 		let eventData = this.state.userEvent
-
 		axios.post(`${process.env.REACT_APP_API}/image`, data)
 			.then(res => {
 				axios.patch(`${process.env.REACT_APP_API}/events/${res.data._id}`, eventData)

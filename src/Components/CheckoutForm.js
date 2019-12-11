@@ -53,15 +53,16 @@ class CheckoutForm extends Component {
 
 axios.post(`${process.env.REACT_APP_API}/paymentIntent`, stripeData).then(res => {
 
-{/*console.log('res.data.clientSecret', res.data.clientSecret)
+console.log('res.data.clientSecret', res.data.clientSecret)
 
 	console.log('res.data.sellersStripeDetails', res.data.sellerStripeAccountID)
 
-var stripe = Stripe(process.env.REACT_APP_API_STRIPE_PUBLISH, { stripeAccount: res.data.sellerStripeAccountID})*/}
+
 
 
 
 		this.props.stripe.handleCardPayment(res.data.clientSecret, {}).then( paymentRes => {
+			console.log('paymentReserr', paymentRes)
 			if(paymentRes.error){
 				this.setState({
 					message: paymentRes.error.message
@@ -75,8 +76,12 @@ var stripe = Stripe(process.env.REACT_APP_API_STRIPE_PUBLISH, { stripeAccount: r
 			let createTicketData = {
 							purchaser: this.props.purchaser,
 							userEvent: this.props.userEvent,
-							numTicketsSought: this.props.numTicketsSought
+							numTicketsSought: this.props.numTicketsSought,
+							paymentIntentID: paymentRes.paymentIntent.id
 						}
+			
+
+						console.log('createTicketData',createTicketData)
 
 			axios.post(`${process.env.REACT_APP_API}/ticket`, createTicketData)
 			.then(res => {this.setState({
@@ -94,7 +99,7 @@ var stripe = Stripe(process.env.REACT_APP_API_STRIPE_PUBLISH, { stripeAccount: r
 
 
 
-	})
+	}).catch(err => console.log('handleCardPaymentErr', err))
 
 		})
 

@@ -108,6 +108,7 @@ class Profile extends React.Component {
 		<h2>Your Upcoming Events</h2>
 			<UsersUpcomingEvents
 				ticketsBought={this.state.user.ticketsBought}
+				purchaserID={this.state.userID}
 			/>
 		</div>
 		}
