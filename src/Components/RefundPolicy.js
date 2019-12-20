@@ -21,6 +21,19 @@ componentDidMount(){
 
 	render() {
 
+let refundSummary = ''
+
+if (this.props.howToResell === 'originalPrice'){
+	this.props.globalRefundPolicy === true ?
+	refundSummary = `Refunded tickets will be named '${this.props.originalName[0]}', '${this.props.originalName[1]}' etc. They will be sold with tickets that haven't been refunded and won't be distinguishable from them.` : refundSummary = `Refunded tickets will be named '${this.props.originalName}'. They will be sold with tickets that haven't been refunded and won't be distinguishable from them.`
+} else if (this.props.ticketTypesEquivalent === true){
+	this.props.globalRefundPolicy === true ?
+	refundSummary = `All your refunded tickets will be resold as 'Last Minute Tickets'. There will be no mention of ${this.props.originalName[0]}, ${this.props.originalName[1]} etc` : refundSummary = `Refunded tickets will be resold as 'Last Minute Tickets'. There will be no mention of '${this.props.originalName}'`
+} else{
+	this.props.globalRefundPolicy === true ?
+	refundSummary = `All your refunded tickets will be resold referencing their original name - 'Last Minute ${this.props.originalName[0]} Tickets', 'Last Minute ${this.props.originalName[1]} Tickets' etc.` : refundSummary = `Refunded tickets will be resold be resold referencing their original name - 'Last Minute ${this.props.originalName} Tickets'`
+}
+
 
 
 	  return (
@@ -34,11 +47,14 @@ componentDidMount(){
 			>
 				<option
 					value="excessDemand"
-					>Refund if tickets are sold out and new customers are waiting to buy</option>
+					>Refund if all {this.props.numberOfTickets > 1 ? 'ticket types' : 'tickets'} have sold out and new customers are waiting to buy</option>
+					{this.props.numberOfTickets > 1 && <option value="excessDemandTicketType">{this.props.globalRefundPolicy === false ? `Refund if this specific ticket type - ${this.props.originalName} - has sold out and new customers are waiting to buy` : `Refund each specific ticket type (${this.props.originalName[0]}, ${this.props.originalName[1]} etc.) if it has sold out and new customers are waiting to buy`} </option>}
 				<option value="untilSpecific">Refund until a specific date & time</option>
 				<option value="noRefunds">No Refunds</option>
 			</select>
 			</div>
+
+
 
 
 
@@ -76,7 +92,7 @@ componentDidMount(){
 		>
 			<option
 				value="auction"
-				disabled={this.props.selectedRefundOption !== "excessDemand"}
+				disabled={this.props.selectedRefundOption !== "excessDemand" && this.props.selectedRefundOption !== 'excessDemandTicketType'}
 				>Auction to Highest Bidder</option>
 				<option value="originalPrice">Charge Original Price</option>
 				<option value="specific">Charge Specific Price</option>
@@ -114,23 +130,10 @@ componentDidMount(){
 
 
 
-		{this.props.numberOfTickets >1 &&
-			<div>
-					<h4>What to name tickets when re-selling</h4>
-						<select
-						required
-						value={this.props.nameOfResoldTickets}
-						onChange={event => this.props.handleRefundChange(event, 'nameOfResoldTickets', this.props.i)}
-						>
-							<option
-								value="original"
-								>{this.props.originalNames}</option>
-								<option value="lastMinuteTickets">Sell as 'Last Minute Tickets'</option>
-						</select>
-						</div>}
-
 	</div>
 	}
+
+{this.props.numberOfTickets > 1 && <div>{refundSummary}</div>}
 
 
 			</>

@@ -46,6 +46,7 @@ class CreateEvent extends React.Component {
 			organiser: "",
 			currency: "EUR",
 			totalTicketsCreated: 1,
+			ticketTypesEquivalent: true,
 			tickets: [{
 				ticketType: '',
 				ticketTypeID: 1,
@@ -61,7 +62,7 @@ class CreateEvent extends React.Component {
 								howToResell: 'auction',
 								resellAtSpecificPrice: '',
 								minimumPrice: '',
-								nameOfResoldTickets: 'lastMinuteTickets'}
+							}
 			}]
 			,
 			globalRefundPolicy: true,
@@ -69,8 +70,7 @@ class CreateEvent extends React.Component {
 							refundUntil: '',
 							howToResell: 'auction',
 							resellAtSpecificPrice: '',
-							minimumPrice: '',
-							nameOfResoldTickets: 'lastMinuteTickets'}
+							minimumPrice: ''}
 		},
 		errors: {
 			startDateInPast: false,
@@ -175,6 +175,21 @@ validTicketCheck = (e, i) => {
 
 
 
+
+		handleBooleanChange = (e, field) => {
+			let userEvent = this.state.usersEvent
+			if (e.target.value ==='true'){
+				userEvent.ticketTypesEquivalent = true
+			} else if(e.target.value ==='false'){
+				userEvent.ticketTypesEquivalent = false
+			}
+				   this.setState({ userEvent })
+		}
+
+
+
+
+
 	changeSellingTimes = (e, field1, ticketNumber, field2) => {
 
 		let userEvent = this.state.userEvent
@@ -186,7 +201,6 @@ validTicketCheck = (e, i) => {
 			userEvent.tickets[ticketNumber][field2] = Date.now()
 		} else if(e.target.value === 'whenPreviousSoldOut'){
 			userEvent.tickets[ticketNumber][field2] = ''
-			userEvent.tickets[ticketNumber].sellWhenPrevSoldOut = true
 		} else if(e.target.value === 'eventBegins'){
 			userEvent.tickets[ticketNumber][field2] = userEvent.startDetails
 		} else if (e.target.value ==='eventEnds'){
@@ -271,6 +285,11 @@ validTicketCheck = (e, i) => {
 
 
 	handleRefundChange = (e, field, i)=>{
+		console.log('handleRefundChange triggered')
+		console.log('e.target.value', e.target.value)
+		console.log('field', field)
+		console.log('i', i)
+
 		let userEvent = this.state.userEvent
 		if (i === 'not relevant'){
 			if(field === 'optionSelected' && e.target.value !== 'excessDemand'){
@@ -305,7 +324,6 @@ validTicketCheck = (e, i) => {
 			ticketTypeID: userEvent.totalTicketsCreated + 1,
 			price: '',
 			numberOfTickets: '',
-			sellWhenPrevSoldOut: false,
 			sellWhenTicketNumberSoldOut: '',
 			startSelling: 'now',
 			stopSelling: 'eventEnds',
@@ -316,8 +334,8 @@ validTicketCheck = (e, i) => {
 							refundUntil: '',
 							howToResell: 'auction',
 							resellAtSpecificPrice: '',
-							minimumPrice: '',
-							nameOfResoldTickets: 'lastMinuteTickets'}
+							minimumPrice: ''
+							}
 		}
 		)
 		userEvent.totalTicketsCreated += 1
@@ -365,9 +383,9 @@ validTicketCheck = (e, i) => {
 	}
 
 	changeGlobalRefundPolicy = () => {
-		let globalRefundPolicy = this.state.globalRefundPolicy
-		globalRefundPolicy = !globalRefundPolicy
-		this.setState({ globalRefundPolicy })
+		let userEvent = this.state.userEvent
+		userEvent.globalRefundPolicy = !userEvent.globalRefundPolicy
+		this.setState({ userEvent })
 	}
 
 	highestPricedTicket = () => {
@@ -724,52 +742,70 @@ required
 					<option value="true">Apply the same refund policy to all ticket types</option>
 					<option value="false">Apply a different refund policy to each ticket type</option>
 				</select>
-				</div>
+
+						<h4>Are all ticket types equivalent to each other when customers enter the event?</h4>
+							<select
+							required
+							value={this.props.ticketTypesEquivalent}
+							onChange={event => this.handleBooleanChange(event, 'ticketTypesEquivalent')}
+							>
+							<option value={true}>Yes - eg. Early Bird, General Admission etc.</option>
+								<option value={false}>No - eg. Backstage Access, VIP Treatment etc.</option>
+							</select>
+
+
+						<hr />
+							</div>
 			}
 
 
+{(this.state.userEvent.globalRefundPolicy === true)?
+<RefundPolicy
+ticketTypesEquivalent={this.state.userEvent.ticketTypesEquivalent}
+globalRefundPolicy ={this.state.userEvent.globalRefundPolicy}
+selectedRefundOption={this.state.userEvent.globalRefundOptions.optionSelected}
+handleRefundChange={this.handleRefundChange}
+refundUntil={this.state.userEvent.globalRefundOptions.refundUntil}
+howToResell={this.state.userEvent.globalRefundOptions.howToResell}
+resellAtSpecificPrice={this.state.userEvent.globalRefundOptions.resellAtSpecificPrice}
+i = {'not relevant'}
+price={this.state.userEvent.tickets.price}
+textForAuctionAndSpecific={'The original price of the most expensive ticket is'}
+ticketName={'Refunded Tickets'}
+minimumPrice={this.state.userEvent.tickets.minimumPrice}
+highestPricedTicket={this.highestPricedTicket()}
+currencySymbol={this.state.currencyOptions[this.state.userEvent.currency]}
+nameOfResoldTickets={this.state.userEvent.globalRefundOptions.nameOfResoldTickets}
+originalName={this.getTicketNames()}
+numberOfTickets={this.state.userEvent.tickets.length}
+ticketTypesEquivalent={this.state.userEvent.ticketTypesEquivalent}
 
+ />
+ :this.state.userEvent.tickets.map(	(e,i) =>
+ {return <div key={i}>
+ <RefundPolicy
+ 	ticketTypesEquivalent={this.state.userEvent.ticketTypesEquivalent}
+ 	globalRefundPolicy ={this.state.userEvent.globalRefundPolicy}
+	selectedRefundOption={this.state.userEvent.tickets[i].refunds.optionSelected}
+	handleRefundChange={this.handleRefundChange}
+	i={i}
+	refundUntil={this.state.userEvent.tickets[i].refunds.refundUntil}
+	howToResell={this.state.userEvent.tickets[i].refunds.howToResell}
+	resellAtSpecificPrice={this.state.userEvent.tickets[i].refunds.resellAtSpecificPrice}
+	ticketName={`Ticket Type ${i+1}: ${e.ticketType}`}
+	price={e.price}
+	textForAuctionAndSpecific={'The original price was'}
+	minimumPrice={e.minimumPrice}
+	highestPricedTicket={e.price}
+	currencySymbol={this.state.currencyOptions[this.state.userEvent.currency]}
+	nameOfResoldTickets={this.state.userEvent.tickets[i].refunds.nameOfResoldTickets}
+	originalName={e.ticketType}
+	numberOfTickets={this.state.userEvent.tickets.length}
+	ticketTypesEquivalent={this.state.userEvent.ticketTypesEquivalent}
 
-
-		{(this.state.globalRefundPolicy === true)?
-			<RefundPolicy
-			selectedRefundOption={this.state.userEvent.globalRefundOptions.optionSelected}
-			handleRefundChange={this.handleRefundChange}
-			refundUntil={this.state.userEvent.globalRefundOptions.refundUntil}
-			howToResell={this.state.userEvent.globalRefundOptions.howToResell}
-			resellAtSpecificPrice={this.state.userEvent.globalRefundOptions.resellAtSpecificPrice}
-			i = {'not relevant'}
-			price={this.state.userEvent.tickets.price}
-			textForAuctionAndSpecific={'The original price of the most expensive ticket is'}
-			ticketName={'Refunded Tickets'}
-			minimumPrice={this.state.userEvent.tickets.minimumPrice}
-			highestPricedTicket={this.highestPricedTicket()}
-			currencySymbol={this.state.currencyOptions[this.state.userEvent.currency]}
-			nameOfResoldTickets={this.state.userEvent.globalRefundOptions.nameOfResoldTickets}
-			originalNames={`Use Original Names - ${this.getTicketNames()[0]}, ${this.getTicketNames()[1]} etc. `}
-			numberOfTickets={this.state.userEvent.tickets.length}
-			 />
-			 :this.state.userEvent.tickets.map(	(e,i) =>
-			 {return <div key={i}>
-			 <RefundPolicy
-	 			selectedRefundOption={this.state.userEvent.tickets[i].refunds.optionSelected}
-	 			handleRefundChange={this.handleRefundChange}
-				i={i}
-	 			refundUntil={this.state.userEvent.tickets[i].refunds.refundUntil}
-	 			howToResell={this.state.userEvent.tickets[i].refunds.howToResell}
-	 			resellAtSpecificPrice={this.state.userEvent.tickets[i].refunds.resellAtSpecificPrice}
-				ticketName={`Ticket Type ${i+1}: ${e.ticketType}`}
-				price={e.price}
-				textForAuctionAndSpecific={'The original price was'}
-				minimumPrice={e.minimumPrice}
-				highestPricedTicket={e.price}
-				currencySymbol={this.state.currencyOptions[this.state.userEvent.currency]}
-				nameOfResoldTickets={this.state.userEvent.tickets[i].refunds.nameOfResoldTickets}
-				originalNames={`Use Original Name - ${e.ticketType}`}
-				numberOfTickets={this.state.userEvent.tickets.length}
-	 			 />
-				 <hr />
-			 </div>
+	 />
+	 <hr />
+ </div>
 
 
 			 }	)}

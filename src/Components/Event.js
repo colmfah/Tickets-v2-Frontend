@@ -176,6 +176,22 @@ return(
 	}
 
   render() {
+
+		let sellRefundedTickets = <div>No refunded tickets to sell</div>
+		let numberTicketsAvailable = this.state.userEvent.tickets.map( e => e.ticketsAvailable).reduce((t,i) => t+i)
+
+		if(this.state.userEvent.ticketTypesEquivalent === true && this.state.userEvent.globalRefundPolicy === true && this.state.userEvent.tickets[0].refunds.howToResell !== 'originalPrice' && numberTicketsAvailable === 0){
+			sellRefundedTickets = <div>Sell Refunded Tickets Code</div>
+		}
+
+//loop thru tickets to check if they are sold out
+
+
+
+
+
+
+
     return (
       <>
         <Nav />
@@ -229,6 +245,9 @@ return(
 						/>
 						</div>}
 
+						{sellRefundedTickets}
+
+
 									</div>
 									<hr />
 								</div>
@@ -280,6 +299,7 @@ return(
 	</div>
 </StripeProvider>
 }
+
 
 
 

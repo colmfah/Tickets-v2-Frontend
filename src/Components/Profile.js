@@ -107,7 +107,7 @@ class Profile extends React.Component {
 		<div>
 		<h2>Your Upcoming Events</h2>
 			<UsersUpcomingEvents
-				ticketsBought={this.state.user.ticketsBought}
+				ticketsBought={this.state.user.ticketsBought.filter(e => e.refunded === false)}
 				purchaserID={this.state.userID}
 			/>
 		</div>
