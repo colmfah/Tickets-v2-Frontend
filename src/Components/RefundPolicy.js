@@ -106,8 +106,8 @@ if (this.props.howToResell === 'originalPrice'){
 					required
 					min={this.props.highestPricedTicket}
 					type='number'
-					onChange={event => this.props.handleRefundChange(event, 'minimumAuctionPrice', this.props.i)}
-					placeholder='Enter Minimum Auction Price Here'
+					onChange={event => this.props.handleRefundChange(event, 'minimumPrice', this.props.i)}
+					placeholder={this.props.highestPricedTicket}
 					/>
 				</div>
 			}

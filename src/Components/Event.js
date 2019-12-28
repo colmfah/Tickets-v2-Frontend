@@ -4,6 +4,8 @@ import moment from "moment";
 import { Elements, StripeProvider } from "react-stripe-elements";
 import CheckoutForm from "./CheckoutForm";
 import Nav from "./Nav";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 
 class Event extends React.Component {
@@ -15,7 +17,6 @@ class Event extends React.Component {
 
 
   state = {
-		stripe: null,
     formFields: [
       { label: "Number to Buy", type: "number", value: "price" }
     ],
@@ -55,10 +56,15 @@ class Event extends React.Component {
 								nameOfResoldTickets: 'lastMinuteTickets'},
 				buy: {
 					numTicketsSought: 0
-				}
-
+				},
 			}],
     },
+		waitList: {
+			quantity: 1,
+			maxPrice: '',
+			expires: 'starts',
+			specificDate: ''
+		},
     currency: {
       USD: "$",
       EUR: "€",
@@ -100,6 +106,13 @@ class Event extends React.Component {
     }
   }
 
+	waitListChange = (e, field) => {
+		let waitList = this.state.waitList
+		waitList[field] = e.target.value
+		this.setState({waitList})
+
+	}
+
 
 	relevantPrevTicketSoldOut = () => {
 		let userEvent = this.state.userEvent
@@ -114,13 +127,6 @@ class Event extends React.Component {
 
 		)})
 
-	}
-
-
-
-
-	return5 = () =>{
-		return 5
 	}
 
 
@@ -181,10 +187,80 @@ return(
 		let numberTicketsAvailable = this.state.userEvent.tickets.map( e => e.ticketsAvailable).reduce((t,i) => t+i)
 
 		if(this.state.userEvent.ticketTypesEquivalent === true && this.state.userEvent.globalRefundPolicy === true && this.state.userEvent.tickets[0].refunds.howToResell !== 'originalPrice' && numberTicketsAvailable === 0){
-			sellRefundedTickets = <div>Sell Refunded Tickets Code</div>
+			sellRefundedTickets = <div>
+			<h5>Last Minute Tickets</h5>
+			<p>A small number of tickets will be sold shortly. You can bid for these tickets here. If there excess demand, the tickets will sell to the highest bidder</p>
+			<form>
+
+			<div>
+			<label>
+				How Many Tickets?
+			</label>
+				<input
+					required
+					type="number"
+					min={1}
+					max={10}
+					value={this.state.userEvent.waitList.quantity}
+					onChange={event => this.waitListChange(event, 'quantity')}
+					/>
+			</div>
+
+			<div>
+			<label>
+				{`How much are your prepared to pay?: ${this.state.userEvent.currency}`}
+			</label>
+				<input
+					required
+					type="number"
+					min={this.state.userEvent.tickets[0].refunds.minimumPrice}
+					value={this.state.userEvent.waitList.maxPrice}
+					placeholder={this.state.userEvent.tickets[0].refunds.minimumPrice}
+					onChange={event => this.waitListChange(event, 'maximumPrice')}
+					/>
+			</div>
+
+
+			<div>
+			<label>
+				When is the latest you are willing your receive your tickets?
+			</label>
+			<select
+				required
+				value={this.state.userEvent.waitList.expires}
+				onChange={event => this.waitListChange(event, 'expires')}
+			>
+				<option value="starts">When Event Starts</option>
+				<option value="hourBeforeEnds">1 Hour Before Event Ends</option>
+				<option value="specific">Let me set a specific date and time</option>
+			</select>
+			</div>
+
+			{this.state.waitList.expires ==='specific' && <div>
+			<DatePicker
+				required
+				timeIntervals={15}
+				selected={this.state.waitList.specificDate}
+				onChange={event =>
+				this.waitListChange(event, "specificDate")
+				}
+				showTimeSelect
+				dateFormat="Pp"
+				placeholderText='Enter Date'
+			/>
+								</div>}
+
+
+			<button>Apply for Last Minute Tickets</button>
+			</form>
+
+			<hr />
+			</div>
+
 		}
 
-//loop thru tickets to check if they are sold out
+
+
 
 
 
@@ -218,14 +294,17 @@ return(
 
 
 
+
+
 			{this.state.userEvent.tickets.filter(	e => {return(
 				(moment(e.startSellingTime).isSameOrBefore(moment())
 				 && moment(e.stopSellingTime).isAfter(moment()))||
-				e.sellWhenPrevSoldOut && this.state.userEvent.tickets.find(f => {
+				e.startSelling === 'whenPreviousSoldOut' && this.state.userEvent.tickets.find(f => {
 					if(e.sellWhenTicketNumberSoldOut === f.ticketTypeID && f.ticketsAvailable < 1){
 						return true
 					}
-				} ))}).map(	(e,i) => {return (
+				} )
+			)}).map(	(e,i) => {return (
 				<div key={i}>
 					<h5>{e.ticketType}</h5>
 					<div>{e.ticketDescription}</div>
@@ -245,13 +324,13 @@ return(
 						/>
 						</div>}
 
-						{sellRefundedTickets}
 
 
 									</div>
 									<hr />
 								</div>
 								)}	)}
+								{sellRefundedTickets}
 								<div>
 								Subtotal: {this.state.charges.subTotal}
 								</div>
