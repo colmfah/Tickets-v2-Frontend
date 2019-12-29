@@ -3,10 +3,11 @@ import axios from "axios";
 import moment from "moment";
 import { Elements, StripeProvider } from "react-stripe-elements";
 import CheckoutForm from "./CheckoutForm";
+import SaveCardForm from "./SaveCardForm";
+import StoreCheckout from "./StoreCheckout";
 import Nav from "./Nav";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
 
 class Event extends React.Component {
 
@@ -88,7 +89,8 @@ class Event extends React.Component {
           userEvent: res.data
         })
       })
-      .catch(err => console.log(err));
+      .catch(err => console.log(err))
+
 
     if (localStorage.getItem("token")) {
       let token = localStorage.getItem("token");
@@ -108,25 +110,12 @@ class Event extends React.Component {
 
 	waitListChange = (e, field) => {
 		let waitList = this.state.waitList
-		waitList[field] = e.target.value
+		if (field === 'specificDate'){
+			waitList[field] = e
+		}else {
+			waitList[field] = e.target.value
+		}
 		this.setState({waitList})
-
-	}
-
-
-	relevantPrevTicketSoldOut = () => {
-		let userEvent = this.state.userEvent
-
-		userEvent.tickets.filter(	(e,i) => {return(
-
-			userEvent.tickets.forEach(f => {
-				if(e.sellWhenTicketNumberSoldOut === f.ticketTypeID && f.ticketsAvailable < 1){
-
-				}
-			})
-
-		)})
-
 	}
 
 
@@ -187,10 +176,11 @@ return(
 		let numberTicketsAvailable = this.state.userEvent.tickets.map( e => e.ticketsAvailable).reduce((t,i) => t+i)
 
 		if(this.state.userEvent.ticketTypesEquivalent === true && this.state.userEvent.globalRefundPolicy === true && this.state.userEvent.tickets[0].refunds.howToResell !== 'originalPrice' && numberTicketsAvailable === 0){
+			console.log('fdhjsdhjskdjksd', process.env.REACT_APP_API_STRIPE_PUBLISH)
 			sellRefundedTickets = <div>
 			<h5>Last Minute Tickets</h5>
 			<p>A small number of tickets will be sold shortly. You can bid for these tickets here. If there excess demand, the tickets will sell to the highest bidder</p>
-			<form>
+
 
 			<div>
 			<label>
@@ -199,6 +189,7 @@ return(
 				<input
 					required
 					type="number"
+					placeholder={1}
 					min={1}
 					max={10}
 					value={this.state.userEvent.waitList.quantity}
@@ -248,24 +239,24 @@ return(
 				dateFormat="Pp"
 				placeholderText='Enter Date'
 			/>
+
 								</div>}
+<h1>yooooodssasd</h1>
+								<StripeProvider apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}>
+
+								<Elements>
+										<SaveCardForm/>
+								</Elements>
+		</StripeProvider>
 
 
-			<button>Apply for Last Minute Tickets</button>
-			</form>
+
 
 			<hr />
 			</div>
 
+
 		}
-
-
-
-
-
-
-
-
 
 
     return (
@@ -352,7 +343,7 @@ return(
 
 								<div>Stripe Account ID {this.state.userEvent.organiser.stripeAccountID}</div>
 
-{this.state.userEvent.organiser.stripeAccountID !== '' && 				<StripeProvider
+{/*this.state.userEvent.organiser.stripeAccountID !== '' && 				<StripeProvider
 	apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
 	stripeAccount={this.state.userEvent.organiser.stripeAccountID}
 >
@@ -377,7 +368,7 @@ return(
 		</Elements>
 	</div>
 </StripeProvider>
-}
+*/}
 
 
 

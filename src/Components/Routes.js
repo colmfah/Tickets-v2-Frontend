@@ -8,6 +8,7 @@ import Event from './Event'
 import Profile from './Profile'
 import ShowQRCode from './QRCode'
 import StripeConnectSignUp from './StripeConnectSignUp'
+import StripeProvider from "react-stripe-elements";
 
 class Routes extends React.Component {
 
@@ -27,6 +28,7 @@ class Routes extends React.Component {
 	render() {
 
 	  return (
+
 			<BrowserRouter>
 				<Switch>
 					<Route path='/createevent' render={ () => this.tokenCheck() ? <CreateEvent /> : <Redirect to="/login" /> }/>
@@ -40,6 +42,7 @@ class Routes extends React.Component {
 					<Route path='/' component={Events} />
 				</Switch>
 			</BrowserRouter>
+
 		)
 }
 }

@@ -52,15 +52,6 @@ class CheckoutForm extends Component {
 							}
 
 axios.post(`${process.env.REACT_APP_API}/paymentIntent`, stripeData).then(res => {
-
-console.log('res.data.clientSecret', res.data.clientSecret)
-
-	console.log('res.data.sellersStripeDetails', res.data.sellerStripeAccountID)
-
-
-
-
-
 		this.props.stripe.handleCardPayment(res.data.clientSecret, {}).then( paymentRes => {
 			console.log('paymentReserr', paymentRes)
 			if(paymentRes.error){
@@ -79,9 +70,7 @@ console.log('res.data.clientSecret', res.data.clientSecret)
 							numTicketsSought: this.props.numTicketsSought,
 							paymentIntentID: paymentRes.paymentIntent.id
 						}
-			
 
-						console.log('createTicketData',createTicketData)
 
 			axios.post(`${process.env.REACT_APP_API}/ticket`, createTicketData)
 			.then(res => {this.setState({
@@ -112,12 +101,13 @@ console.log('res.data.clientSecret', res.data.clientSecret)
 
 
   render() {
+
     return (
       <div>
         <p>{this.state.message}</p>
         <CardElement />
         <button onClick={this.submit}>
-          Purchase
+          Purchase Tickets
         </button>
       </div>
     );
