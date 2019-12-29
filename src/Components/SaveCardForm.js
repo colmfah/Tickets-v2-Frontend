@@ -6,27 +6,40 @@ import axios from "axios";
 class SaveCardForm extends Component {
 
 
-
-
-
+state = {
+	message: ''
+}
 
 
 
   submit = e => {
     e.preventDefault();
+		this.setState({message:'This will take a moment. Please be patient...'})
 		const cardElement = this.props.elements.getElement('card');
-		console.log('cardElement', cardElement)
-
 		axios.get(`${process.env.REACT_APP_API}/saveCardDetails`).then(res => {
-		console.log('res.data', res.data)
+		this.setState({message:'This will take a moment. Please be patient. Verifying credit card...'})
 		this.props.stripe.confirmCardSetup(res.data.client_secret, {
 			payment_method: {
         card: cardElement,
       },
 		}
     ).then( confirmCardSetupRes => {
-			console.log('confirmCardSetupRes', confirmCardSetupRes)
-  }).catch(err => console.log('some errrrr', err));
+			if (confirmCardSetupRes.setupIntent.status === 'succeeded'){
+				this.setState({message:'This will take a moment. Please be patient. Credit Card Confirmed. Saving Details...'})
+
+
+
+		axios.post(`${process.env.REACT_APP_API}/purchaseWaitList`, {
+				waitListData: this.props.waitListData,
+				purchaserID: this.props.purchaserID,
+				paymentMethodID: confirmCardSetupRes.setupIntent.payment_method
+			}).then(res => {console.log('waitListRes', res)})
+
+			}else{
+				// display error message
+			}
+
+  }).catch(err => console.log('confirmCardSetupRes errrrr', err));
 })
 
 }
@@ -40,6 +53,7 @@ class SaveCardForm extends Component {
 
     return (
       <div>
+			<p>{this.state.message}</p>
 			<form onSubmit={this.submit}>
 				<CardElement />
 				<button>
@@ -52,11 +66,3 @@ class SaveCardForm extends Component {
 }
 
 export default injectStripe(SaveCardForm);
-
-
-
-{/*this.props.stripe.confirmCardSetup('{PAYMENT_INTENT_CLIENT_SECRET}', {
-payment_method: {
-card: cardElement,
-},
-})*/}

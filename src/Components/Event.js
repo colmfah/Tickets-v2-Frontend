@@ -4,7 +4,6 @@ import moment from "moment";
 import { Elements, StripeProvider } from "react-stripe-elements";
 import CheckoutForm from "./CheckoutForm";
 import SaveCardForm from "./SaveCardForm";
-import StoreCheckout from "./StoreCheckout";
 import Nav from "./Nav";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -176,7 +175,6 @@ return(
 		let numberTicketsAvailable = this.state.userEvent.tickets.map( e => e.ticketsAvailable).reduce((t,i) => t+i)
 
 		if(this.state.userEvent.ticketTypesEquivalent === true && this.state.userEvent.globalRefundPolicy === true && this.state.userEvent.tickets[0].refunds.howToResell !== 'originalPrice' && numberTicketsAvailable === 0){
-			console.log('fdhjsdhjskdjksd', process.env.REACT_APP_API_STRIPE_PUBLISH)
 			sellRefundedTickets = <div>
 			<h5>Last Minute Tickets</h5>
 			<p>A small number of tickets will be sold shortly. You can bid for these tickets here. If there excess demand, the tickets will sell to the highest bidder</p>
@@ -241,20 +239,18 @@ return(
 			/>
 
 								</div>}
-<h1>yooooodssasd</h1>
-								<StripeProvider apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}>
 
-								<Elements>
-										<SaveCardForm/>
-								</Elements>
-		</StripeProvider>
-
-
-
+	<StripeProvider apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}>
+		<Elements>
+				<SaveCardForm
+				purchaserID={this.state.purchaser}
+				waitListData={this.state.waitList}
+				/>
+		</Elements>
+	</StripeProvider>
 
 			<hr />
 			</div>
-
 
 		}
 
