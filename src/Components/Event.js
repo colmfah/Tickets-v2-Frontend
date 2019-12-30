@@ -71,6 +71,7 @@ class Event extends React.Component {
       NZD: "$"
     },
     purchaser: "",
+		stripeCustomerID: '',
     errorMsg: "",
 		charges: {
 			subTotal: 0,
@@ -81,30 +82,25 @@ class Event extends React.Component {
   }
 
   componentDidMount() {
-    axios
-      .get(`${process.env.REACT_APP_API}/event/${this.props.match.params.id}`)
-      .then(res => {
-        this.setState({
-          userEvent: res.data
-        })
-      })
-      .catch(err => console.log(err))
-
-
+			let token = ''
     if (localStorage.getItem("token")) {
-      let token = localStorage.getItem("token");
+      token = localStorage.getItem("token")
+		}
       let objectToSend = {
-        token: token
+        token: token,
+				specificEvent: this.props.match.params.id
       };
       axios
-        .post(`${process.env.REACT_APP_API}/auth`, objectToSend)
+        .post(`${process.env.REACT_APP_API}/retrieveEventByID`, objectToSend)
         .then(res => {
           this.setState({
-            purchaser: res.data._id
+            purchaser: res.data.purchaser,
+						stripeCustomerID: res.data.stripeCustomerID,
+						userEvent: res.data.userEvent
           });
         })
         .catch(err => console.log(err));
-    }
+
   }
 
 	waitListChange = (e, field) => {
@@ -177,17 +173,16 @@ return(
 		if(this.state.userEvent.ticketTypesEquivalent === true && this.state.userEvent.globalRefundPolicy === true && this.state.userEvent.tickets[0].refunds.howToResell !== 'originalPrice' && numberTicketsAvailable === 0){
 			sellRefundedTickets = <div>
 			<h5>Last Minute Tickets</h5>
-			<p>A small number of tickets will be sold shortly. You can bid for these tickets here. If there excess demand, the tickets will sell to the highest bidder</p>
 
+			{this.state.userEvent.globalWaitListCount < 1 ?
+			<p>A small number of tickets will be sold shortly. You can bid for these tickets here. If there excess demand, the tickets will sell to the highest bidder</p>: <div></div>}
 
+			{this.state.userEvent.globalWaitListCount > 1 && <div>{this.state.userEvent.currency}{this.state.userEvent.tickets[0].refunds.minimumPrice}</div>}
 			<div>
-			<label>
-				How Many Tickets?
-			</label>
+			<label>How Many Tickets?</label>
 				<input
 					required
 					type="number"
-					placeholder={1}
 					min={1}
 					max={10}
 					value={this.state.userEvent.waitList.quantity}
@@ -195,6 +190,8 @@ return(
 					/>
 			</div>
 
+
+{this.state.userEvent.globalWaitListCount < 1 && <div>
 			<div>
 			<label>
 				{`How much are your prepared to pay?: ${this.state.userEvent.currency}`}
@@ -245,10 +242,11 @@ return(
 				<SaveCardForm
 				purchaserID={this.state.purchaser}
 				waitListData={this.state.waitList}
+				userEventID={this.state.userEvent._id}
 				/>
 		</Elements>
 	</StripeProvider>
-
+</div> }
 			<hr />
 			</div>
 
@@ -339,7 +337,7 @@ return(
 
 								<div>Stripe Account ID {this.state.userEvent.organiser.stripeAccountID}</div>
 
-{/*this.state.userEvent.organiser.stripeAccountID !== '' && 				<StripeProvider
+{this.state.userEvent.organiser.stripeAccountID !== '' && 				<StripeProvider
 	apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
 	stripeAccount={this.state.userEvent.organiser.stripeAccountID}
 >
@@ -364,7 +362,7 @@ return(
 		</Elements>
 	</div>
 </StripeProvider>
-*/}
+}
 
 
 

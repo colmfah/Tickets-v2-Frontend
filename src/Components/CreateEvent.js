@@ -177,7 +177,7 @@ validTicketCheck = (e, i) => {
 
 
 		handleBooleanChange = (e, field) => {
-			let userEvent = this.state.usersEvent
+			let userEvent = this.state.userEvent
 			if (e.target.value ==='true'){
 				userEvent.ticketTypesEquivalent = true
 			} else if(e.target.value ==='false'){
@@ -746,7 +746,7 @@ required
 						<h4>Are all ticket types equivalent to each other when customers enter the event?</h4>
 							<select
 							required
-							value={this.props.ticketTypesEquivalent}
+							value={this.state.userEvent.ticketTypesEquivalent}
 							onChange={event => this.handleBooleanChange(event, 'ticketTypesEquivalent')}
 							>
 							<option value={true}>Yes - eg. Early Bird, General Admission etc.</option>

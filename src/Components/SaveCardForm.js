@@ -32,6 +32,7 @@ state = {
 		axios.post(`${process.env.REACT_APP_API}/purchaseWaitList`, {
 				waitListData: this.props.waitListData,
 				purchaserID: this.props.purchaserID,
+				userEventID: this.props.userEventID,
 				paymentMethodID: confirmCardSetupRes.setupIntent.payment_method
 			}).then(res => {console.log('waitListRes', res)})
 

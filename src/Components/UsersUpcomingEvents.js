@@ -27,6 +27,7 @@ requestRefund = (e, ticketID, i) => {
 	this.setState({message})
 	axios.post(`${process.env.REACT_APP_API}/refundRequest`, {ticketID: ticketID, minimumPrice: this.state.minimumPrice[i], purchaserID: this.props.purchaserID})
 		.then(res => {
+			console.log('res.data', res.data)
 			let waitList = this.state.waitList
 			waitList[i] = res.data.waitList
 			let message = this.state.message
@@ -68,12 +69,21 @@ return (
 			<p>Click here to access your QR code to enter the event</p>
 		</Link>
 
+		<p>Refund Policy: {e.refunds.optionSelected}</p>
+		<p>How To ReSell: {e.refunds.howToResell}</p>
+
 
 
 		{/*display refund request if refund is part of ticket*/}
-		{(e.refunds.optionSelected === 'excessDemand' || (e.refunds.optionSelected === 'untilSpecific' && moment(e.refunds.refundUntil).isAfter(Date.now()))) &&
+		{(e.refunds.optionSelected === 'excessDemand' || e.refunds.optionSelected === 'excessDemandTicketType' || (e.refunds.optionSelected === 'untilSpecific' && moment(e.refunds.refundUntil).isAfter(Date.now()))) &&
 		<div>
-		<button onClick={(event) => this.requestRefund(event, e._id, i)}>Request Refund</button>
+
+
+		{e.refundRequested === true ? <div><button onClick={(event) => this.cancelRefundRequest(event, e._id, i)}>Cancel Refund Request</button></div> : <div><button onClick={(event) => this.requestRefund(event, e._id, i)}>Request Refund</button></div>
+}
+
+
+
 		<div>{this.state.message[i]}</div>
 		</div>}
 
