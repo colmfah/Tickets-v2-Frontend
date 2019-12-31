@@ -23,60 +23,55 @@ class CheckoutForm extends Component {
       this.setState({
         message: `Checking if tickets are still available`
       })
-
-      let checkForTicketsObject = {
+			let objectToSend = {}
+      objectToSend.checkForTickets = {
         userEvent: this.props.userEvent._id,
-        numTicketsSought: this.props.numTicketsSought
+        numTicketsSought: this.props.numTicketsSought,
+				purchaser: this.props.purchaser
       }
 
-      axios
-        .post(
-          `${process.env.REACT_APP_API}/checkForTickets`,
-          checkForTicketsObject
-        )
-        .then(res => {
-          this.setState({
-            message: res.data.message
-          });
-          if (!res.data.insufficientTickets) {
-            this.setState({
-              message: "Processing Payment. Please Wait...."
-            })
 
-							let stripeData = {
-							  amount: this.props.total,
-							  currency: this.props.currency,
-								seller: this.props.userEvent.organiser._id,
-								description: this.props.eventTitle,
-								moneyForColm: this.props.moneyForColm
-							}
+	this.setState({message: "Processing Payment. Please Wait..."})
+	objectToSend.stripeData = {
+	  amount: this.props.total,
+	  currency: this.props.currency,
+		seller: this.props.userEvent.organiser._id,
+		description: this.props.eventTitle,
+		moneyForColm: this.props.moneyForColm
+	}
 
-axios.post(`${process.env.REACT_APP_API}/paymentIntent`, stripeData).then(res => {
+
+
+
+axios.post(`${process.env.REACT_APP_API}/paymentIntent`, objectToSend).then(res => {
+	console.log('res from payment intent arrived on frontend')
+	this.setState({message: res.data.message})
+
+	if (res.data.success){
 		this.props.stripe.handleCardPayment(res.data.clientSecret, {}).then( paymentRes => {
-			console.log('paymentReserr', paymentRes)
+			console.log('paymentRes', paymentRes)
 			if(paymentRes.error){
-				this.setState({
-					message: paymentRes.error.message
-				})
+				this.setState({message: paymentRes.error.message})
+axios.post(`${process.env.REACT_APP_API}/deleteTempTickets`, res.data.tickets)
+
+{/*Secuirty Issue: There is a window here for hacker to manually post the tickets to backend to make them valid using updateTicketData controller*/}
+
 			}
 			else if(paymentRes.paymentIntent.status === 'succeeded'){
 
-
-
-
-			let createTicketData = {
+			let updateTicketData = {
 							purchaser: this.props.purchaser,
-							userEvent: this.props.userEvent,
-							numTicketsSought: this.props.numTicketsSought,
+							tickets: res.data.tickets,
 							paymentIntentID: paymentRes.paymentIntent.id
 						}
 
 
-			axios.post(`${process.env.REACT_APP_API}/ticket`, createTicketData)
+			axios.post(`${process.env.REACT_APP_API}/emailTickets`, updateTicketData)
 			.then(res => {this.setState({
 					message:"Payment Successful. Your tickets will be emailed to you shortly"
 						})
 					}).catch(err => console.log('create tickets err', err))
+
 
 		} else {
 			this.setState({
@@ -85,20 +80,11 @@ axios.post(`${process.env.REACT_APP_API}/paymentIntent`, stripeData).then(res =>
 			console.log('payment failed', paymentRes)
 		}
 
-
-
-
 	}).catch(err => console.log('handleCardPaymentErr', err))
-
+	}
 		})
-
-	}})
     }
-
   }
-
-
-
 
   render() {
 
