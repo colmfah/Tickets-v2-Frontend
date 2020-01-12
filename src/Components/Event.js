@@ -13,6 +13,7 @@ class Event extends React.Component {
 	constructor(){
 	super()
 	this.changeNumTickets= this.changeNumTickets.bind(this)
+	this.calculateStripeFee= this.calculateStripeFee.bind(this)
 }
 
 
@@ -93,13 +94,14 @@ class Event extends React.Component {
       axios
         .post(`${process.env.REACT_APP_API}/retrieveEventByID`, objectToSend)
         .then(res => {
+					console.log('userevent from be', res.data.userEvent)
           this.setState({
             purchaser: res.data.purchaser,
 						stripeCustomerID: res.data.stripeCustomerID,
 						userEvent: res.data.userEvent
           });
         })
-        .catch(err => console.log(err));
+        .catch(err => console.log('errr', err));
 
   }
 
@@ -159,10 +161,16 @@ return(
 )
 	}
 
+
+
 	displayTotal = () => {
 		return (
 			 this.state.charges.fixedCharge+this.state.charges.variableCharge+this.state.charges.subTotal+this.state.charges.vatOnCharges
 		).toFixed(2)
+	}
+
+	calculateStripeFee = () => {
+		return (1.23*(0.25 + (0.014)*this.displayTotal()))
 	}
 
   render() {
@@ -335,7 +343,7 @@ return(
 								Grand Total: {this.displayTotal()}
 								</div>
 
-								<div>Stripe Account ID {this.state.userEvent.organiser.stripeAccountID}</div>
+								<div>Stripe Fee {this.calculateStripeFee()}</div>
 
 {this.state.userEvent.organiser.stripeAccountID !== '' && 				<StripeProvider
 	apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
@@ -347,7 +355,7 @@ return(
 				total={
 					this.displayTotal()
 				}
-				moneyForColm={this.displayAdminFee()}
+				moneyForColm={this.displayAdminFee()-this.calculateStripeFee()}
 				currency={this.state.userEvent.currency}
 				eventTitle={this.state.userEvent.title}
 				purchaser={this.state.purchaser}

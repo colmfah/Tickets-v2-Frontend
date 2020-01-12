@@ -27,6 +27,7 @@ class Profile extends React.Component {
     axios
       .post(`${process.env.REACT_APP_API}/profile`, objectToSend)
       .then(res => {
+				console.log('comp mount', res.data)
         this.setState({
           user: res.data
         });
@@ -34,9 +35,11 @@ class Profile extends React.Component {
       .catch(err => console.log(err));
   }
 
-  click = () => {
-    console.log("I have been clicked");
-  };
+updateState = (updatedUserData) => {
+	let user = this.state.user
+	user = updatedUserData
+	this.setState({user})
+}
 
   turnScannerOnOff = usersEvent => {
     let stateCopy = this.state.user.usersEvents;
@@ -109,6 +112,7 @@ class Profile extends React.Component {
 			<UsersUpcomingEvents
 				ticketsBought={this.state.user.ticketsBought.filter(e => e.refunded === false)}
 				purchaserID={this.state.userID}
+				updateState={this.updateState}
 			/>
 		</div>
 		}

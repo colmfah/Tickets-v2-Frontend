@@ -31,7 +31,7 @@ class CheckoutForm extends Component {
       }
 
 
-	this.setState({message: "Processing Payment. Please Wait..."})
+	this.setState({message: "Checking for tickets. Please Wait..."})
 	objectToSend.stripeData = {
 	  amount: this.props.total,
 	  currency: this.props.currency,
@@ -44,7 +44,7 @@ class CheckoutForm extends Component {
 
 
 axios.post(`${process.env.REACT_APP_API}/paymentIntent`, objectToSend).then(res => {
-	console.log('res from payment intent arrived on frontend')
+	console.log('res from payment intent arrived on frontend', res)
 	this.setState({message: res.data.message})
 
 	if (res.data.success){
@@ -53,17 +53,29 @@ axios.post(`${process.env.REACT_APP_API}/paymentIntent`, objectToSend).then(res 
 			if(paymentRes.error){
 				this.setState({message: paymentRes.error.message})
 axios.post(`${process.env.REACT_APP_API}/deleteTempTickets`, res.data.tickets)
+//i've never tested this. also need to include it anywhere else payment might fail
 
 {/*Secuirty Issue: There is a window here for hacker to manually post the tickets to backend to make them valid using updateTicketData controller*/}
 
 			}
 			else if(paymentRes.paymentIntent.status === 'succeeded'){
+			console.log('updating tickets section')
 
 			let updateTicketData = {
 							purchaser: this.props.purchaser,
 							tickets: res.data.tickets,
-							paymentIntentID: paymentRes.paymentIntent.id
+							paymentIntentID: paymentRes.paymentIntent.id,
+							userEvent: this.props.userEvent._id,
 						}
+
+
+if (res.data.refundsRequested == true){
+	console.log('condition triggered')
+	updateTicketData.refundRequests = res.data.refundRequests
+}
+
+console.log('updateTicketData', updateTicketData)
+
 
 
 			axios.post(`${process.env.REACT_APP_API}/emailTickets`, updateTicketData)
