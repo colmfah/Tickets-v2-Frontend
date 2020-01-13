@@ -127,7 +127,7 @@ class Event extends React.Component {
 			let highPriceTickets = tickets.filter(	e => {return e.price > 10}	)
 			tickets.forEach(	e => {subTotal += (e.buy.numTicketsSought * e.price) }	)
 			tickets.forEach(e => {totalTickets += Number(e.buy.numTicketsSought)})
-			if(tickets.length === 1){
+			if(tickets.filter(e=>e.ticketTypeID > 0).length === 1){
 				fixedCharge = totalTickets * 0.49
 				if(tickets[0].price > 10){
 					variableCharge = (subTotal * 0.04)
