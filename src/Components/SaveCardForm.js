@@ -34,10 +34,14 @@ state = {
 				purchaserID: this.props.purchaserID,
 				userEventID: this.props.userEventID,
 				paymentMethodID: confirmCardSetupRes.setupIntent.payment_method
-			}).then(res => {console.log('waitListRes', res)})
+			}).then(res => {
+				console.log('waitListRest')
+				console.log('waitListRes', res.data)
+				this.setState({message: res.data.message})
+			})
 
 			}else{
-				// display error message
+				this.setState({message:'Error: We were unable to verify your card details. Your bid has not been saved.'})
 			}
 
   }).catch(err => console.log('confirmCardSetupRes errrrr', err));

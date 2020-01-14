@@ -79,6 +79,10 @@ class Event extends React.Component {
 			fixedCharge: 0,
 			variableCharge: 0,
 			vatOnCharges: 0,
+		},
+		cardDetails:{
+			last4: '',
+			card: ''
 		}
   }
 
@@ -94,9 +98,10 @@ class Event extends React.Component {
       axios
         .post(`${process.env.REACT_APP_API}/retrieveEventByID`, objectToSend)
         .then(res => {
-					console.log('userevent from be', res.data.userEvent)
+					console.log('userevent from be', res.data)
           this.setState({
             purchaser: res.data.purchaser,
+						cardDetails: res.data.cardDetails,
 						stripeCustomerID: res.data.stripeCustomerID,
 						userEvent: res.data.userEvent
           });
@@ -109,7 +114,12 @@ class Event extends React.Component {
 		let waitList = this.state.waitList
 		if (field === 'specificDate'){
 			waitList[field] = e
-		}else {
+		}else if (field === 'expires') {
+			waitList.specificDate = ''
+			waitList[field] = e.target.value
+		}
+
+		else {
 			waitList[field] = e.target.value
 		}
 		this.setState({waitList})
@@ -345,7 +355,7 @@ return(
 
 								<div>Stripe Fee {this.calculateStripeFee()}</div>
 
-{this.state.userEvent.organiser.stripeAccountID !== '' && 				<StripeProvider
+{(this.state.userEvent.organiser.stripeAccountID !== '' && this.state.userEvent.globalWaitListCount >= 1) && 				<StripeProvider
 	apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
 	stripeAccount={this.state.userEvent.organiser.stripeAccountID}
 >
