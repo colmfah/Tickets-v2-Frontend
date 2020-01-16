@@ -2,6 +2,7 @@ import React from 'react'
 import moment from "moment"
 import {Link} from 'react-router-dom'
 import axios from "axios"
+import { Stripe, CardElement, injectStripe } from "react-stripe-elements";
 
 
 class UsersUpcomingEvents extends React.Component {
@@ -30,10 +31,10 @@ requestRefund = (e, ticketID, i) => {
 	console.log('this.state.minimumPrice[i]', this.state.minimumPrice[i])
 	axios.post(`${process.env.REACT_APP_API}/refundRequest`, {ticketID: ticketID, minimumPrice: this.state.minimumPrice[i], purchaserID: this.props.purchaserID, token: localStorage.getItem("token")})
 		.then(res => {
+
 			message[i] = res.data.message
 			this.setState({message})
-			this.props.updateState(res.data.user)
-			this.props.updateState(res.data.user)
+
 		})
 }
 
@@ -155,7 +156,6 @@ return (
 
 			}
 		}
-
 
 
 export default UsersUpcomingEvents

@@ -83,7 +83,9 @@ class Event extends React.Component {
 		cardDetails:{
 			last4: '',
 			card: ''
-		}
+		},
+		replaceExistingCard: false,
+		message: ''
   }
 
   componentDidMount() {
@@ -98,7 +100,6 @@ class Event extends React.Component {
       axios
         .post(`${process.env.REACT_APP_API}/retrieveEventByID`, objectToSend)
         .then(res => {
-					console.log('userevent from be', res.data)
           this.setState({
             purchaser: res.data.purchaser,
 						cardDetails: res.data.cardDetails,
@@ -109,6 +110,10 @@ class Event extends React.Component {
         .catch(err => console.log('errr', err));
 
   }
+
+	upDateMessage = (msg) => {
+		this.setState({message: msg})
+	}
 
 	waitListChange = (e, field) => {
 		let waitList = this.state.waitList
@@ -183,6 +188,25 @@ return(
 		return (1.23*(0.25 + (0.014)*this.displayTotal()))
 	}
 
+	chargeExistingCard = (e) =>{
+		e.preventDefault()
+		this.setState({message: 'Saving Your Bid. Please Wait...'})
+		let objectToSend = {}
+		objectToSend.waitListData = this.state.waitList
+		objectToSend.purchaserID = this.state.purchaser
+		objectToSend.userEventID = this.state.userEvent._id
+		axios.post(`${process.env.REACT_APP_API}/chargeExistingCard`, objectToSend).then(res => {
+			this.setState({message: res.data.message})
+		})
+	}
+
+replaceExistingCard = (e) => {
+	e.preventDefault()
+	this.setState({
+		replaceExistingCard: true
+	})
+}
+
   render() {
 
 		let sellRefundedTickets = <div>No refunded tickets to sell</div>
@@ -254,16 +278,25 @@ return(
 			/>
 
 								</div>}
-
-	<StripeProvider apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}>
+{(this.state.cardDetails.card === '' || this.state.cardDetails.last4 === '' || this.state.replaceExistingCard === true )?	<StripeProvider apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}>
 		<Elements>
 				<SaveCardForm
 				purchaserID={this.state.purchaser}
 				waitListData={this.state.waitList}
 				userEventID={this.state.userEvent._id}
+				replaceExistingCard={this.state.replaceExistingCard}
+				message={this.state.message}
+				upDateMessage={this.upDateMessage}
 				/>
 		</Elements>
-	</StripeProvider>
+	</StripeProvider> : <div>Would you like to pay for these tickets using {this.state.cardDetails.card} card ending in {this.state.cardDetails.last4}?
+	<button onClick={this.chargeExistingCard}>Yes Please</button>
+	<button onClick={this.replaceExistingCard}>No, charge a different card</button>
+	<div>{this.state.message}</div>
+	</div>}
+
+
+
 </div> }
 			<hr />
 			</div>
@@ -355,7 +388,7 @@ return(
 
 								<div>Stripe Fee {this.calculateStripeFee()}</div>
 
-{(this.state.userEvent.organiser.stripeAccountID !== '' && this.state.userEvent.globalWaitListCount >= 1) && 				<StripeProvider
+{(this.state.userEvent.organiser.stripeAccountID !== '') && 				<StripeProvider
 	apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
 	stripeAccount={this.state.userEvent.organiser.stripeAccountID}
 >
