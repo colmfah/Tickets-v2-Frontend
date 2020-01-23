@@ -28,12 +28,14 @@ requestRefund = (e, ticketID, i) => {
 	let message = this.state.message
 	message[i] = 'Please Wait...'
 	this.setState({message})
-	console.log('this.state.minimumPrice[i]', this.state.minimumPrice[i])
 	axios.post(`${process.env.REACT_APP_API}/refundRequest`, {ticketID: ticketID, minimumPrice: this.state.minimumPrice[i], purchaserID: this.props.purchaserID, token: localStorage.getItem("token")})
 		.then(res => {
-
+			console.log('res.data', res.data)
 			message[i] = res.data.message
 			this.setState({message})
+			if(res.data.user){
+						this.props.updateState(res.data.user)
+			}
 
 		})
 }
@@ -78,6 +80,8 @@ return (
 {this.props.ticketsBought.map((e, i) => {
 	return (
 		<div key={i}>
+		<div>Ticket: {i+1}</div>
+		<div>{e._id}</div>
 		<p>location: {e.userEvent.venue}</p>
 		<p>title {e.userEvent.title}</p>
 		<p>startDetails
@@ -101,7 +105,7 @@ return (
 		{(e.refunds.optionSelected === 'excessDemand' || e.refunds.optionSelected === 'excessDemandTicketType' || (e.refunds.optionSelected === 'untilSpecific' && moment(e.refunds.refundUntil).isAfter(Date.now()))) &&
 		<div>
 
-		{(e.refundRequested === true && e.customersWaitingToBuy === false) &&
+		{(e.refundRequested === true) &&
 		<div>
 		<p>Your request for a refund of {e.purchasersMinimumPrice} has been registered</p>
 		</div>}
@@ -117,7 +121,7 @@ return (
 
 
 		{/*allow customer enter lower bid for refund if backend shows there is a waitlist. Backend will only send this back for tickets where excess demand is selected*/}
-	{(e.refundRequested === true && e.customersWaitingToBuy === false) &&
+	{(e.refundRequested === true) &&
 	<div>
 	<p>There is excess demand for refunds for this ticket. Priority will be given to tickets with the lowest cost to refund.</p> <p>What is the lowest amount you are prepared to accept as a refund?</p>
 	<form>

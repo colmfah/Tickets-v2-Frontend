@@ -36,8 +36,9 @@ class Profile extends React.Component {
   }
 
 updateState = (updatedUserData) => {
+	console.log('updatedUserData')
 	let user = this.state.user
-	user = updatedUserData
+	user.ticketsBought = updatedUserData.ticketsBought
 	this.setState({user})
 }
 
