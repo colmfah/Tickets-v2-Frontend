@@ -64,12 +64,6 @@ class Event extends React.Component {
 				},
 			}],
     },
-		waitList: {
-			quantity: 1,
-			maximumPrice: '',
-			expires: 'starts',
-			specificDate: ''
-		},
     currency: {
       USD: "$",
       EUR: "€",
@@ -126,32 +120,34 @@ class Event extends React.Component {
 	}
 
 	waitListChange = (e, field, placeInOriginalArray) => {
-		console.log('placeInOriginalArray', placeInOriginalArray)
+
 		let waitList = this.state.waitList
-		let tickets = this.state.userEvent.tickets
-		if (field === 'specificDate'){
-			waitList[field] = e
-		}else if (field === 'expires') {
-			waitList.specificDate = ''
-			waitList[field] = e.target.value
-		}
+		let userEvent = this.state.userEvent
+		console.log('lmt1', userEvent.tickets[1])
+		if (field === 'waitListSpecificDate'){
+			console.log('date triggered')
+			userEvent.tickets[placeInOriginalArray][field] = e
+		}else if(field === 'numTicketsSought'){
+			console.log('else if triggered')
+					userEvent.tickets[placeInOriginalArray].buy.numTicketsSought = e.target.value
+					//can delete this condition when you remove the buy object - it serves no function
+			}
 		else {
-			waitList[field] = e.target.value
+			console.log('else triggered')
+			userEvent.tickets[placeInOriginalArray][field] = e.target.value
+			console.log('placeInOriginalArray', placeInOriginalArray)
+			console.log('field', field)
+			console.log('e.target.value', e.target.value)
 		}
-		if(field === 'maximumPrice'){
-			tickets[placeInOriginalArray].price = e.target.value
-		}
-		else if(field === 'quantity'){
-			tickets[placeInOriginalArray].buy.numTicketsSought = e.target.value
-		}
-		this.setState({waitList})
+		console.log('lmt2', userEvent.tickets[1])
+		this.setState({userEvent})
+
 	}
 
 
 
 	calculateTotals = (data) => {
-		console.log('data', data)
-		console.log('data.lastMinuteTicket', data.lastMinuteTicket)
+
 			let subTotal = 0
 			let fixedCharge = 0
 			let variableCharge = 0
@@ -162,18 +158,12 @@ class Event extends React.Component {
 
 			let tickets
 			if (data.lastMinuteTicket === false){
-				console.log('lmt false')
 				tickets = this.state.userEvent.tickets.filter(e => e.lastMinuteTicket !== true)
 				purchaseTicketCharges = this.state.purchaseTicketCharges
 			}else{
-				console.log('lmt true')
 				tickets = this.state.userEvent.tickets.filter(e => e.lastMinuteTicket === true)
 				lastMinuteTicketCharges = this.state.lastMinuteTicketCharges
 			}
-
-			console.log('purchaseTicketCharges', purchaseTicketCharges)
-
-			console.log('lastMinuteTicketCharges', lastMinuteTicketCharges)
 
 			let highPriceTickets = tickets.filter(	e => {return e.price > 10}	)
 			tickets.forEach(	e => {subTotal += (e.buy.numTicketsSought * e.price) }	)
@@ -237,10 +227,18 @@ return(
 	chargeExistingCard = (e) =>{
 		e.preventDefault()
 		this.setState({message: 'Saving Your Bid. Please Wait...'})
-		let objectToSend = {}
-		objectToSend.waitListData = this.state.waitList
-		objectToSend.purchaserID = this.state.purchaser
-		objectToSend.userEventID = this.state.userEvent._id
+		let objectToSend = {
+			purchaserID: this.state.purchaser,
+			userEventID: this.state.userEvent._id
+		}
+
+		objectToSend.waitListData = {quantity: this.state.userEvent.tickets[1].buy.numTicketsSought,
+			maximumPrice: this.state.userEvent.tickets[1].price,
+			expires: this.state.userEvent.tickets[1].waitListExpires,
+			specificDate: this.state.userEvent.tickets[1].waitListSpecificDate}
+
+			console.log('objectToSend', objectToSend)
+
 		axios.post(`${process.env.REACT_APP_API}/chargeExistingCard`, objectToSend).then(res => {
 			this.setState({message: res.data.message})
 		})
@@ -253,9 +251,18 @@ replaceExistingCard = (e) => {
 	})
 }
 
+
   render() {
 
 		let numberTicketsAvailable = this.state.userEvent.tickets.map( e => e.ticketsAvailable).reduce((t,i) => t+i)
+
+
+
+
+
+
+
+
 
     return (
       <>
@@ -371,9 +378,13 @@ replaceExistingCard = (e) => {
 
 
 
+
 {this.state.userEvent.tickets.filter(e => e.lastMinuteTicket === true).map(f => {return (
 	<LastMinuteTickets
-	 	waitListData={this.state.waitList}
+	 	waitListData={{quantity: f.buy.numTicketsSought,
+			maximumPrice: f.price,
+			expires: f.waitListExpires,
+			specificDate: f.waitListSpecificDate}}
 		waitListChange={this.waitListChange}
 		currency={this.state.userEvent.currency}
 		minimumPrice={f.refunds.minimumPrice}
@@ -388,25 +399,39 @@ replaceExistingCard = (e) => {
 <div>Total: {this.state.lastMinuteTicketCharges.fixedCharge + this.state.lastMinuteTicketCharges.variableCharge + this.state.lastMinuteTicketCharges.vatOnCharges + this.state.lastMinuteTicketCharges.subTotal}</div>
 
 
-{(this.state.cardDetails.card === '' || this.state.cardDetails.last4 === '' || this.state.replaceExistingCard === true )?	<StripeProvider apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}>
+{/*{(this.state.cardDetails.card === '' || this.state.cardDetails.last4 === '' || this.state.replaceExistingCard === true )?	*/}
+
+
+<StripeProvider
+	apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
+	>
 		<Elements>
 				<SaveCardForm
 				purchaserID={this.state.purchaser}
-				waitListData={this.state.waitList}
+				waitListData={{quantity: this.state.userEvent.tickets[1].buy.numTicketsSought,
+					maximumPrice: this.state.userEvent.tickets[1].price,
+					expires: this.state.userEvent.tickets[1].waitListExpires,
+					specificDate: this.state.userEvent.tickets[1].waitListSpecificDate}}
 				userEventID={this.state.userEvent._id}
 				replaceExistingCard={this.state.replaceExistingCard}
 				message={this.state.message}
 				upDateMessage={this.upDateMessage}
+				stripeAccountID={this.state.userEvent.organiser.stripeAccountID}
 				/>
 		</Elements>
-	</StripeProvider> : <div>Would you like to pay for these tickets using {this.state.cardDetails.card} card ending in {this.state.cardDetails.last4}?
+	</StripeProvider>
+
+
+
+{/*	: <div>Would you like to pay for these tickets using {this.state.cardDetails.card} card ending in {this.state.cardDetails.last4}?
 	<button onClick={this.chargeExistingCard}>Yes Please</button>
 	<button onClick={this.replaceExistingCard}>No, charge a different card</button>
 	<div>{this.state.message}</div>
 	</div>}
+	Temporarily removed because saved cards on my stripe account can't be charged to accounts I am connected to. The fixed is to record the connected stripe account when saving card and save in my db the event.organisers that the card is saved to
+*/}
 	</div>
 	}
-
 
 
       </>

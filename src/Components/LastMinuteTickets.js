@@ -12,7 +12,7 @@ class LastMinuteTickets extends React.Component {
 }
 
 componentDidMount(){
-
+	console.log('wld', this.props.waitListData)
 }
 
 	render() {
@@ -32,7 +32,7 @@ componentDidMount(){
 					min={1}
 					max={10}
 					value={this.props.waitListData.quantity}
-					onChange={(event) => {this.props.waitListChange(event, 'quantity', this.props.placeInOriginalArray); this.props.calculateTotals({lastMinuteTicket: true})}}
+					onChange={(event) => {this.props.waitListChange(event, 'numTicketsSought', this.props.placeInOriginalArray); this.props.calculateTotals({lastMinuteTicket: true})}}
 					/>
 			</div>
 
@@ -45,7 +45,7 @@ componentDidMount(){
 					type="number"
 					min={this.props.minimumPrice}
 					value={this.props.waitListData.maximumPrice}
-					onChange={(event) => {this.props.waitListChange(event, 'maximumPrice', this.props.placeInOriginalArray);this.props.calculateTotals({lastMinuteTicket: true})}}
+					onChange={(event) => {this.props.waitListChange(event, 'price', this.props.placeInOriginalArray);this.props.calculateTotals({lastMinuteTicket: true})}}
 					/>
 			</div>
 
@@ -58,7 +58,7 @@ componentDidMount(){
 			<select
 				required
 				value={this.props.waitListData.expires}
-				onChange={event => this.props.waitListChange(event, 'expires', this.props.placeInOriginalArray)}
+				onChange={event => this.props.waitListChange(event, 'waitListExpires', this.props.placeInOriginalArray)}
 			>
 				<option value="starts">When Event Starts</option>
 				<option value="hourBeforeEnds">1 Hour Before Event Ends</option>
@@ -72,7 +72,7 @@ componentDidMount(){
 				timeIntervals={15}
 				selected={this.props.waitListData.specificDate}
 				onChange={event =>
-				this.props.waitListChange(event, "specificDate", this.props.placeInOriginalArray)
+				this.props.waitListChange(event, "waitListSpecificDate", this.props.placeInOriginalArray)
 				}
 				showTimeSelect
 				dateFormat="Pp"
