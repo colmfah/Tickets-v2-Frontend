@@ -17,16 +17,13 @@ state = {
 	message: ''
 }
   submit = e => {
-		console.log('this.props.stripeAccountID', this.props.stripeAccountID)
     e.preventDefault();
 		this.props.upDateMessage('This will take a moment. Please be patient...')
 		const cardElement = this.props.elements.getElement('card');
 
 		axios.get(`${process.env.REACT_APP_API}/saveCardDetails`)
 		.then(res => {
-			console.log('save card details res', res)
 		this.props.upDateMessage('This will take a moment. Please be patient. Verifying credit card...')
-
 
 		this.props.stripe.confirmCardSetup(res.data.client_secret, {
 			payment_method: {
@@ -35,18 +32,8 @@ state = {
 		}
     )
 
-
-
-
-
-
-
-
-
-
-
 		.then( confirmCardSetupRes => {
-			console.log('confirmCardSetupRes', confirmCardSetupRes)
+
 			if (confirmCardSetupRes.setupIntent.status === 'succeeded'){
 				this.props.upDateMessage('This will take a moment. Please be patient. Credit Card Confirmed. Saving Details...')
 

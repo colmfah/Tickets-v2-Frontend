@@ -44,23 +44,19 @@ class CheckoutForm extends Component {
 
 
 axios.post(`${process.env.REACT_APP_API}/paymentIntent`, objectToSend).then(res => {
-	console.log('res from payment intent arrived on frontend', res)
 	this.setState({message: res.data.message})
 
 	if (res.data.success){
 		this.props.stripe.handleCardPayment(res.data.clientSecret, {}).then( paymentRes => {
-			console.log('paymentRes', paymentRes)
 			if(paymentRes.error){
 				this.setState({message: paymentRes.error.message})
-axios.post(`${process.env.REACT_APP_API}/deleteTempTickets`, res.data.tickets)
+axios.post(`${process.env.REACT_APP_API}/deleteTempTickets`, {tickets: res.data.tickets, refunds: res.data.refundRequests})
 //i've never tested this. also need to include it anywhere else payment might fail
 
 {/*Secuirty Issue: There is a window here for hacker to manually post the tickets to backend to make them valid using updateTicketData controller*/}
 
 			}
 			else if(paymentRes.paymentIntent.status === 'succeeded'){
-			console.log('updating tickets section')
-
 			let updateTicketData = {
 							purchaser: this.props.purchaser,
 							tickets: res.data.tickets,
@@ -70,17 +66,12 @@ axios.post(`${process.env.REACT_APP_API}/deleteTempTickets`, res.data.tickets)
 
 
 if (res.data.refundsRequested == true){
-	console.log('condition triggered')
 	updateTicketData.refundRequests = res.data.refundRequests
 }
 
-console.log('updateTicketData', updateTicketData)
-
-
-
 			axios.post(`${process.env.REACT_APP_API}/emailTickets`, updateTicketData)
 			.then(res => {this.setState({
-					message:"Payment Successful. Your tickets will be emailed to you shortly"
+					message:res.data.message
 						})
 					}).catch(err => console.log('create tickets err', err))
 

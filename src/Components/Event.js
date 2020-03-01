@@ -132,6 +132,7 @@ class Event extends React.Component {
 					userEvent.tickets[placeInOriginalArray].buy.numTicketsSought = e.target.value
 					//can delete this condition when you remove the buy object - it serves no function
 			}
+
 		else {
 			console.log('else triggered')
 			userEvent.tickets[placeInOriginalArray][field] = e.target.value
@@ -384,7 +385,9 @@ replaceExistingCard = (e) => {
 	 	waitListData={{quantity: f.buy.numTicketsSought,
 			maximumPrice: f.price,
 			expires: f.waitListExpires,
-			specificDate: f.waitListSpecificDate}}
+			specificDate: f.waitListSpecificDate,
+			deliverTogether: f.waitListDeliverTogether
+		}}
 		waitListChange={this.waitListChange}
 		currency={this.state.userEvent.currency}
 		minimumPrice={f.refunds.minimumPrice}
@@ -411,7 +414,9 @@ replaceExistingCard = (e) => {
 				waitListData={{quantity: this.state.userEvent.tickets[1].buy.numTicketsSought,
 					maximumPrice: this.state.userEvent.tickets[1].price,
 					expires: this.state.userEvent.tickets[1].waitListExpires,
-					specificDate: this.state.userEvent.tickets[1].waitListSpecificDate}}
+					specificDate: this.state.userEvent.tickets[1].waitListSpecificDate,
+					deliverTogether: this.state.userEvent.tickets[1].waitListDeliverTogether
+				}}
 				userEventID={this.state.userEvent._id}
 				replaceExistingCard={this.state.replaceExistingCard}
 				message={this.state.message}

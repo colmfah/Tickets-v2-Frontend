@@ -81,6 +81,20 @@ componentDidMount(){
 
 								</div>}
 
+{this.props.waitListData.quantity > 1 &&<div>
+		<label>
+			How do you want to receive your tickets?
+		</label>
+		<select
+			required
+			value={this.props.waitListData.deliverTogether}
+			onChange={event => this.props.waitListChange(event, 'waitListDeliverTogether', this.props.placeInOriginalArray)}
+		>
+			<option value="false">1 by 1 as they become available (more likely to receive tickets)</option>
+			<option value="true">Only when {this.props.waitListData.quantity} tickets are available</option>
+		</select>
+		</div>}
+
 			<hr />
 			</>
 		)
