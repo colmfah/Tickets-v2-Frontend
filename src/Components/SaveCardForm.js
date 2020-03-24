@@ -36,7 +36,8 @@ state = {
 
 			if (confirmCardSetupRes.setupIntent.status === 'succeeded'){
 				this.props.upDateMessage('This will take a moment. Please be patient. Credit Card Confirmed. Saving Details...')
-
+				console.log('waitListData', this.props.waitListData);
+				
 		axios.post(`${process.env.REACT_APP_API}/purchaseWaitList`, {
 				waitListData: this.props.waitListData,
 				purchaserID: this.props.purchaserID,

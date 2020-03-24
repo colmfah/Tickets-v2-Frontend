@@ -327,7 +327,7 @@ replaceExistingCard = (e) => {
 									<hr />
 								</div>
 								)}	)}
-{this.state.userEvent.tickets.filter(e => e.lastMinuteTicket === true).length < 1 && <div>
+								{(this.state.userEvent.tickets.filter(e => e.finalFewTicket === true).length > 0 || this.state.userEvent.tickets.filter(e => e.ticketTypeID > 0 && e.soldOut === false) )&& <div>
 								<div>
 								Subtotal: {this.state.purchaseTicketCharges.subTotal}
 								</div>
@@ -367,7 +367,9 @@ replaceExistingCard = (e) => {
 				numTicketsSought={this.state.userEvent.tickets.filter( e => {return e.buy.numTicketsSought > 0}).map(	e => {return ({
 					ticketType: e.ticketType,
 					ticketTypeID: e.ticketTypeID,
-					numTicketsSought: e.buy.numTicketsSought
+					numTicketsSought: e.buy.numTicketsSought,
+					finalFewTicket: e.finalFewTicket,
+					lastMinuteTicket: e.lastMinuteTicket
 				})
 			}	)}
 			/>
@@ -379,7 +381,7 @@ replaceExistingCard = (e) => {
 
 
 
-
+{this.state.userEvent.tickets.filter(e => e.lastMinuteTicket === true).length > 0 && <h4>Bid For Tickets</h4>}
 {this.state.userEvent.tickets.filter(e => e.lastMinuteTicket === true).map(f => {return (
 	<LastMinuteTickets
 	 	waitListData={{quantity: f.buy.numTicketsSought,
@@ -411,11 +413,11 @@ replaceExistingCard = (e) => {
 		<Elements>
 				<SaveCardForm
 				purchaserID={this.state.purchaser}
-				waitListData={{quantity: this.state.userEvent.tickets[1].buy.numTicketsSought,
-					maximumPrice: this.state.userEvent.tickets[1].price,
-					expires: this.state.userEvent.tickets[1].waitListExpires,
-					specificDate: this.state.userEvent.tickets[1].waitListSpecificDate,
-					deliverTogether: this.state.userEvent.tickets[1].waitListDeliverTogether
+				waitListData={{quantity: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].buy.numTicketsSought,
+					maximumPrice: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].price,
+					expires: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].waitListExpires,
+					specificDate: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].waitListSpecificDate,
+					deliverTogether: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].waitListDeliverTogether
 				}}
 				userEventID={this.state.userEvent._id}
 				replaceExistingCard={this.state.replaceExistingCard}
