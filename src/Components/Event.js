@@ -40,7 +40,7 @@ class Event extends React.Component {
 			description: "",
 			startDetails: "",
 			endDetails: "",
-			organiser: {_id: '', name: '', stripeAccountID: ''},
+			organiser: {_id: '', name: '', stripeAccountID: '', salesPlan: ''},
 			currency: "EUR",
 			tickets: [{
 				ticketType: '',
@@ -169,7 +169,7 @@ class Event extends React.Component {
 			let highPriceTickets = tickets.filter(	e => {return e.price > 10}	)
 			tickets.forEach(	e => {subTotal += (e.buy.numTicketsSought * e.price) }	)
 			tickets.forEach(e => {totalTickets += Number(e.buy.numTicketsSought)})
-			if(allTickets.filter(e=>e.ticketTypeID > 0).length === 1){
+			if(this.state.userEvent.organiser.salesPlan === 'basic'){
 				fixedCharge = totalTickets * 0.49
 				if(tickets[0].price > 10){
 					variableCharge = (subTotal * 0.04)
@@ -356,9 +356,8 @@ replaceExistingCard = (e) => {
 	<div>
 		<Elements>
 			<CheckoutForm
-				total={
-					this.displayTotal()
-				}
+				total={this.displayTotal()}
+				ticketTypesEquivalent={this.state.userEvent.ticketTypesEquivalent}
 				moneyForColm={this.displayAdminFee()-this.calculateStripeFee()}
 				currency={this.state.userEvent.currency}
 				eventTitle={this.state.userEvent.title}

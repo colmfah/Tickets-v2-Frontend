@@ -23,11 +23,11 @@ class CheckoutForm extends Component {
       this.setState({
         message: `Checking if tickets are still available`
       })
-			let objectToSend = {}
+			let objectToSend = {ticketTypesEquivalent: this.props.ticketTypesEquivalent}
       objectToSend.checkForTickets = {
         userEvent: this.props.userEvent._id,
         numTicketsSought: this.props.numTicketsSought,
-				purchaser: this.props.purchaser
+		purchaser: this.props.purchaser
       }
 
 
