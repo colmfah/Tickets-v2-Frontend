@@ -5,57 +5,57 @@ import axios from "axios";
 
 class SaveCardForm extends Component {
 
-	componentDidUpdate(){
+	// waitListData={this.state.userEvent.tickets.filter(e => e.lastMinuteTicket===true && e.buy.numTicketsSought > 0)}
 
+	// waitListData={{quantity: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].buy.numTicketsSought,
+	// 	maximumPrice: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].price,
+	// 	expires: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].waitListExpires,
+	// 	specificDate: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].waitListSpecificDate,
+	// 	deliverTogether: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].waitListDeliverTogether
+	// }}
+
+	componentDidUpdate(){
+		console.log('waitListData', this.props.waitListData)
 	}
 
+	state = {
+		message: ''
+	}
 
+	submit = e => {
+		e.preventDefault()
 
+		//do if statement ....if there are no requests to purchase last minute tickets (this.props.waitListData will be blank)
 
-
-state = {
-	message: ''
-}
-  submit = e => {
-    e.preventDefault();
 		this.props.upDateMessage('This will take a moment. Please be patient...')
 		const cardElement = this.props.elements.getElement('card');
 
-		axios.get(`${process.env.REACT_APP_API}/saveCardDetails`)
-		.then(res => {
-		this.props.upDateMessage('This will take a moment. Please be patient. Verifying credit card...')
+		axios.get(`${process.env.REACT_APP_API}/saveCardDetails`).then(res => {
+			this.props.upDateMessage('This will take a moment. Please be patient. Verifying credit card...')
+			this.props.stripe.confirmCardSetup(res.data.client_secret, {payment_method: {card: cardElement}}).then( confirmCardSetupRes => {
 
-		this.props.stripe.confirmCardSetup(res.data.client_secret, {
-			payment_method: {
-        card: cardElement,
-      }
-		}
-    )
+				if (confirmCardSetupRes.setupIntent.status === 'succeeded'){
+					this.props.upDateMessage('This will take a moment. Please be patient. Credit Card Confirmed. Saving Details...')
+					
+					axios.post(`${process.env.REACT_APP_API}/purchaseWaitList`, {
+							waitListData: this.props.waitListData,
+							purchaserID: this.props.purchaserID,
+							userEventID: this.props.userEventID,
+							paymentMethodID: confirmCardSetupRes.setupIntent.payment_method,
+							replaceExistingCard: this.props.replaceExistingCard,
+							cardSaved: this.props.cardSaved
+						}).then(res => {
+							this.props.upDateMessage(res.data.message)
+						})
 
-		.then( confirmCardSetupRes => {
+				}else{
+					this.this.props.upDateMessage('Error: We were unable to verify your card details. Your bid has not been saved.')
+				}
 
-			if (confirmCardSetupRes.setupIntent.status === 'succeeded'){
-				this.props.upDateMessage('This will take a moment. Please be patient. Credit Card Confirmed. Saving Details...')
-				console.log('waitListData', this.props.waitListData);
-				
-		axios.post(`${process.env.REACT_APP_API}/purchaseWaitList`, {
-				waitListData: this.props.waitListData,
-				purchaserID: this.props.purchaserID,
-				userEventID: this.props.userEventID,
-				paymentMethodID: confirmCardSetupRes.setupIntent.payment_method,
-				replaceExistingCard: this.props.replaceExistingCard
-			}).then(res => {
-				this.props.upDateMessage(res.data.message)
-			})
+			}).catch(err => console.log('confirmCardSetupRes errrrr', err));
+		})
 
-			}else{
-				this.this.props.upDateMessage('Error: We were unable to verify your card details. Your bid has not been saved.')
-			}
-
-  }).catch(err => console.log('confirmCardSetupRes errrrr', err));
-})
-
-}
+	}
 
   render() {
 

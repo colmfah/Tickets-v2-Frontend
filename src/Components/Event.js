@@ -227,20 +227,21 @@ return(
 
 	chargeExistingCard = (e) =>{
 		e.preventDefault()
+		console.log('colm')
+		
 		this.setState({message: 'Saving Your Bid. Please Wait...'})
 		let objectToSend = {
+			waitListData: this.state.userEvent.tickets.filter(e => e.lastMinuteTicket===true && e.buy.numTicketsSought > 0),
 			purchaserID: this.state.purchaser,
-			userEventID: this.state.userEvent._id
-		}
+			userEventID: this.state.userEvent._id,
+			replaceExistingCard: this.state.replaceExistingCard,
+			cardSaved: this.state.cardDetails.cardSaved
+			}
 
-		objectToSend.waitListData = {quantity: this.state.userEvent.tickets[1].buy.numTicketsSought,
-			maximumPrice: this.state.userEvent.tickets[1].price,
-			expires: this.state.userEvent.tickets[1].waitListExpires,
-			specificDate: this.state.userEvent.tickets[1].waitListSpecificDate}
+		console.log('objectToSend', objectToSend);
+		
 
-			console.log('objectToSend', objectToSend)
-
-		axios.post(`${process.env.REACT_APP_API}/chargeExistingCard`, objectToSend).then(res => {
+		axios.post(`${process.env.REACT_APP_API}/purchaseWaitList`, objectToSend).then(res => {
 			this.setState({message: res.data.message})
 		})
 	}
@@ -256,14 +257,6 @@ replaceExistingCard = (e) => {
   render() {
 
 		let numberTicketsAvailable = this.state.userEvent.tickets.map( e => e.ticketsAvailable).reduce((t,i) => t+i)
-
-
-
-
-
-
-
-
 
     return (
       <>
@@ -403,39 +396,36 @@ replaceExistingCard = (e) => {
 <div>Total: {this.state.lastMinuteTicketCharges.fixedCharge + this.state.lastMinuteTicketCharges.variableCharge + this.state.lastMinuteTicketCharges.vatOnCharges + this.state.lastMinuteTicketCharges.subTotal}</div>
 
 
-{/*{(this.state.cardDetails.card === '' || this.state.cardDetails.last4 === '' || this.state.replaceExistingCard === true )?	*/}
+{(this.state.cardDetails.cardSaved === false || this.state.replaceExistingCard === true )?
 
-
-<StripeProvider
-	apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
-	>
+	<StripeProvider apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}>
 		<Elements>
 				<SaveCardForm
-				purchaserID={this.state.purchaser}
-				waitListData={{quantity: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].buy.numTicketsSought,
-					maximumPrice: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].price,
-					expires: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].waitListExpires,
-					specificDate: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].waitListSpecificDate,
-					deliverTogether: this.state.userEvent.tickets[this.state.userEvent.tickets.length-1].waitListDeliverTogether
-				}}
-				userEventID={this.state.userEvent._id}
-				replaceExistingCard={this.state.replaceExistingCard}
-				message={this.state.message}
-				upDateMessage={this.upDateMessage}
-				stripeAccountID={this.state.userEvent.organiser.stripeAccountID}
+					purchaserID={this.state.purchaser}
+					waitListData={this.state.userEvent.tickets.filter(e => e.lastMinuteTicket===true && e.buy.numTicketsSought > 0)}
+					userEventID={this.state.userEvent._id}
+					replaceExistingCard={this.state.replaceExistingCard}
+					message={this.state.message}
+					upDateMessage={this.upDateMessage}
+					stripeAccountID={this.state.userEvent.organiser.stripeAccountID}
+					cardSaved={this.state.cardDetails.cardSaved}
 				/>
 		</Elements>
 	</StripeProvider>
 
 
 
-{/*	: <div>Would you like to pay for these tickets using {this.state.cardDetails.card} card ending in {this.state.cardDetails.last4}?
-	<button onClick={this.chargeExistingCard}>Yes Please</button>
-	<button onClick={this.replaceExistingCard}>No, charge a different card</button>
-	<div>{this.state.message}</div>
+	: <div>Would you like to pay for these tickets using {this.state.cardDetails.card} card ending in {this.state.cardDetails.last4}?
+		<button onClick={this.chargeExistingCard}>Yes Please</button>
+		<button onClick={this.replaceExistingCard}>No, charge a different card</button>
+		<div>{this.state.message}</div>
 	</div>}
-	Temporarily removed because saved cards on my stripe account can't be charged to accounts I am connected to. The fixed is to record the connected stripe account when saving card and save in my db the event.organisers that the card is saved to
-*/}
+
+{/*  Temporarily removed because saved cards on my stripe account can't be charged to accounts I am connected to. 
+The fixed is to record the connected stripe account when saving card and save in my db the event.organisers that the card is saved to */}
+	
+
+
 	</div>
 	}
 
