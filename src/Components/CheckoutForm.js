@@ -50,7 +50,7 @@ axios.post(`${process.env.REACT_APP_API}/paymentIntent`, objectToSend).then(res 
 		this.props.stripe.handleCardPayment(res.data.clientSecret, {}).then( paymentRes => {
 			if(paymentRes.error){
 				this.setState({message: paymentRes.error.message})
-axios.post(`${process.env.REACT_APP_API}/deleteTempTickets`, {tickets: res.data.tickets, refunds: res.data.refundRequests})//amend to include overdue refunds
+axios.post(`${process.env.REACT_APP_API}/deleteTempTickets`, {tickets: res.data.tickets, refunds: res.data.refundRequests, ticketsAlreadyRefunded: res.data.ticketsAlreadyRefunded})//amend to include overdue refunds
 //i've never tested this. also need to include it anywhere else payment might fail
 
 {/*Secuirty Issue: There is a window here for hacker to manually post the tickets to backend to make them valid using updateTicketData controller*/}
@@ -60,14 +60,13 @@ axios.post(`${process.env.REACT_APP_API}/deleteTempTickets`, {tickets: res.data.
 			let updateTicketData = {
 							purchaser: this.props.purchaser,
 							tickets: res.data.tickets,
+							ticketsAlreadyRefunded: res.data.ticketsAlreadyRefunded,
+							refundRequests: res.data.refundRequests,
 							paymentIntentID: paymentRes.paymentIntent.id,
 							userEvent: this.props.userEvent._id,
 						}
 
 
-if (res.data.refundsRequested == true){
-	updateTicketData.refundRequests = res.data.refundRequests
-}
 
 			axios.post(`${process.env.REACT_APP_API}/emailTickets`, updateTicketData)
 			.then(res => {this.setState({

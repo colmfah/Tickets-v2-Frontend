@@ -285,11 +285,8 @@ validTicketCheck = (e, i) => {
 
 
 	handleRefundChange = (e, field, i)=>{
-		console.log('handleRefundChange triggered')
-		console.log('e.target.value', e.target.value)
-		console.log('field', field)
-		console.log('i', i)
 
+		
 		let userEvent = this.state.userEvent
 		if (i === 'not relevant'){
 			if(field === 'optionSelected' && e.target.value !== 'excessDemand'){

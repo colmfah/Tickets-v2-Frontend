@@ -17,11 +17,15 @@ componentDidMount(){
 
 	render() {
 
+		let excessDemandCondition
+
+		if(this.props.refundOption === 'excessDemand' || this.props.refundOption === 'excessDemandTicketType'){excessDemandCondition = `the tickets will sell to the highest bidder`}else{excessDemandCondition = `the tickets will sell to the earliest bidder`}
+
 	  return (
 			<>
 			<h5>{this.props.ticketType}</h5>
 
-			<p>A small number of tickets will be sold shortly. You can bid for these tickets here. If there excess demand, the tickets will sell to the highest bidder</p>
+	  <p>A small number of tickets will be sold shortly. You can bid for these tickets here. If there excess demand, {excessDemandCondition}</p>
 
 
 			<div>
@@ -36,18 +40,25 @@ componentDidMount(){
 					/>
 			</div>
 
-			<div>
-			<label>
-				{`How much are your prepared to pay?: ${this.props.currency}`}
-			</label>
-				<input
-					required
-					type="number"
-					min={this.props.minimumPrice}
-					value={this.props.waitListData.maximumPrice}
-					onChange={(event) => {this.props.waitListChange(event, 'price', this.props.placeInOriginalArray);this.props.calculateTotals({lastMinuteTicket: true})}}
+
+
+			{this.props.refundOption === 'excessDemand' || this.props.refundOption === 'excessDemandTicketType' ? 
+
+				<div>
+					<label>{`How much are your prepared to pay?: ${this.props.currency}`}</label>
+					<input
+						required
+						type="number"
+						min={this.props.minimumPrice}
+						value={this.props.waitListData.maximumPrice}
+						onChange={(event) => {this.props.waitListChange(event, 'price', this.props.placeInOriginalArray);this.props.calculateTotals({lastMinuteTicket: true})}}
 					/>
-			</div>
+				</div>
+				: 
+	  			<div>Price: {this.props.minimumPrice}</div>
+			}
+
+
 
 
 

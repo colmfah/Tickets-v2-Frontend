@@ -49,7 +49,7 @@ if (this.props.howToResell === 'originalPrice'){
 					value="excessDemand"
 					>Refund if all {this.props.numberOfTickets > 1 ? 'ticket types' : 'tickets'} have sold out and new customers are waiting to buy</option>
 					{this.props.numberOfTickets > 1 && <option value="excessDemandTicketType">{this.props.globalRefundPolicy === false ? `Refund if this specific ticket type - ${this.props.originalName} - has sold out and new customers are waiting to buy` : `Refund each specific ticket type (${this.props.originalName[0]}, ${this.props.originalName[1]} etc.) if it has sold out and new customers are waiting to buy`} </option>}
-				<option value="untilSpecific">Refund until a specific date & time</option>
+				<option value="untilSpecific">Refund until a specific date and time</option>
 				<option value="noRefunds">No Refunds</option>
 			</select>
 			</div>

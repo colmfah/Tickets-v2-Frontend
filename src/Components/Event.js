@@ -361,7 +361,8 @@ replaceExistingCard = (e) => {
 					ticketTypeID: e.ticketTypeID,
 					numTicketsSought: e.buy.numTicketsSought,
 					finalFewTicket: e.finalFewTicket,
-					lastMinuteTicket: e.lastMinuteTicket
+					lastMinuteTicket: e.lastMinuteTicket,
+					resaleOfRefund: e.resaleOfRefund
 				})
 			}	)}
 			/>
@@ -373,8 +374,8 @@ replaceExistingCard = (e) => {
 
 
 
-{this.state.userEvent.tickets.filter(e => e.lastMinuteTicket === true).length > 0 && <h4>Bid For Tickets</h4>}
-{this.state.userEvent.tickets.filter(e => e.lastMinuteTicket === true).map(f => {return (
+{this.state.userEvent.tickets.filter(e => e.lastMinuteTicket).length > 0 && <h4>Bid For Tickets</h4>}
+{this.state.userEvent.tickets.filter(e => e.lastMinuteTicket).map(f => {return (
 	<LastMinuteTickets
 	 	waitListData={{quantity: f.buy.numTicketsSought,
 			maximumPrice: f.price,
@@ -388,6 +389,7 @@ replaceExistingCard = (e) => {
 		placeInOriginalArray={f.placeInOriginalArray}
 		calculateTotals={this.calculateTotals}
 		ticketType={f.ticketType}
+		refundOption={f.refunds.optionSelected}
 	/>)})}
 
 
