@@ -19,7 +19,7 @@ componentDidMount(){
 
 		let excessDemandCondition
 
-		if(this.props.refundOption === 'excessDemand' || this.props.refundOption === 'excessDemandTicketType'){excessDemandCondition = `the tickets will sell to the highest bidder`}else{excessDemandCondition = `the tickets will sell to the earliest bidder`}
+		if(this.props.refundOption === 'auction'){excessDemandCondition = `the tickets will sell to the highest bidder`}else{excessDemandCondition = `the tickets will sell to the earliest bidder`}
 
 	  return (
 			<>
@@ -42,7 +42,7 @@ componentDidMount(){
 
 
 
-			{this.props.refundOption === 'excessDemand' || this.props.refundOption === 'excessDemandTicketType' ? 
+			{this.props.refundOption === 'auction' ? 
 
 				<div>
 					<label>{`How much are your prepared to pay?: ${this.props.currency}`}</label>

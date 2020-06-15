@@ -92,57 +92,33 @@ class Event extends React.Component {
 		message: ''
   }
 
-  componentDidMount() {
+	componentDidMount() {
 			let token = ''
-    if (localStorage.getItem("token")) {
-      token = localStorage.getItem("token")
+	if (localStorage.getItem("token")) {
+		token = localStorage.getItem("token")
 		}
-      let objectToSend = {
-        token: token,
+		let objectToSend = {
+		token: token,
 				specificEvent: this.props.match.params.id
-      };
-      axios
-        .post(`${process.env.REACT_APP_API}/retrieveEventByID`, objectToSend)
-        .then(res => {
-          this.setState({
-            purchaser: res.data.purchaser,
+		};
+		axios
+		.post(`${process.env.REACT_APP_API}/retrieveEventByID`, objectToSend)
+		.then(res => {
+			this.setState({
+			purchaser: res.data.purchaser,
 						cardDetails: res.data.cardDetails,
 						stripeCustomerID: res.data.stripeCustomerID,
 						userEvent: res.data.userEvent
-          });
-        })
-        .catch(err => console.log('errr', err));
+			});
+		})
+		.catch(err => console.log('errr', err));
 
-  }
-
-	upDateMessage = (msg) => {
-		this.setState({message: msg})
 	}
 
-	waitListChange = (e, field, placeInOriginalArray) => {
 
-		let waitList = this.state.waitList
-		let userEvent = this.state.userEvent
-		console.log('lmt1', userEvent.tickets[1])
-		if (field === 'waitListSpecificDate'){
-			console.log('date triggered')
-			userEvent.tickets[placeInOriginalArray][field] = e
-		}else if(field === 'numTicketsSought'){
-			console.log('else if triggered')
-					userEvent.tickets[placeInOriginalArray].buy.numTicketsSought = e.target.value
-					//can delete this condition when you remove the buy object - it serves no function
-			}
 
-		else {
-			console.log('else triggered')
-			userEvent.tickets[placeInOriginalArray][field] = e.target.value
-			console.log('placeInOriginalArray', placeInOriginalArray)
-			console.log('field', field)
-			console.log('e.target.value', e.target.value)
-		}
-		console.log('lmt2', userEvent.tickets[1])
-		this.setState({userEvent})
-
+	calculateStripeFee = () => {
+	return (1.23*(0.25 + (0.014)*this.displayTotal()))
 	}
 
 
@@ -159,10 +135,10 @@ class Event extends React.Component {
 
 			let tickets
 			if (data.lastMinuteTicket === false){
-				tickets = this.state.userEvent.tickets.filter(e => e.lastMinuteTicket !== true)
+				tickets = this.state.userEvent.tickets.filter(e => {return (e.lastMinuteTicket !== true && e.chargeForTicketsStatus==='chargeForTickets')})
 				purchaseTicketCharges = this.state.purchaseTicketCharges
 			}else{
-				tickets = this.state.userEvent.tickets.filter(e => e.lastMinuteTicket === true)
+				tickets = this.state.userEvent.tickets.filter(e => {return (e.lastMinuteTicket === true && e.chargeForTicketsStatus==='chargeForTickets')})
 				lastMinuteTicketCharges = this.state.lastMinuteTicketCharges
 			}
 
@@ -198,65 +174,243 @@ class Event extends React.Component {
 
 	}
 
-
-  changeNumTickets = (e, i) => {
-		let userEvent = this.state.userEvent
-		userEvent.tickets[i].buy.numTicketsSought = Number(e.target.value)
-    this.setState({
-      userEvent: userEvent
-    })
-  }
-
-displayAdminFee = () => {
-return(
-	(this.state.purchaseTicketCharges.fixedCharge+this.state.purchaseTicketCharges.variableCharge+this.state.purchaseTicketCharges.vatOnCharges).toFixed(2)
-)
-	}
-
-
+	displayAdminFee = () => {
+		return(
+			(this.state.purchaseTicketCharges.fixedCharge+this.state.purchaseTicketCharges.variableCharge+this.state.purchaseTicketCharges.vatOnCharges).toFixed(2)
+		)
+			}
 
 	displayTotal = () => {
 		return (
-			 this.state.purchaseTicketCharges.fixedCharge+this.state.purchaseTicketCharges.variableCharge+this.state.purchaseTicketCharges.subTotal+this.state.purchaseTicketCharges.vatOnCharges
+				this.state.purchaseTicketCharges.fixedCharge+this.state.purchaseTicketCharges.variableCharge+this.state.purchaseTicketCharges.subTotal+this.state.purchaseTicketCharges.vatOnCharges
 		).toFixed(2)
 	}
 
-	calculateStripeFee = () => {
-		return (1.23*(0.25 + (0.014)*this.displayTotal()))
+	changeNumTickets = (e, i) => {
+		let userEvent = this.state.userEvent
+		userEvent.tickets[i].buy.numTicketsSought = Number(e.target.value)
+	this.setState({
+		userEvent: userEvent
+	})
 	}
 
 	chargeExistingCard = (e) =>{
+	e.preventDefault()
+
+
+	this.setState({message: 'Saving Your Bid. Please Wait...'})
+	let objectToSend = {
+		waitListData: this.state.userEvent.tickets.filter(e => e.lastMinuteTicket===true && e.buy.numTicketsSought > 0),
+		purchaserID: this.state.purchaser,
+		userEventID: this.state.userEvent._id,
+		replaceExistingCard: this.state.replaceExistingCard,
+		cardSaved: this.state.cardDetails.cardSaved
+		}
+
+	console.log('objectToSend', objectToSend);
+
+
+	axios.post(`${process.env.REACT_APP_API}/purchaseWaitList`, objectToSend).then(res => {
+		this.setState({message: res.data.message})
+	})
+	}
+
+	payWithSavedCard = (e, numTicketsSought) =>{
 		e.preventDefault()
-		console.log('colm')
+		this.setState({message: "Checking for tickets. Please Wait..."})
+
 		
-		this.setState({message: 'Saving Your Bid. Please Wait...'})
+
 		let objectToSend = {
-			waitListData: this.state.userEvent.tickets.filter(e => e.lastMinuteTicket===true && e.buy.numTicketsSought > 0),
-			purchaserID: this.state.purchaser,
-			userEventID: this.state.userEvent._id,
-			replaceExistingCard: this.state.replaceExistingCard,
-			cardSaved: this.state.cardDetails.cardSaved
-			}
-
-		console.log('objectToSend', objectToSend);
+	
+			checkForTickets :{				
+				numTicketsSought: numTicketsSought,
+				purchaser: this.state.purchaser,				
+				userEvent: this.state.userEvent._id,
+			  },
+			  stripeData: {
+				amount: this.displayTotal(),
+				currency: this.state.currency,
+				description: this.state.userEvent.title,
+				moneyForColm: this.displayAdminFee()-this.calculateStripeFee(),
+				seller: this.state.userEvent.organiser._id,	  
+			  },
+			  ticketTypesEquivalent: this.state.userEvent.ticketTypesEquivalent,
+			  waitListData: this.state.userEvent.tickets.filter(e => e.lastMinuteTicket===true && e.buy.numTicketsSought > 0),
+			  cardSaved: this.state.cardDetails.cardSaved,
+			  replaceExistingCard: this.state.replaceExistingCard
 		
+		}
+	
 
-		axios.post(`${process.env.REACT_APP_API}/purchaseWaitList`, objectToSend).then(res => {
+
+		axios.post(`${process.env.REACT_APP_API}/paymentIntent`, objectToSend).then(res => {
 			this.setState({message: res.data.message})
+		
+			if (res.data.success){
+				this.props.stripe.handleCardPayment(res.data.clientSecret, {}).then( paymentRes => {
+					if(paymentRes.error){
+						this.setState({message: paymentRes.error.message})
+						axios.post(`${process.env.REACT_APP_API}/deleteTempTickets`, {tickets: res.data.tickets, refunds: res.data.refundRequests, ticketsAlreadyRefunded: res.data.ticketsAlreadyRefunded})//amend to include overdue refunds
+						//i've never tested this. also need to include it anywhere else payment might fail
+		
+						{/*Secuirty Issue: There is a window here for hacker to manually post the tickets to backend to make them valid using updateTicketData controller*/}
+		
+					}
+					else if(paymentRes.paymentIntent.status === 'succeeded'){
+						let updateTicketData = {
+										purchaser: this.props.purchaser,
+										tickets: res.data.tickets,
+										ticketsAlreadyRefunded: res.data.ticketsAlreadyRefunded,
+										refundRequests: res.data.refundRequests,
+										paymentIntentID: paymentRes.paymentIntent.id,
+										userEvent: this.props.userEvent._id,
+										}
+					
+					axios.post(`${process.env.REACT_APP_API}/emailTickets`, updateTicketData).then(res => {
+						this.setState({message:res.data.message})
+							}).catch(err => console.log('create tickets err', err))
+		
+		
+					} else {
+						this.setState({
+							message: "Payment Failed. You have not been charged"
+						})
+						console.log('payment failed', paymentRes)
+					}
+		
+			}).catch(err => console.log('handleCardPaymentErr', err))
+			}
+				})
+	}
+
+
+	replaceExistingCard = (e) => {
+		e.preventDefault()
+		this.setState({
+			replaceExistingCard: true
 		})
 	}
 
-replaceExistingCard = (e) => {
-	e.preventDefault()
-	this.setState({
-		replaceExistingCard: true
-	})
-}
+	upDateMessage = (msg) => {
+		this.setState({message: msg})
+	}
+
+	waitListChange = (e, field, placeInOriginalArray) => {
+
+		let waitList = this.state.waitList
+		let userEvent = this.state.userEvent
+		console.log('lmt1', userEvent.tickets[1])
+		if (field === 'waitListSpecificDate'){
+			console.log('date triggered')
+			userEvent.tickets[placeInOriginalArray][field] = e
+		}else if(field === 'numTicketsSought'){
+			console.log('else if triggered')
+					userEvent.tickets[placeInOriginalArray].buy.numTicketsSought = e.target.value
+					//can delete this condition when you remove the buy object - it serves no function
+			}
+
+		else {
+			console.log('else triggered')
+			userEvent.tickets[placeInOriginalArray][field] = e.target.value
+			console.log('placeInOriginalArray', placeInOriginalArray)
+			console.log('field', field)
+			console.log('e.target.value', e.target.value)
+		}
+		console.log('lmt2', userEvent.tickets[1])
+		this.setState({userEvent})
+
+	}
 
 
   render() {
 
-		let numberTicketsAvailable = this.state.userEvent.tickets.map( e => e.ticketsAvailable).reduce((t,i) => t+i)
+	{/**this.state.userEvent.tickets.filter(e => e.finalFewTicket === true).length > 0 || this.state.userEvent.tickets.filter(e => e.ticketTypeID > 0 && e.soldOut === false) )&& <div></div>**/}
+
+
+	let numTicketsSought = this.state.userEvent.tickets.filter( e => {return e.buy.numTicketsSought > 0}).map(e => {return (
+		{
+			chargeForTicketsStatus: e.chargeForTicketsStatus,
+			chargeForNoShows: e.chargeForNoShows,
+			ticketType: e.ticketType,
+			ticketTypeID: e.ticketTypeID,
+			numTicketsSought: e.buy.numTicketsSought,
+			finalFewTicket: e.finalFewTicket,
+			lastMinuteTicket: e.lastMinuteTicket,
+			resaleOfRefund: e.resaleOfRefund
+		}
+	)})
+
+	let checkoutForm = 		
+		<StripeProvider
+			apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
+			stripeAccount={this.state.userEvent.organiser.stripeAccountID}
+		>
+			<Elements>		
+				<CheckoutForm
+					total={this.displayTotal()}
+					ticketTypesEquivalent={this.state.userEvent.ticketTypesEquivalent}
+					moneyForColm={this.displayAdminFee()-this.calculateStripeFee()}
+					currency={this.state.userEvent.currency}
+					eventTitle={this.state.userEvent.title}
+					purchaser={this.state.purchaser}
+					userEvent={this.state.userEvent}
+					purchaserID={this.state.purchaser}
+					replaceExistingCard={this.state.replaceExistingCard}
+					cardSaved={this.state.cardDetails.cardSaved}
+					upDateMessage={this.upDateMessage}
+					numTicketsSought={numTicketsSought}
+				/>
+			</Elements>
+		
+		</StripeProvider>
+
+	let useSavedCardDisplay = 
+		<div>
+			Would you like to pay for these tickets using {this.state.cardDetails.card} card ending in {this.state.cardDetails.last4}?
+			<button onClick={(e) => this.payWithSavedCard(e, numTicketsSought)}>Yes Please</button>
+			<button onClick={this.replaceExistingCard}>No, charge a different card</button>
+			<div>{this.state.message}</div>
+		</div>
+
+
+
+
+	let saveCardDisplay = 
+		<StripeProvider apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}>
+			<Elements>
+					<SaveCardForm
+						cardSaved={this.state.cardDetails.cardSaved}
+						currency={this.state.userEvent.currency}
+						eventTitle={this.state.userEvent.title}
+						purchaserID={this.state.purchaser}	
+						replaceExistingCard={this.state.replaceExistingCard}
+						message={this.state.message}
+						moneyForColm={this.displayAdminFee()-this.calculateStripeFee()}
+						numTicketsSought={numTicketsSought}
+						seller = {this.state.userEvent.organiser._id}
+						stripeAccountID={this.state.userEvent.organiser.stripeAccountID}
+						ticketTypesEquivalent = {this.state.userEvent.ticketTypesEquivalent}
+						total={this.displayTotal()}
+						upDateMessage={this.upDateMessage}
+						userEventID={this.state.userEvent._id}
+						waitListData={this.state.userEvent.tickets.filter(e => e.lastMinuteTicket===true && e.buy.numTicketsSought > 0)}
+					/>
+			</Elements>
+		</StripeProvider>
+
+
+
+
+
+	let paymentDisplay
+
+	if (this.state.userEvent.organiser.stripeAccountID !== ''){
+		if (this.state.cardDetails.cardSaved === false || this.state.replaceExistingCard === true){
+			paymentDisplay = saveCardDisplay
+		}else{paymentDisplay = useSavedCardDisplay}
+	}
+		
 
     return (
       <>
@@ -298,10 +452,14 @@ replaceExistingCard = (e) => {
 				<div key={i}>
 					<h5>{e.ticketType}</h5>
 					<div>{e.ticketDescription}</div>
-					<div>{this.state.userEvent.currency}{e.price}</div>
-					<div>
 
-			{e.ticketsAvailable < 1 ? <div>Sold Out</div> : <div>
+					{e.chargeForTicketsStatus==='chargeForTickets' ? <div>Price: {this.state.userEvent.currency}{e.price}</div> : <div>Price: Free</div>}
+
+			{e.chargeForNoShows>0 && <div>Fine for securing ticket and not attending: ${this.state.userEvent.currency}${e.chargeForNoShows} per ticket</div>}
+
+				<div>
+
+			{e.soldOut ? <div>Sold Out</div> : <div>
 						<label>How Many Tickets?</label>
 						<input
 							value={e.buy.numTicketsSought}
@@ -320,57 +478,28 @@ replaceExistingCard = (e) => {
 									<hr />
 								</div>
 								)}	)}
-								{(this.state.userEvent.tickets.filter(e => e.finalFewTicket === true).length > 0 || this.state.userEvent.tickets.filter(e => e.ticketTypeID > 0 && e.soldOut === false) )&& <div>
-								<div>
-								Subtotal: {this.state.purchaseTicketCharges.subTotal}
-								</div>
-								<div>
-								Fixed Charge: {this.state.purchaseTicketCharges.fixedCharge}
-								</div>
-								<div>
-								Variable Charge: {this.state.purchaseTicketCharges.variableCharge}
-								</div>
-								<div>
-								VAT on charges {this.state.purchaseTicketCharges.vatOnCharges}
-								</div>
-								<div>
-								Total Service Fee: {this.displayAdminFee()}
-								</div>
-								<div>
-								Grand Total: {this.displayTotal()}
-								</div>
 
-								<div>Stripe Fee {this.calculateStripeFee()}</div>
 
-{(this.state.userEvent.organiser.stripeAccountID !== '') && 				<StripeProvider
-	apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}
-	stripeAccount={this.state.userEvent.organiser.stripeAccountID}
->
-	<div>
-		<Elements>
-			<CheckoutForm
-				total={this.displayTotal()}
-				ticketTypesEquivalent={this.state.userEvent.ticketTypesEquivalent}
-				moneyForColm={this.displayAdminFee()-this.calculateStripeFee()}
-				currency={this.state.userEvent.currency}
-				eventTitle={this.state.userEvent.title}
-				purchaser={this.state.purchaser}
-				userEvent={this.state.userEvent}
-				numTicketsSought={this.state.userEvent.tickets.filter( e => {return e.buy.numTicketsSought > 0}).map(	e => {return ({
-					ticketType: e.ticketType,
-					ticketTypeID: e.ticketTypeID,
-					numTicketsSought: e.buy.numTicketsSought,
-					finalFewTicket: e.finalFewTicket,
-					lastMinuteTicket: e.lastMinuteTicket,
-					resaleOfRefund: e.resaleOfRefund
-				})
-			}	)}
-			/>
-		</Elements>
-	</div>
-</StripeProvider>
-}
-</div>}
+							
+
+
+								
+									<div>
+									Subtotal: {this.state.purchaseTicketCharges.subTotal}
+									</div>
+									<div>
+									Admin Fee: {this.displayAdminFee()}
+									</div>
+									<div>
+									Grand Total: {this.displayTotal()}
+									</div>
+
+								
+
+					
+
+
+
 
 
 
@@ -389,7 +518,7 @@ replaceExistingCard = (e) => {
 		placeInOriginalArray={f.placeInOriginalArray}
 		calculateTotals={this.calculateTotals}
 		ticketType={f.ticketType}
-		refundOption={f.refunds.optionSelected}
+		refundOption={f.refunds.howToResell}
 	/>)})}
 
 
@@ -398,38 +527,14 @@ replaceExistingCard = (e) => {
 <div>Total: {this.state.lastMinuteTicketCharges.fixedCharge + this.state.lastMinuteTicketCharges.variableCharge + this.state.lastMinuteTicketCharges.vatOnCharges + this.state.lastMinuteTicketCharges.subTotal}</div>
 
 
-{(this.state.cardDetails.cardSaved === false || this.state.replaceExistingCard === true )?
-
-	<StripeProvider apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}>
-		<Elements>
-				<SaveCardForm
-					purchaserID={this.state.purchaser}
-					waitListData={this.state.userEvent.tickets.filter(e => e.lastMinuteTicket===true && e.buy.numTicketsSought > 0)}
-					userEventID={this.state.userEvent._id}
-					replaceExistingCard={this.state.replaceExistingCard}
-					message={this.state.message}
-					upDateMessage={this.upDateMessage}
-					stripeAccountID={this.state.userEvent.organiser.stripeAccountID}
-					cardSaved={this.state.cardDetails.cardSaved}
-				/>
-		</Elements>
-	</StripeProvider>
 
 
-
-	: <div>Would you like to pay for these tickets using {this.state.cardDetails.card} card ending in {this.state.cardDetails.last4}?
-		<button onClick={this.chargeExistingCard}>Yes Please</button>
-		<button onClick={this.replaceExistingCard}>No, charge a different card</button>
-		<div>{this.state.message}</div>
-	</div>}
-
-{/*  Temporarily removed because saved cards on my stripe account can't be charged to accounts I am connected to. 
-The fixed is to record the connected stripe account when saving card and save in my db the event.organisers that the card is saved to */}
-	
 
 
 	</div>
 	}
+
+{paymentDisplay}
 
 
       </>
