@@ -33,12 +33,16 @@ logout = () => {
 
 				{this.tokenCheck() ?
 					<div>
-					<Link to={`/profile`}>
-							Your Profile
+					<Link to={`/tickets`}>
+							Your Tickets
 					</Link>
 
 					<Link to={`/createevent`}>
 						Create Event
+					</Link>
+
+					<Link to={`/yourevents`}>
+						Your Events
 					</Link>
 
 					<div onClick={this.logout}>Log Out</div>

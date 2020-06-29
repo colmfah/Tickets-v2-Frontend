@@ -2,12 +2,11 @@ import React from "react";
 import Nav from "./Nav";
 import UsersUpcomingEvents from './UsersUpcomingEvents'
 import { Link } from "react-router-dom";
-import QrReader from "react-qr-reader";
 import axios from "axios";
 import moment from "moment";
 
 
-class Profile extends React.Component {
+class Tickets extends React.Component {
   state = {
     user: {
       email: "",
@@ -158,4 +157,4 @@ updateState = (updatedUserData) => {
 		  }
 		}
 
-export default Profile;
+export default Tickets;
