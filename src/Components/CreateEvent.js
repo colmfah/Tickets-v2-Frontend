@@ -47,6 +47,7 @@ class CreateEvent extends React.Component {
 			currency: "EUR",
 			totalTicketsCreated: 1,
 			ticketTypesEquivalent: true,
+			eventPassword: '',
 			tickets: [{
 				ticketType: '',
 				ticketTypeID: 1,
@@ -546,6 +547,16 @@ class CreateEvent extends React.Component {
 				</select>
 			</div>
 		}
+
+		<div>
+			<input
+				value={this.state.userEvent.eventPassword}
+				required
+				onChange={event => this.changeField(event, 'eventPassword')}
+				type='password'
+				placeholder='password to check customers in'
+			/>
+		</div>
 
 
 		<h1>Create Tickets</h1>

@@ -7,40 +7,35 @@ import axios from "axios";
 import moment from "moment";
 
 
-class YourEvents extends React.Component {
+class CheckIn extends React.Component {
   state = {
-    yourEvents: [{
-      userEvent: '',
-      title: '',
-      capacity: 0,
-      ticketsSold: 0,
-      ticketsRefunded: 0,
-      ticketTypes: [ {}, {} ]
-    }]
+
+    eventRequested: '',
+    password: '',
+    message: '',
+    userEvent: {},
+    showCheckIn: false,
+    checkIn: false
   }
 
   componentDidMount() {
-
-    let token = localStorage.getItem("token");
-    axios.post(`${process.env.REACT_APP_API}/yourEvents`, {token: token}).then(res => {this.setState({yourEvents: res.data})}).catch(err => console.log(err));
   }
 
-  turnScannerOnOff = userEvent => {
-    let stateCopy = this.state.yourEvents
-    stateCopy.map(e => {
+  checkInLogIn = (e) => {
+      e.preventDefault()
 
-      console.log('e.userEvent', e.userEvent)
-      console.log('userEvent', userEvent);
-      
-      
-      
-      if (e.userEvent === userEvent) {
-        e.checkIn = !e.checkIn
-        return e
-      }
-    })
+      axios.post(`${process.env.REACT_APP_API}/checkInLogIn`, {userEvent: this.state.eventRequested, password: this.state.password}).then(res => {
+              
+        this.setState({message: res.data.message, userEvent: res.data.userEvent, showCheckIn: res.data.success})
+    
+    }).catch(err => console.log(err));
 
-    this.setState({usersEvents: stateCopy})
+  }
+
+  eventDetails = (e, field) => {
+      let stateCopy = this.state
+      stateCopy[field]=e.target.value
+      this.setState(stateCopy)
   }
 
   handleScan = (data, userEvent) => {
@@ -72,6 +67,26 @@ class YourEvents extends React.Component {
     }
   }
 
+  turnScannerOnOff = userEvent => {
+    let stateCopy = this.state.yourEvents
+    stateCopy.map(e => {
+
+      console.log('e.userEvent', e.userEvent)
+      console.log('userEvent', userEvent);
+      
+      
+      
+      if (e.userEvent === userEvent) {
+        e.checkIn = !e.checkIn
+        return e
+      }
+    })
+
+    this.setState({usersEvents: stateCopy})
+  }
+
+
+
   render() {
     return (
 <>
@@ -80,11 +95,72 @@ class YourEvents extends React.Component {
 
 
 
-	<h2>Events you are organising</h2>
+	<h2>Check In</h2>
+
+    <form onSubmit={this.checkInLogIn}>
+
+        <div>
+            <input
+                value={this.state.eventRequested}
+                required
+                onChange={event => this.eventDetails(event, 'eventRequested')}
+                type='text'
+                placeholder='Event ID'
+            />
+        </div>
+
+        <div>
+            <input
+                value={this.state.password}
+                required
+                onChange={event => this.eventDetails(event, 'password')}
+                type='password'
+                placeholder='Password'
+            />
+        </div>
+
+        <button>Submit</button>
+
+    </form>
+
+    {this.state.showCheckIn ? 
+        <div>
+            
+            <h3>{this.state.userEvent.title}</h3>
+
+            {this.state.checkIn ? 
+                    <div>
+                      <button onClick={() => this.turnScannerOnOff()}>
+                        Turn Off Check In
+                      </button>
+                      <QrReader
+                        delay={300}
+                        onError={this.handleError}
+                        onScan={event => this.handleScan(event, this.state.userEvent._id)}
+                      />
+                    </div>
+                    : 
+                    <button onClick={() => this.turnScannerOnOff()}>
+                      Check In Tickets
+                    </button>
+            } 
+        
+        
+        </div> 
+        
+        
+        
+        : 
+        
+        <div>{this.state.message}</div>}
+
+    
+
+
 
 
       
-        {this.state.yourEvents.map((e,i) => {return(
+        {/*this.state.yourEvents.map((e,i) => {return(
 
             <div key={i}>
 
@@ -138,7 +214,7 @@ class YourEvents extends React.Component {
                  
                 
         })
-        }
+        */}
 
 
 </>
@@ -146,4 +222,4 @@ class YourEvents extends React.Component {
 		  }
 		}
 
-export default YourEvents;
+export default CheckIn;
