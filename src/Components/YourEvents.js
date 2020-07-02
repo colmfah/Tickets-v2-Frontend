@@ -25,53 +25,6 @@ class YourEvents extends React.Component {
     axios.post(`${process.env.REACT_APP_API}/yourEvents`, {token: token}).then(res => {this.setState({yourEvents: res.data})}).catch(err => console.log(err));
   }
 
-  turnScannerOnOff = userEvent => {
-    let stateCopy = this.state.yourEvents
-    stateCopy.map(e => {
-
-      console.log('e.userEvent', e.userEvent)
-      console.log('userEvent', userEvent);
-      
-      
-      
-      if (e.userEvent === userEvent) {
-        e.checkIn = !e.checkIn
-        return e
-      }
-    })
-
-    this.setState({usersEvents: stateCopy})
-  }
-
-  handleScan = (data, userEvent) => {
-    if (data) {
-
-      this.turnScannerOnOff(userEvent)
-
-      let stateCopy = this.state.yourEvents
-      stateCopy.map(e => {
-        if (e.userEvent === userEvent) {
-          e.message = "QR code scanned. Checking database for match..."
-          return e
-        }
-      })
-      this.setState({yourEvents: stateCopy})
-
-      let token = localStorage.getItem("token")
-
-      axios.post(`${process.env.REACT_APP_API}/checkIn`, {qrcode: data, userEvent: userEvent, creatorToken: token}).then(res => {
-          let stateCopy = this.state.yourEvents
-          stateCopy = stateCopy.map(e => {
-            if (e.userEvent === userEvent) {
-              e.message = res.data.message
-              return e
-            }
-          });
-          this.setState({usersEvents: stateCopy})
-        }).catch(err => {console.log(err)})
-    }
-  }
-
   render() {
     return (
 <>
@@ -109,27 +62,6 @@ class YourEvents extends React.Component {
                   )})}
                 </div>
                 }
-
-                {e.checkIn ? 
-                    <div>
-                      <button onClick={() => this.turnScannerOnOff(e.userEvent)}>
-                        Turn Off Check In
-                      </button>
-                      <QrReader
-                        delay={300}
-                        onError={this.handleError}
-                        onScan={event => this.handleScan(event, e.userEvent)}
-                      />
-                    </div>
-                    : 
-                    <button onClick={() => this.turnScannerOnOff(e.userEvent)}>
-                      Check In Tickets
-                    </button>
-                  }  
-                  <div>{e.message}</div>
-
-
-
                 <hr />
 
             </div>

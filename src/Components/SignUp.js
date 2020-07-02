@@ -35,8 +35,7 @@ class SignUp extends React.Component {
     axios
       .post(`${process.env.REACT_APP_API}/users`, this.state.user)
       .then(res => {
-        if (res.data === "You already registered") {
-          console.log(res.data);
+        if (res.data.message === "You already registered") {
           this.setState({ errorMsg: "You have already registered" });
         } else {
 					localStorage.setItem("token", res.data)

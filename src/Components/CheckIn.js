@@ -41,48 +41,32 @@ class CheckIn extends React.Component {
   handleScan = (data, userEvent) => {
     if (data) {
 
-      this.turnScannerOnOff(userEvent)
+      this.turnScannerOnOff()
+      this.setState({message: "QR code scanned. Checking database for match..."})
 
-      let stateCopy = this.state.yourEvents
-      stateCopy.map(e => {
-        if (e.userEvent === userEvent) {
-          e.message = "QR code scanned. Checking database for match..."
-          return e
-        }
-      })
-      this.setState({yourEvents: stateCopy})
+      axios.post(`${process.env.REACT_APP_API}/checkIn`, {qrcode: data, userEvent: userEvent, password: this.state.password}).then(res => {
 
-      let token = localStorage.getItem("token")
-
-      axios.post(`${process.env.REACT_APP_API}/checkIn`, {qrcode: data, userEvent: userEvent, creatorToken: token}).then(res => {
-          let stateCopy = this.state.yourEvents
-          stateCopy = stateCopy.map(e => {
-            if (e.userEvent === userEvent) {
-              e.message = res.data.message
-              return e
-            }
-          });
-          this.setState({usersEvents: stateCopy})
+        this.setState({message: res.data.message})
         }).catch(err => {console.log(err)})
     }
   }
 
-  turnScannerOnOff = userEvent => {
-    let stateCopy = this.state.yourEvents
-    stateCopy.map(e => {
-
-      console.log('e.userEvent', e.userEvent)
-      console.log('userEvent', userEvent);
-      
-      
-      
-      if (e.userEvent === userEvent) {
-        e.checkIn = !e.checkIn
-        return e
-      }
+  logOut = () => {
+    this.setState({
+      message: '',
+      showCheckIn: false,
+      checkIn: false,
+      eventRequested: '',
+      password: '',
+      userEvent: {}
     })
 
-    this.setState({usersEvents: stateCopy})
+  }
+
+  turnScannerOnOff = () => {
+    let stateCopy = this.state
+    stateCopy.checkIn = !stateCopy.checkIn
+    this.setState({checkIn: stateCopy.checkIn})
   }
 
 
@@ -97,124 +81,70 @@ class CheckIn extends React.Component {
 
 	<h2>Check In</h2>
 
-    <form onSubmit={this.checkInLogIn}>
 
-        <div>
-            <input
-                value={this.state.eventRequested}
-                required
-                onChange={event => this.eventDetails(event, 'eventRequested')}
-                type='text'
-                placeholder='Event ID'
-            />
-        </div>
 
-        <div>
-            <input
-                value={this.state.password}
-                required
-                onChange={event => this.eventDetails(event, 'password')}
-                type='password'
-                placeholder='Password'
-            />
-        </div>
+    {!this.state.showCheckIn ? 
 
-        <button>Submit</button>
+      <form onSubmit={this.checkInLogIn}>
 
-    </form>
+      <div>
+          <input
+              value={this.state.eventRequested}
+              required
+              onChange={event => this.eventDetails(event, 'eventRequested')}
+              type='text'
+              placeholder='Event ID'
+          />
+      </div>
 
-    {this.state.showCheckIn ? 
-        <div>
-            
-            <h3>{this.state.userEvent.title}</h3>
+      <div>
+          <input
+              value={this.state.password}
+              required
+              onChange={event => this.eventDetails(event, 'password')}
+              type='password'
+              placeholder='Password'
+          />
+      </div>
 
-            {this.state.checkIn ? 
-                    <div>
-                      <button onClick={() => this.turnScannerOnOff()}>
-                        Turn Off Check In
-                      </button>
-                      <QrReader
-                        delay={300}
-                        onError={this.handleError}
-                        onScan={event => this.handleScan(event, this.state.userEvent._id)}
-                      />
-                    </div>
-                    : 
-                    <button onClick={() => this.turnScannerOnOff()}>
-                      Check In Tickets
-                    </button>
-            } 
+      <button>Submit</button>
+
+      </form>
+    :
+      <div>
+          
+          <h3>{this.state.userEvent.title}</h3>
+          <div>From: {moment(this.state.userEvent.startDetails).format("ddd, Do MMM YYYY, HH:mm ")} Until: {moment(this.state.userEvent.endDetails).format("ddd, Do MMM YYYY, HH:mm ")}</div>
+          <div>Venue: {this.state.venue}</div>
+
+          {this.state.checkIn ? 
+            <div>
+              <button onClick={this.turnScannerOnOff}>
+                Turn Off Check In
+              </button>
+              <QrReader
+                delay={300}
+                onError={this.handleError}
+                onScan={event => this.handleScan(event, this.state.userEvent._id)}
+              />
+            </div>
+          : 
+            <button onClick={this.turnScannerOnOff}>
+              Check In Ticket
+            </button>
+          } 
+
+          <button onClick={this.logOut}>Log Out of Event</button>
+      
+      
+      </div>}
         
         
-        </div> 
+
         
-        
-        
-        : 
-        
-        <div>{this.state.message}</div>}
+  <div>{this.state.message}</div>
 
     
-
-
-
-
-      
-        {/*this.state.yourEvents.map((e,i) => {return(
-
-            <div key={i}>
-
-                <p>{e.title}</p>
-                <p>Net Tickets Sold: {(e.ticketsSold - e.ticketsRefunded)} out of {e.capacity}</p>
-                <p>Total Tickets Sold (including cancelled tickets): {e.ticketsSold}</p>
-                <p>Cancelled Tickets: {e.ticketsRefunded}</p>
-                <br />
-
-                {(e.ticketTypes.length > 0 && e.ticketsSold > 0)&& 
-                
-                <div>
-                  <p>Ticket Types</p>
-                  {e.ticketTypes.map((f,j) => {return(
-                    <div key={j}>
-                      <p>{f.ticketType}</p>
-                      <p>Net Tickets Sold: {(f.ticketsSold - f.ticketsRefunded)} out of {f.capacity}</p>
-                      <p>Total Tickets Sold (including cancelled tickets): {f.ticketsSold}</p>
-                      <p>Cancelled Tickets: {f.ticketsRefunded}</p>
-                      <br />
-                    </div>
-                  )})}
-                </div>
-                }
-
-                {e.checkIn ? 
-                    <div>
-                      <button onClick={() => this.turnScannerOnOff(e.userEvent)}>
-                        Turn Off Check In
-                      </button>
-                      <QrReader
-                        delay={300}
-                        onError={this.handleError}
-                        onScan={event => this.handleScan(event, e.userEvent)}
-                      />
-                    </div>
-                    : 
-                    <button onClick={() => this.turnScannerOnOff(e.userEvent)}>
-                      Check In Tickets
-                    </button>
-                  }  
-                  <div>{e.message}</div>
-
-
-
-                <hr />
-
-            </div>
-
-        )
-                 
-                
-        })
-        */}
 
 
 </>
