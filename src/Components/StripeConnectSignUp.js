@@ -11,16 +11,24 @@ class StripeConnectSignUp extends React.Component {
 		error: false,
 		code: false,
 		readAndWrite: false,
-		message: ''
+		message: '',
+		name: ''
 	}
 
 componentDidMount(){
+
+	console.log('component mounts')
+
+	console.log('name');
+	
+	
 
 	const token = localStorage.getItem("token")
 	const query = new URLSearchParams(this.props.location.search)
 	const code = query.get('code')
 	const scope = query.get('scope')
 	const error = query.get('error')
+
 	if (error){
 		this.setState({error: true, message: error})
 	} else if (scope && scope !=='read_write'){
@@ -31,11 +39,13 @@ componentDidMount(){
 		const objectToSend = {
 			token: token,
 			code: code,
-			scope: scope
+			scope: scope,
+			name: this.state.name
 		}
-		axios
-			.patch(`${process.env.REACT_APP_API}/sellersStripeDetails`, objectToSend)
-			.then(res => this.setState({message: res.data.message}))
+
+		axios.patch(`${process.env.REACT_APP_API}/sellersStripeDetails`, objectToSend).then(res => {
+			console.log('res.data', res.data)
+			this.setState({message: res.data.message})})
 			.catch(err => console.log(err))
 	}
 }

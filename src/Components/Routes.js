@@ -9,6 +9,7 @@ import CheckIn from './CheckIn'
 import Tickets from './Tickets'
 import ShowQRCode from './QRCode'
 import YourEvents from './YourEvents'
+import confirmEmail from './confirmEmail'
 import StripeConnectSignUp from './StripeConnectSignUp'
 import StripeProvider from "react-stripe-elements";
 
@@ -34,6 +35,7 @@ class Routes extends React.Component {
 			<BrowserRouter>
 				<Switch>
 					<Route path='/checkin' component={CheckIn} />
+					<Route path='/confirmEmail/:id' component={confirmEmail} />
 					<Route path='/createevent' render={ () => this.tokenCheck() ? <CreateEvent /> : <Redirect to="/login" /> }/>
 					<Route path='/events/:id' component={Event} />
 					<Route path='/events' component={Events} />

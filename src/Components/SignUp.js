@@ -4,24 +4,20 @@ import { Link } from "react-router-dom";
 import Nav from "./Nav";
 
 
+
 class SignUp extends React.Component {
   state = {
     formFields: [
-      { label: "Name", type: "text", value: "name" },
+      { label: "Name", type: "text", value: "your name" },
       { label: "Email", type: "email", value: "email" },
-      { label: "Password", type: "password", value: "password" },
-      { label: "Location", type: "text", value: "location" }
+      { label: "Password", type: "password", value: "password" }
     ],
 
     user: {
-      name: "",
       email: "",
       password: "",
-      location: "",
-			sell: false
     },
-
-    errorMsg: "Already have an account?"
+    message: "Already have an account?"
   };
 
   changeField = (e, field) => {
@@ -32,31 +28,8 @@ class SignUp extends React.Component {
 
   signup = e => {
     e.preventDefault();
-    axios
-      .post(`${process.env.REACT_APP_API}/users`, this.state.user)
-      .then(res => {
-        if (res.data.message === "You already registered") {
-          this.setState({ errorMsg: "You have already registered" });
-        } else {
-					localStorage.setItem("token", res.data)
-					if(this.state.user.sell === false){
-						this.props.history.push({
-							pathname: "/events"
-						})
-					}
-					else {
-						this.props.history.push({
-							pathname: "/stripeConnectSignUp"
-						})
-					}
-
-
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
+    axios.post(`${process.env.REACT_APP_API}/users`, this.state.user).then(res => {this.setState({ message: res.data.message})}).catch(err => {console.log(err)})
+  }
 
   render() {
     return (
@@ -76,24 +49,10 @@ class SignUp extends React.Component {
 								</div>
 							))}
 
-							<div>
-							<label>
-							Do you want to sell tickets?
-							</label>
-							<select
-								required
-								value={this.state.user.sell}
-								onChange={event => this.changeField(event, 'sell')}
-							>
-								<option value="false">No</option>
-								<option value="true">Yes</option>
-							</select>
-							</div>
-
 							<button>Signup</button>
 
                   <p>
-                    {this.state.errorMsg}
+                    {this.state.message}
                     <Link to="/login">
                       Login
                     </Link>
