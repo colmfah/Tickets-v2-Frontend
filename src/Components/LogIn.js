@@ -26,22 +26,19 @@ class LogIn extends React.Component {
 
   login = e => {
     e.preventDefault();
-    axios
-      .post(`${process.env.REACT_APP_API}/login`, this.state.user)
-      .then(res => {
-        let token = res.data.token;
+    axios.post(`${process.env.REACT_APP_API}/login`, this.state.user).then(res => {
+
+        console.log('res.data', res.data)
+        
+        let token = res.data.token
         if (token) {
           localStorage.setItem("token", token);
-          this.setState({ errorMsg: "Logged In" });
-          this.props.history.push({
-            pathname: "/events"
-          });
-        } else if (res.data === "Wrong Password") {
-          this.setState({ errorMsg: "Wrong user name or password" });
-        } else if (res.data === "You need to register") {
-          this.setState({
-            errorMsg: "Email address not found. Please Register"
-          });
+          this.setState({ errorMsg: "Logged In" })
+
+          res.data.tempPassword? this.props.history.push({pathname: "/changePassword"}) : this.props.history.push({pathname: "/events"})
+
+        } else{
+          this.setState({errorMsg: res.data.message})
         }
       })
       .catch(err => {
@@ -71,10 +68,11 @@ class LogIn extends React.Component {
 					<button>Log In</button>
 					<span>{this.state.errorMsg}</span>
 					<p>Don't have an account?
-						<Link to="/signup">
-							Sign Up
-						</Link>
+						<Link to="/signup">Sign Up</Link>
 					</p>
+          
+					<Link to="/forgotPassword">Forgot Your Password?</Link>
+					
 				</form>
       </>
     );

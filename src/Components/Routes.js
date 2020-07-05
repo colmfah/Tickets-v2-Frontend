@@ -12,6 +12,10 @@ import YourEvents from './YourEvents'
 import confirmEmail from './confirmEmail'
 import StripeConnectSignUp from './StripeConnectSignUp'
 import StripeProvider from "react-stripe-elements";
+import ForgotPassword from './ForgotPassword'
+import ChangePassword from './ChangePassword'
+
+
 
 class Routes extends React.Component {
 
@@ -35,10 +39,12 @@ class Routes extends React.Component {
 			<BrowserRouter>
 				<Switch>
 					<Route path='/checkin' component={CheckIn} />
+					<Route path='/changepassword' component={() => this.tokenCheck() ? <ChangePassword /> : <Redirect to="/login" /> } />
 					<Route path='/confirmEmail/:id' component={confirmEmail} />
 					<Route path='/createevent' render={ () => this.tokenCheck() ? <CreateEvent /> : <Redirect to="/login" /> }/>
 					<Route path='/events/:id' component={Event} />
 					<Route path='/events' component={Events} />
+					<Route path='/forgotPassword' component={ForgotPassword} />
 					<Route path='/login' component={LogIn} />
 					<Route path='/tickets' render={ () => this.tokenCheck() ? <Tickets /> : <Redirect to="/login" /> }/>
 					<Route path='/qr/:id' component={ShowQRCode} />

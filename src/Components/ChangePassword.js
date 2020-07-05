@@ -2,17 +2,14 @@ import React from 'react'
 import axios from "axios";
 import Nav from "./Nav";
 
-
-class ForgotPassword extends React.Component {
+class ChangePassword extends React.Component {
 
 	state = {
-        email: '',
+        password: '',
         message: ''
 	}
 
-
     componentDidMount(){
-
     }
 
     changeField = (e, field) => {
@@ -23,14 +20,11 @@ class ForgotPassword extends React.Component {
 
     submit = (e) => {
         e.preventDefault()
-        axios.post(`${process.env.REACT_APP_API}/resetPassword`, {email: this.state.email}).then(res => {
-            console.log('res.data', res.data);
-            
+        let token = localStorage.getItem("token");
+        axios.patch(`${process.env.REACT_APP_API}/updateUser`, {token: token, change: {password: this.state.password}}).then(res => {
             let stateCopy = this.state
             stateCopy.message = res.data.message
             this.setState(stateCopy)
-
-
         })
 
     }
@@ -40,9 +34,9 @@ class ForgotPassword extends React.Component {
 			<>  
                 <Nav />         
                 <form onSubmit={(event) => this.submit(event)}>
-                    <label>Email Address</label>
-                    <input value={this.state.email} required onChange={event => this.changeField(event, 'email')} type='email'/>
-                    <button>Reset Password</button>
+                    <label>New Password</label>
+                    <input value={this.state.password} required onChange={event => this.changeField(event, 'password')} type='password'/>
+                    <button>Change Password</button>
                 </form>
 
                 <div>{this.state.message}</div>
@@ -52,4 +46,4 @@ class ForgotPassword extends React.Component {
 }
 }
 
-export default ForgotPassword
+export default ChangePassword
