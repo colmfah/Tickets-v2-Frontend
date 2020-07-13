@@ -1,34 +1,29 @@
-import React from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
-import Nav from "./Nav";
 
-
+import axios from "axios"
+import { Link } from "react-router-dom"
+import Nav from "./Nav"
+import React from "react"
 
 class SignUp extends React.Component {
   state = {
-    formFields: [
-      { label: "Name", type: "text", value: "your name" },
-      { label: "Email", type: "email", value: "email" },
-      { label: "Password", type: "password", value: "password" }
-    ],
-
+    message: "",
     user: {
       email: "",
+      name: "",
       password: "",
-    },
-    message: "Already have an account?"
-  };
+    }
+  }
 
   changeField = (e, field) => {
-    let user = this.state.user;
-    user[field] = e.target.value;
-    this.setState({ user });
-  };
+    let user = this.state.user
+    user[field] = e.target.value
+    this.setState({ user })
+  }
 
   signup = e => {
-    e.preventDefault();
-    axios.post(`${process.env.REACT_APP_API}/users`, this.state.user).then(res => {this.setState({ message: res.data.message})}).catch(err => {console.log(err)})
+    e.preventDefault()
+    axios.post(`${process.env.REACT_APP_API}/users`, this.state.user).then(res => {       
+      this.setState({ message: res.data.message})}).catch(err => {console.log(err)})
   }
 
   render() {
@@ -36,31 +31,42 @@ class SignUp extends React.Component {
       <>
       	<Nav />
 					<form onSubmit={this.signup}>
-						<h1>Sign up</h1>
-						{this.state.formFields.map((e, i) => (
-							<div key={i}>
-								<label>{e.label}</label>
-								<input
-									value={this.state.user[e.value]}
-									required
-									onChange={event => this.changeField(event, e.value)}
-									type={e.type}
-									/>
-								</div>
-							))}
+      
+            <input
+              required
+              value={this.state.user.name}
+              onChange={event => this.changeField(event, 'name')}
+              type={'text'}
+              placeholder={'Your Name'}
+            />
+            <br />
 
-							<button>Signup</button>
+            <input
+              required
+              value={this.state.user.email}
+              onChange={event => this.changeField(event, 'email')}
+              type={'email'}
+              placeholder={'Email Address'}
+            />
+            <br />
 
-                  <p>
-                    {this.state.message}
-                    <Link to="/login">
-                      Login
-                    </Link>
-                  </p>
-				</form>
+            <input
+              required
+              value={this.state.user.password}
+              minLength={"8"}
+              onChange={event => this.changeField(event, 'password')}
+              type={'password'}
+              placeholder={'Password'}
+            />
+            <br />
+				
+
+							<button>Sign Up</button>     
+				  </form>
+            {this.state.message!==''? <div>{this.state.message}</div>: <div>Already Have An Account? <Link to="/login"> Login</Link></div>}
       </>
-    );
+    )
   }
 }
 
-export default SignUp;
+export default SignUp

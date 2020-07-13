@@ -17,6 +17,7 @@ class confirmEmail extends React.Component {
     }
 
     componentDidMount(){
+        
         axios.post(`${process.env.REACT_APP_API}/confirmEmail`, {code: this.props.match.params.id}).then(res => {
             this.setState({message: res.data.message})
             if(res.data.success){
@@ -33,20 +34,7 @@ class confirmEmail extends React.Component {
     }
 
     submit = () => {
-        if(!this.state.sell){
-            this.props.history.push({pathname: "/events"})
-        }
-        else {
-
-            this.props.history.push({pathname: "/stripeConnectSignUp"})
-
-            {/*let token = localStorage.getItem("token");
-            axios.patch(`${process.env.REACT_APP_API}/updateUser`, {name: this.state.name, token: token}).then(res => {
-                
-            }).catch(err => {  
-                console.log('axios err', err)  
-            })*/}
-        }
+        !this.state.sell ? this.props.history.push({pathname: "/events"}) : this.props.history.push({pathname: "/stripeConnectSignUp"})
     }
 
 
@@ -59,14 +47,13 @@ class confirmEmail extends React.Component {
                 {this.state.success ? 
                     <form onSubmit={this.submit}>
 
-                        <div>
-                            <div>Do you want to connect your Stripe account to sell tickets?</div> 
-                            <div>You do not need to connect your Stripe account if you are selling free tickets</div>
-                            <select required value={this.state.sell} onChange={event => this.changeField(event, 'sell')}>
-                                <option value="false">No</option>
-                                <option value="true">Yes</option>
-                            </select>
-                        </div>
+                        <div>Do you want to connect your Stripe account to sell tickets?</div> 
+                        <select required value={this.state.sell} onChange={event => this.changeField(event, 'sell')}>
+                            <option value="false">No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                        <div>You do not need to connect your Stripe account if you are selling free tickets</div>
+                            
 
                         <button>Submit</button>
 
@@ -74,12 +61,9 @@ class confirmEmail extends React.Component {
                     :
                     <Link to={`/signup`}>Sign Up</Link>
                 }
-
-                
-
 			</>
-		)
-}
+		    )
+    }
 }
 
 export default withRouter(confirmEmail)

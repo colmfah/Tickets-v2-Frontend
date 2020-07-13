@@ -10,11 +10,6 @@ class ForgotPassword extends React.Component {
         message: ''
 	}
 
-
-    componentDidMount(){
-
-    }
-
     changeField = (e, field) => {
         let stateCopy = this.state
         stateCopy[field] = e.target.value
@@ -24,15 +19,10 @@ class ForgotPassword extends React.Component {
     submit = (e) => {
         e.preventDefault()
         axios.post(`${process.env.REACT_APP_API}/resetPassword`, {email: this.state.email}).then(res => {
-            console.log('res.data', res.data);
-            
             let stateCopy = this.state
             stateCopy.message = res.data.message
             this.setState(stateCopy)
-
-
         })
-
     }
 
 	render() {
@@ -41,7 +31,13 @@ class ForgotPassword extends React.Component {
                 <Nav />         
                 <form onSubmit={(event) => this.submit(event)}>
                     <label>Email Address</label>
-                    <input value={this.state.email} required onChange={event => this.changeField(event, 'email')} type='email'/>
+                    <input 
+                        required 
+                        value={this.state.email} 
+                        onChange={event => this.changeField(event, 'email')} 
+                        type='email'
+                        placeholder={'Email Address'}
+                    />
                     <button>Reset Password</button>
                 </form>
 

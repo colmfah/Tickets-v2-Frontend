@@ -5,46 +5,32 @@ import { Link } from "react-router-dom";
 
 class LogIn extends React.Component {
   state = {
-    formFields: [
-      { label: "Email", type: "email", value: "email" },
-      { label: "Password", type: "password", value: "password" }
-    ],
-
     user: {
       email: "",
       password: ""
     },
-
-    errorMsg: ""
-  };
+    message: ""
+  }
 
   changeField = (e, field) => {
     let user = this.state.user;
     user[field] = e.target.value;
     this.setState({ user });
-  };
+  }
 
   login = e => {
     e.preventDefault();
     axios.post(`${process.env.REACT_APP_API}/login`, this.state.user).then(res => {
-
-        console.log('res.data', res.data)
-        
         let token = res.data.token
         if (token) {
           localStorage.setItem("token", token);
-          this.setState({ errorMsg: "Logged In" })
-
+          this.setState({ message: "Logged In" })
           res.data.tempPassword? this.props.history.push({pathname: "/changePassword"}) : this.props.history.push({pathname: "/events"})
-
         } else{
-          this.setState({errorMsg: res.data.message})
+          this.setState({message: res.data.message})
         }
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
+    })
+  }
 
   render() {
     return (
@@ -53,26 +39,26 @@ class LogIn extends React.Component {
 				<form onSubmit={this.login}>
 					<h1>Login</h1>
 
-					{this.state.formFields.map((e, i) => (
-            <div key={i}>
-            <label>{e.label}</label>
-            <input
-							value={this.state.user[e.value]}
-							required
-							onChange={event => this.changeField(event, e.value)}
-							type={e.type}
-						/>
-            </div>
-            ))}
-
+          <input
+            required
+						value={this.state.user.email}
+            onChange={event => this.changeField(event, 'email')}
+            type={'email'}
+            placeholder={'Email Address'}
+					/>
+          <br />
+          <input
+            required
+						value={this.state.user.password}
+            onChange={event => this.changeField(event, 'password')}
+            type={'password'}
+            placeholder={'Password'}
+					/>
+          <br />
 					<button>Log In</button>
-					<span>{this.state.errorMsg}</span>
-					<p>Don't have an account?
-						<Link to="/signup">Sign Up</Link>
-					</p>
-          
-					<Link to="/forgotPassword">Forgot Your Password?</Link>
-					
+					<div>{this.state.errorMsg}</div>
+					<div>Don't have an account? <Link to="/signup">Sign Up</Link></div>    
+					<div><Link to="/forgotPassword">Forgot Your Password?</Link></div>
 				</form>
       </>
     );

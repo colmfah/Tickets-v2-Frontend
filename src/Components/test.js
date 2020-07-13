@@ -1,15 +1,22 @@
-const cardElement = this.props.elements.getElement('card');
+import React, { Component } from 'react'
 
-		axios.get(`${process.env.REACT_APP_API}/saveCardDetails`).then(res => {
+export class test extends Component {
 
-			this.props.stripe.confirmCardSetup(res.data.client_secret, {payment_method: {card: cardElement}}).then( confirmCardSetupRes => {
 
-				if (confirmCardSetupRes.setupIntent.status === 'succeeded'){
-		
-                        axios.post(`${process.env.REACT_APP_API}/paymentIntent`, objectToSend).then(res => {					
-							this.props.upDateMessage(res.data.message)
-				
-                        })
-                }
-            })
-        })
+
+
+    render() {
+        return (
+            <div> 
+                <div>Upload Image</div>           
+                <input
+                    required
+                    type="file"
+                    onChange={this.fileUploaded}
+                />
+            </div>
+        )
+    }
+}
+
+export default test

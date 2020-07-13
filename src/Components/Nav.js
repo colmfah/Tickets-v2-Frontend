@@ -58,7 +58,7 @@ logout = () => {
 						</Link>
 					</div>
 				}
-      </nav>
+      		</nav>
     )
   }
 }
