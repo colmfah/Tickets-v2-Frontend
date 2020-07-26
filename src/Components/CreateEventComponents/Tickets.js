@@ -1,15 +1,126 @@
 import React, { Component } from 'react'
+
 import DatePicker from "react-datepicker";
+import moment from "moment";
 
-export class Tickets extends Component {
+export class Test extends Component {
+
+    state = {
+        errors: []
+    }
 
 
-    
+    continue = (e, values) => {
+        e.preventDefault()
+        console.log('values', values)
+        
+        const checkForErrors = (values) => {            
+            let errors = []
+            let validTicketTypeIDs = values.tickets.map(e=>e.ticketTypeID)
+            values.tickets.forEach((e,i) => {
+                if(e.ticketType === ''){
+                    errors.push(`Please provide a name for ticket ${i+1}`)
+                } 
+                if(e.numberOfTickets === ''){
+                    errors.push(`Please fill out the number of tickets you wish to sell for ticket ${i+1}`)
+                } 
+                if(e.startSelling === ''){
+                    errors.push(`Please fill out the time to start selling ticket ${i+1}`)
+                }
+                if(e.stopSelling === ''){
+                    errors.push(`Please fill out the time to stop selling ticket ${i+1}`)
+                }
+                if(e.chargeForTicketsStatus === ''){
+                    errors.push(`Please select whether ticket ${i+1} is a paid ticket or free ticket`)
+                }
+                if(e.chargeForTicketsStatus === 'freeTickets' && e.chargeForNoShows === ''){
+                    errors.push(`Please fill out how much you want to fine customers who don't turn up for ticket ${i+1}`)
+                }else if (e.chargeForTicketsStatus !== 'freeTickets' && e.price === ''){
+                    errors.push(`Please fill out the price for ticket ${i+1}`)
+                }
+
+                if(e.chargeForTicketsStatus === 'freeTickets' && e.chargeForNoShows > 0 && e.hold === ''){
+                    errors.push(`Please select how to fine customers who purchase ticket ${i+1} but don't turn up`)
+                }
+
+                if(!moment(e.stopSelling).isAfter(e.startSelling)){
+                    errors.push(`You have chosen to stop selling ticket ${i+1} before the time you have chosen to start selling them`)
+                }
+                if(e.startSelling!=='whenPreviousSoldOut'  &&  moment(e.endDetails).isAfter(e.stopSelling)){
+                    errors.push(`You have chosen to stop selling ticket ${i+1} before the time you have chosen to start selling them`)
+                }
+                if(e.startSelling ==='whenPreviousSoldOut' && !validTicketTypeIDs.includes(e.sellWhenTicketNumberSoldOut)){
+                    errors.push(`You have chosen not to sell ticket ${i+1} until a ticket that doesn't exist sells out`)
+                }
+            })
+
+            if(values.tickets.length > 1 && values.ticketTypesEquivalent === ''){
+                errors.push(`Please select whether or not your ticket types are equivalent`)
+            }
+
+            return errors
+        }
+
+        let errors = checkForErrors(values)
+
+        errors.length === 0 ? this.props.nextStep() : this.setState({errors})
+        
+    }
+
+    goBack = (e) => {
+        
+     
+        this.props.prevStep()
+    }
+
     render() {
+        const {values} = this.props
+        let startSelling = values.tickets.map((e,i) => {
+            if(e.startSelling === 'whenPreviousSoldOut'){
+                return(
+                    <div>
+                        <select
+                            required
+                            value={values.tickets[i].sellWhenTicketNumberSoldOut}
+                            onChange={(event) => {this.props.changeTicketDetails(event, 'sellWhenTicketNumberSoldOut', i); this.props.validTicketCheck(event, i)}}
+                        >
+            
+                            <option value=''>When which ticket is sold out?</option>
+                
+                            {values.tickets.filter((e, ind) => ind<i).map(	(e, index) => {
+                                return (
+                                    <option key={index} value={e.ticketTypeID}>
+                                        {e.ticketType}
+                                    </option>
+                                )}	
+                            )}
+                        </select>
+        
+                    </div>
+
+                )
+            } else if(e.startSelling == 'specific'){
+                return(
+                    <div>                 
+                        <DatePicker
+                            timeIntervals={15}
+                            onChange={event => this.props.changeTicketDetails(event, 'startSellingTime', i)}
+                            selected={e.startSellingTime}
+                            placeholderText='Select Date And Time'
+                            showTimeSelect
+                            dateFormat="Pp"
+                            required
+                            />
+                    </div>
+                )
+            }else{return <div></div>}
+        })
+
         return (
-            <>
+            <> 
+            <form>
                 <h1>Create Tickets</h1>
-                {this.props.tickets.map((e, i) => {
+                {values.tickets.map((e, i) => {
                     return (
                         <div key={i}>
                             <div>Ticket Number {i+1}:</div>
@@ -18,7 +129,7 @@ export class Tickets extends Component {
                                 <input
                                     required
                                     type="text"
-                                    value={this.props.tickets[i].ticketType}
+                                    value={values.tickets[i].ticketType}
                                     onChange={event => this.props.changeTicketDetails(event, 'ticketType', i)}
                                     placeholder="Ticket Name: Early Bird, General Admission..."
                                 />     
@@ -27,7 +138,7 @@ export class Tickets extends Component {
                             <div>
                                 <input
                                     type="text"
-                                    value={this.props.tickets[i].ticketDescription}
+                                    value={values.tickets[i].ticketDescription}
                                     onChange={event => this.props.changeTicketDetails(event, 'ticketDescription', i)}
                                     placeholder="Ticket Description (optional): Get backstage access..."
                                 />          
@@ -37,7 +148,7 @@ export class Tickets extends Component {
                             <div>					          
                                 <select
                                     required 
-                                    value={this.props.tickets[i].chargeForTicketsStatus}			
+                                    value={values.tickets[i].chargeForTicketsStatus}			
                                     onChange={event => this.props.changeTicketDetails(event, 'chargeForTicketsStatus', i)}
                                 >
                                 <option value="" disabled>Select Ticket Type</option>
@@ -47,12 +158,13 @@ export class Tickets extends Component {
                             </div>
 
 
-                            {this.props.tickets[i].chargeForTicketsStatus === 'freeTickets' ?
+                            {values.tickets[i].chargeForTicketsStatus === 'freeTickets' ?
                                 <div>
                                     €
                                     <input
+                                        required
                                         type="number"
-                                        value={this.props.tickets[i].chargeForNoShows}
+                                        value={values.tickets[i].chargeForNoShows}
                                         onChange={event => this.props.changeTicketDetails(event, 'chargeForNoShows', i)}
                                         placeholder="Fine for customers who don't show up"
                                         min={0}
@@ -66,24 +178,25 @@ export class Tickets extends Component {
                                     <input
                                         required
                                         type="number"
-                                        value={this.props.tickets[i].price}
+                                        value={values.tickets[i].price}
                                         onChange={event => this.props.changeTicketDetails(event, 'price', i)}
-                                        placeholder="10"
-                                        min={10}
+                                        placeholder="Price"
+                                        min={1}
                                     />
                                 </div>
                             
                             }
 
-                            {this.props.tickets[i].chargeForNoShows > 0 ? 
+                            {values.tickets[i].chargeForNoShows > 0 ? 
                             <div>
                                 <select
                                     required 
-                                    value={this.props.tickets[i].hold}			
+                                    value={values.tickets[i].hold}			
                                     onChange={event => this.props.changeTicketDetails(event, 'hold', i)}
                                 >
-                                <option value="hold">Place hold on customers account before event begins</option>
-                                <option value="noHold">Trust customers to provide chargable credit card (no hold placed)</option>
+                                    <option value="" disabled>Select How To Fine Customers</option>
+                                    <option value="hold">Place hold on customers' credit credit before event begins</option>
+                                    <option value="noHold">Trust customers to provide chargable credit card (no hold placed)</option>
                                 </select>
                             </div>
                             : <div></div>        
@@ -94,114 +207,59 @@ export class Tickets extends Component {
                                     required
                                     type="number"
                                     min={1}
-                                    value={this.props.tickets[i].numberOfTickets}
+                                    value={values.tickets[i].numberOfTickets}
                                     onChange={event => this.props.changeTicketDetails(event, 'numberOfTickets', i)}
                                     placeholder="Number of Tickets"
                                 />
                             </div>
 
-                            <div>
-                                <label>Start Selling Tickets:</label>
-                                        
+                            <div>       
                                 <select
-                                    required value={this.props.tickets[i].startSelling}
+                                    required value={values.tickets[i].startSelling}
                                     onChange={event => this.props.changeSellingTimes(event, 'startSelling', i, 'startSellingTime')}
                                 >
+                                    <option value='' disabled>Start Selling Tickets</option>
                                     <option value="now">Now</option>
                                     <option value="specific">Specific Date and Time</option>
                                     <option value="whenPreviousSoldOut" disabled={i==0}>When A Previous Ticket Is Sold Out</option>
                                 </select>
                             </div>
 
-                            {this.props.tickets[i].startSelling === 'whenPreviousSoldOut' &&
-                                <div>
-                                    <label>When Which Ticket is sold out?</label>
-                                    <select
-                                        required
-                                        value={this.props.tickets[i].sellWhenTicketNumberSoldOut}
-                                        onChange={(event) => {this.props.changeTicketDetails(event, 'sellWhenTicketNumberSoldOut', i); this.props.validTicketCheck(event, i)}}
-                                    >
+                            {startSelling[i]}
 
-                                    <option value=''>select ticket</option>
-
-                                    {this.props.tickets.filter((e, ind) => ind<i).map(	(e, index) => {
-                                        return (
-                                            <option key={index} value={e.ticketTypeID}>
-                                                {e.ticketType}
-                                            </option>
-                                        )}	
-                                    )}
-
-                                    </select>
-
-                                {this.props.tickets[i].waitingForTicketThatDoesntExistToSellOut &&
-                                    <div className='error'>
-                                        Please select a valid ticket
-                                    </div>}
-
-                                </div>
-                            }
-
-
-                            {this.props.tickets[i].startSelling == 'specific' &&
-                                <div>
-                                    <label>
-                                        <DatePicker
-                                            timeIntervals={15}
-                                            onChange={event => this.props.changeTicketDetails(event, 'startSellingTime', i)}
-                                            onBlur={event => this.props.errorIfSecondTimeIsNotBeforeFirstTime(this.state.userEvent.startDetails, event.target.value, 'startSellingAfterEventBegins')}
-                                            selected={this.props.tickets[i].startSellingTime}
-                                            placeholderText='Select Date And Time'
-                                            showTimeSelect
-                                            dateFormat="Pp"
-                                            required
-                                            />
-                                        </label>
-                                </div>
-                            }
-
-                        {/*this.state.errors.startSellingAfterEventBegins === true && this.props.tickets[i].startSelling === 'specific' && <div className='warning'>{this.state.errorMsg.startSellingAfterEventBegins}</div>*/}
 
 
                             <div>
-                                <label>
-                                Stop Selling Tickets:
+
                                     <select
-                                        required value={this.props.tickets[i].stopSelling}
+                                        required value={values.tickets[i].stopSelling}
                                         onChange={event => this.props.changeSellingTimes(event, 'stopSelling', i, 'stopSellingTime')}
                                     >
+                                        <option value='' disabled>Stop Selling Tickets</option>
                                         <option value="eventBegins">When Event Begins</option>
                                         <option value="eventEnds">When Event Ends</option>
                                         <option value="specific">At Specific Date and Time</option>
                                     </select>
-                                </label>
                             </div>
 
-                            {this.props.tickets[i].stopSelling == 'specific'  &&
+                            {values.tickets[i].stopSelling == 'specific'  ?
                                 <div>
-                                    <label>
                                         <DatePicker
                                             timeIntervals={15}
                                             onChange={event => this.props.changeTicketDetails(event, 'stopSellingTime', i)}
-                                            onBlur={(event) =>{ this.props.errorIfSecondTimeIsNotBeforeFirstTime(this.state.userEvent.endDetails, event.target.value, 'sellingTicketsWhenEventIsOver'); this.errorIfSecondTimeIsNotBeforeFirstTime(this.props.tickets[i].stopSellingTime, this.props.tickets[i].startSellingTime, 'sellingStopsBeforeStarts') }}
-                                            selected={this.props.tickets[i].stopSellingTime}
+                                            selected={values.tickets[i].stopSellingTime}
                                             placeholderText='Select Date And Time'
                                             showTimeSelect
                                             dateFormat="Pp"
                                             required
                                         />
-                                    </label>
                                 </div>
+                                : <div></div>
                             }
 
-                        {/*this.state.errors.sellingTicketsWhenEventIsOver === true && this.props.tickets[i].stopSelling === 'specific' && <div className='warning'>{this.state.errorMsg.sellingTicketsWhenEventIsOver}</div>*/}
-
-                        {/*this.state.errors.sellingStopsBeforeStarts === true && <div className='warning'>{this.state.errorMsg.sellingStopsBeforeStarts}</div>*/}
-
-
-                            {this.props.tickets.length > 1 &&
+                            {values.tickets.length > 1 &&
                                 <button 
-                                    onClick={(event )=> {this.props.deleteTicket(event, i); this.props.waitingForTicketThatDoesntExistToSellOut()} }>Delete Ticket
+                                    onClick={event => this.props.deleteTicket(event, i) }>Delete Ticket
                                 </button>
                             }
                                             
@@ -210,26 +268,31 @@ export class Tickets extends Component {
                     )
                 })}
 
-    <button onClick={(e) => this.props.addTicket(e, true)}>Create Another Ticket</button>
+                <button onClick={(e) => this.props.addTicket(e)}>Create Another Ticket</button>
 
-    {this.props.tickets.length > 1 && 		
-    
-    <div>
-        <h4>Are all ticket types equivalent to each other when customers enter the event?</h4>
-        <select
-            required
-            value={this.state.userEvent.ticketTypesEquivalent}
-            onChange={event => this.props.handleBooleanChange(event, 'ticketTypesEquivalent')}
-            >
-            <option value={true}>Yes - eg. Early Bird, General Admission etc.</option>
-            <option value={false}>No - eg. Backstage Access, VIP Treatment etc.</option>
-        </select>
+                {values.tickets.length > 1 && 		
 
-    </div>
-    }
-</>
+                <div>
+                    <select
+                        required
+                        value={values.ticketTypesEquivalent}
+                        onChange={event => this.props.changeField(event, 'ticketTypesEquivalent', true)}
+                    >
+                        <option value='' disabled>Are all ticket types equivalent to each other when customers enter the event?</option>
+                        <option value={true}>Yes - eg. Early Bird, General Admission etc.</option>
+                        <option value={false}>No - eg. Backstage Access, VIP Treatment etc.</option>
+                    </select>
+
+                </div>
+                }
+                <div>
+                    <button onClick={event => this.continue(event, values)}>Continue</button>   <button onClick={event => this.goBack(event)}>Go Back</button>
+                </div>
+                </form>  
+            {this.state.errors.map((e,i) => <div key={i}>{e}</div>)}
+            </>
         )
     }
 }
 
-export default Tickets
+export default Test

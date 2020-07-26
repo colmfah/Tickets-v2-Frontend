@@ -3,13 +3,8 @@ return (
         <Nav />
         <EventDetails />
     
-        <form onSubmit={this.createEvent}>
-    
-   
-
+       
  
-    
-    
 
     
     

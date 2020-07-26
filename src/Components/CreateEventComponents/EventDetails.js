@@ -5,77 +5,58 @@ import DatePicker from "react-datepicker";
 
 export class EventDetails extends Component {
 
-    state = {
-        errors: []
-    }
+    state= {errors: []}
 
-    continue = (e, values) => {
-
-        const checkForErrors = (values) => {
+    continue = (e, values) => {    
+        const checkForErrors = (values) => {            
             let errors = []
-            if(moment(values.startTime).isAfter(moment(values.endTime))){
-                errors.push(`Your event ends before it starts! Correct your start and end dates`)
-            }
-            if(moment(values.startTime).isBefore(moment())){
-                console.log('condition', moment(values.startTime).isBefore(moment()))
-                console.log('now', moment().format('DD MM YYYY HH:mm'))
-                console.log('start time', moment(values.startTime).format('DD MM YYYY HH:mm'));
-                
-                
-                
-                errors.push(`Your event must start in the future! Correct your start date`)
-            }
-            if(moment(values.endTime).isBefore(moment())){
-                errors.push(`Your event must end in the future! Correct your end date`)
-                console.log('condition', moment(values.endTime).isBefore(moment()))
-                console.log('now', moment().format('DD MM YYYY HH:mm'))
-                console.log('end time', moment(values.endTime).format('DD MM YYYY HH:mm'));
-            }
+
             if(values.title === ''){
-                errors.push(`You must give your event a title`)
+                errors.push(`Please name your event`)
             }
             if(values.description === ''){
-                errors.push(`You must give your event a description`)
+                errors.push(`Please provide a description for your event`)
             }
             if(values.region === ''){
-                errors.push(`You must select a region`)
+                errors.push(`Please select a region`)
             }
-            if(values.venue === ''){
-                errors.push(`You must enter a venue`)
+            if(values.venue=== ''){
+                errors.push(`Please name the venue in which your event is taking place`)
             }
             if(values.address1 === ''){
-                errors.push(`You must fill in the first line of the address`)
+                errors.push(`Please fill out the first line of the address of the venue`)
             }
             if(values.address2 === ''){
-                errors.push(`You must fill in the second line of the address`)
+                errors.push(`Please fill out the second line of the address of the venue`)
             }
             if(values.startDetails === ''){
-                errors.push(`You must provide a start time`)
+                errors.push(`Please provide a start time`)
             }
-            if(values.address1 === ''){
-                errors.push(`You must provide an end time`)
+            if(values.startDetails === ''){
+                errors.push(`Please provide an end time`)
             }
-            if(values.eventPassword.length < 8){
-                errors.push(`Event password must be at least 8 characters`)
+            if(values.eventPassword.length < 6){
+                errors.push(`Please provide a password with at least 6 characters`)
+            }
+            if(!moment(values.endDetails).isAfter(values.startDetails)){
+                errors.push(`You have chosen an end time that is before your start time`)
             }
 
             return errors
         }
 
-        e.preventDefault()
-
         let errors = checkForErrors(values)
-        this.setState({errors})
-   
-        if(errors.length === 0){
-            this.props.getLatLng(e)
-            this.props.nextStep()
-        }   
+
+        if(errors.length === 0 ){
+            // this.props.getLatLng()
+            this.props.nextStep() 
+        }else{
+            this.setState({errors})
+        }
+
     }
 
     
-
-
     render() {
         const {values} = this.props
         return (
@@ -132,6 +113,7 @@ export class EventDetails extends Component {
                         onChange={event => this.props.changeField(event, 'address1')}
                         type='text'
                         placeholder='Street Address'
+                        onBlur={this.props.getLatLng}
                     />
                 </div>
         
@@ -142,6 +124,7 @@ export class EventDetails extends Component {
                         onChange={(event) => this.props.changeField(event, 'address2')}
                         type='text'
                         placeholder='Address Line 2'
+                        onBlur={this.props.getLatLng}
                     />
                 </div>
         
@@ -151,6 +134,7 @@ export class EventDetails extends Component {
                         onChange={(event) => this.props.changeField(event, 'address3')}
                         type='text'
                         placeholder='Address Line 3 (optional)'
+                        onBlur={this.props.getLatLng}
                     />
                 </div>
         
@@ -160,6 +144,7 @@ export class EventDetails extends Component {
                         onChange={event => this.props.changeField(event, 'address4')}
                         type='text'
                         placeholder='Address Line 4 (optional)'
+                        onBlur={this.props.getLatLng}
                     />
                 </div>
         
@@ -201,12 +186,8 @@ export class EventDetails extends Component {
 
                 <button onClick={event => this.continue(event, values)}>Continue</button>
 
-                {this.state.errors.map((e,i)=> {return (
-                    <div key={i}>
-                        <div>{e}</div>
-                    </div>
-                
-                )})}
+                {this.state.errors.map((e,i) => <div key={i}>{e}</div>)}
+
             </>
   
         )

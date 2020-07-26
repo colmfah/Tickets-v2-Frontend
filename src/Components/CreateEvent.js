@@ -2,7 +2,7 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
-
+import Test from './Test'
 import Nav from "./Nav";
 import EventDetails from "./CreateEventComponents/EventDetails";
 import RefundPolicy from './RefundPolicy'
@@ -52,21 +52,21 @@ class CreateEvent extends React.Component {
 		organiser: "",
 		currency: "EUR",
 		totalTicketsCreated: 1,
-		ticketTypesEquivalent: true,
+		ticketTypesEquivalent: '',
 		eventPassword: '',
 		tickets: [{
 			ticketType: '',
 			ticketTypeID: 1,
 			price: '',
 			numberOfTickets: '',
-			startSelling: 'now',
-			chargeForTicketsStatus: 'chargeForTickets',
-			chargeForNoShows: 0,
-			stopSelling: 'eventEnds',
+			startSelling: '',
+			chargeForTicketsStatus: '',
+			chargeForNoShows: '',
+			stopSelling: '',
 			startSellingTime: Date.now(),
 			stopSellingTime: '',
 			ticketDescription: '',
-			hold: 'noHold',
+			hold: '',
 			refunds: {optionSelected: 'excessDemand',
 							refundUntil: '',
 							howToResell: 'auction',
@@ -106,23 +106,22 @@ class CreateEvent extends React.Component {
 
 	}
 
-	addTicket = (e, inForm) => {
-		if(inForm === true){e.preventDefault()}
+	addTicket = (e) => {
 		let userEvent = this.state.userEvent
 		userEvent.tickets.push({
-			chargeForTicketsStatus: 'chargeForTickets',
-			chargeForNoShows: 0,
+			chargeForTicketsStatus: '',
+			chargeForNoShows: '',
 			ticketType: '',
 			ticketTypeID: userEvent.totalTicketsCreated + 1,
 			price: '',
 			numberOfTickets: '',
 			sellWhenTicketNumberSoldOut: '',
-			startSelling: 'now',
-			stopSelling: 'eventEnds',
+			startSelling: '',
+			stopSelling: '',
 			startSellingTime: Date.now(),
 			stopSellingTime: userEvent.endDetails,
 			ticketDescription: '',
-			hold: 'noHold',
+			hold: '',
 			refunds: {optionSelected: 'excessDemand',
 							refundUntil: '',
 							howToResell: 'auction',
@@ -158,12 +157,7 @@ class CreateEvent extends React.Component {
 			})
 	}
 
-	changeField = (e, field) => {
-		console.log('changeField')
-		console.log('field', field)
-		console.log('e', e)
-		
-		
+	changeField = (e, field, boolean) => {
 		
 		let userEvent = this.state.userEvent
 		if (field === "image") {
@@ -172,7 +166,9 @@ class CreateEvent extends React.Component {
 			this.setState({ userEvent })
 		}else if (field === "startDetails" || field === "endDetails") {
 	        userEvent[field] = e
-	    }else {
+		}else if(boolean){
+			e.target.value === 'true' ? userEvent[field]=true : userEvent[field]=false			
+		}else {
 	      userEvent[field] = e.target.value;
 	    }
 	    this.setState({ userEvent })
@@ -183,7 +179,7 @@ class CreateEvent extends React.Component {
 		let userEvent = this.state.userEvent
 
 
-			userEvent.tickets[ticketNumber][field1] = e.target.value
+		userEvent.tickets[ticketNumber][field1] = e.target.value
 
 		if(e.target.value === 'now'){
 			userEvent.tickets[ticketNumber][field2] = Date.now()
@@ -205,7 +201,7 @@ class CreateEvent extends React.Component {
 			userEvent.globalRefundOptions.minimumAuctionPrice = this.highestPricedTicket()
 		}
 		if(e instanceof Date){
-			userEvent.tickets[ticketNumber][field] = Date.parse(e)
+			userEvent.tickets[ticketNumber][field] = e
 		}else {
 
 			userEvent.tickets[ticketNumber][field] = e.target.value
@@ -220,36 +216,13 @@ class CreateEvent extends React.Component {
 		this.setState({ userEvent })
 	}
 
-	errorIfSecondTimeIsNotBeforeFirstTime = (firstTime, secondTime, field) => {
-
-		let errors = this.state.errors
-
-		if(field ==='sellingTicketsWhenEventIsOver'){
-			if(moment(firstTime).isBefore(secondTime)){
-				errors[field] = true
-			}  else{
-				errors[field] = false
-			}
-		}
-		else if(moment(firstTime).isSameOrBefore(secondTime)){
-			errors[field] = true
-		}  else{
-			errors[field] = false
-		}
-		this.setState({errors })
-	}
- 
-
-	getLatLng = (e) => {
-		e.preventDefault()
+	getLatLng = () => {
 		let userEvent = this.state.userEvent
-		let showMap = this.state.showMap
-		showMap = true
 		Geocode.fromAddress(`${userEvent.venue}, ${userEvent.address1}, ${userEvent.address2}, ${userEvent.address3}, ${userEvent.address4}`).then(response => {
 			const { lat, lng } = response.results[0].geometry.location;
 			userEvent.lat = lat
 			userEvent.lng = lng
-			this.setState({ showMap, userEvent })
+			this.setState({ userEvent })
   		})
 	}//checked
 
@@ -349,33 +322,13 @@ class CreateEvent extends React.Component {
 		this.setState({ userEvent })
 		}
 
-	waitingForTicketThatDoesntExistToSellOut = (e) => {
-			let userEvent = this.state.userEvent
-			let validTicketTypeIDs = this.state.userEvent.tickets.map(e=>e.ticketTypeID)
-			console.log('validTicketTypeIDs', validTicketTypeIDs)
-			let ticketsWaitingOnSellOut = userEvent.tickets.filter(e=>{return e.sellWhenPrevSoldOut === true})
-			console.log('ticketsWaitingOnSellOut', ticketsWaitingOnSellOut)
-	
-			let numProblemTickets = ticketsWaitingOnSellOut.filter(e => {if(!validTicketTypeIDs.includes(Number(e.sellWhenTicketNumberSoldOut))){return e}} )
-	
-			let numProblemTicketsArray = numProblemTickets.map(e => e.ticketTypeID)
-	
-			if(numProblemTickets.length > 0){
-				userEvent.tickets.forEach( e => {if(numProblemTicketsArray.includes(Number(e.ticketTypeID))){
-					e.waitingForTicketThatDoesntExistToSellOut = true
-				}
-				})
-				this.setState({ userEvent})
-			}
-		}
+
 
 
   render() {
 	  const { step } = this.state
-	  const{ title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image } = this.state.userEvent
-	  const values = { title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image }
-
-
+	  const{ title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets } = this.state.userEvent
+	  const values = { title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets }
 
 	  switch(step){
 		  case 1:
