@@ -25,9 +25,6 @@ export class Image extends Component {
 
     fileUploaded = (event) => {
 
-        console.log('fileuploadedtriggered');
-        
-
         let fileType = event.target.files[0].type
         let fileSize = event.target.files[0].size        
         let errors = []

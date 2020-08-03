@@ -10,6 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Map from './CreateEventComponents/Map'
 import Image from './CreateEventComponents/Image'
 import Tickets from './CreateEventComponents/Tickets'
+import Cancellations from './CreateEventComponents/Cancellations'
 import Geocode from "react-geocode"
 
 
@@ -67,46 +68,29 @@ class CreateEvent extends React.Component {
 			stopSellingTime: '',
 			ticketDescription: '',
 			hold: '',
-			refunds: {optionSelected: 'excessDemand',
+			refunds: {optionSelected: '',
 							refundUntil: '',
-							howToResell: 'auction',
+							howToResell: '',
 							resellAtSpecificPrice: '',
 							minimumPrice: '',
 						}
 		}],
 		globalRefundPolicy: true,
-		globalRefundOptions: {optionSelected: 'excessDemand',
+		globalRefundOptions: {optionSelected: '',
 						refundUntil: '',
-						howToResell: 'auction',
+						howToResell: '',
 						resellAtSpecificPrice: '',
 						minimumPrice: ''}
-	},
-	errors: {
-		startDateInPast: false,
-		eventEndsBeforeItBegins: false,
-		startSellingAfterEventBegins: false,
-		sellingTicketsWhenEventIsOver: false,
-		sellingStopsBeforeStarts: false,
-	},
-    errorMsg: {
-			startDateInPast: 'Event must begin in the future',
-			eventEndsBeforeItBegins: 'Event must end after it starts',
-			startSellingAfterEventBegins: 'You must start selling tickets before the event begins',
-			sellingTicketsWhenEventIsOver: 'You cannot sell tickets after the event has ended',
-			sellingStopsBeforeStarts: 'You cannot stop selling tickets before you have started selling them',
-			waitingForTicketThatDoesntExistToSellOut: 'The ticket you have selected no longer exists'
-	},
-	onBlurFired: 0
+	}
 	}
 
-
-
-
-	componentDidMount() {
-
+	componentDidMount = () => {
+		
 	}
+
 
 	addTicket = (e) => {
+		e.preventDefault()
 		let userEvent = this.state.userEvent
 		userEvent.tickets.push({
 			chargeForTicketsStatus: '',
@@ -122,9 +106,9 @@ class CreateEvent extends React.Component {
 			stopSellingTime: userEvent.endDetails,
 			ticketDescription: '',
 			hold: '',
-			refunds: {optionSelected: 'excessDemand',
+			refunds: {optionSelected: '',
 							refundUntil: '',
-							howToResell: 'auction',
+							howToResell: '',
 							resellAtSpecificPrice: '',
 							minimumPrice: ''
 							}
@@ -134,22 +118,47 @@ class CreateEvent extends React.Component {
 		this.setState({ userEvent })
 	}
 
-	changeGlobalRefundPolicy = () => {
-		let userEvent = this.state.userEvent
-		userEvent.globalRefundPolicy = !userEvent.globalRefundPolicy
-		this.setState({ userEvent })
-	}
-
 	createEvent = e => {
 		e.preventDefault()
 
-		let data = this.state.userEvent.image
-		let eventData = this.state.userEvent
+		
+		
+
+		let userEvent = this.state.userEvent
+		console.log('userEvent.ticekts',	userEvent.tickets);
+		let data = userEvent.image
+		data.append('title', userEvent.title)
+		data.append('venue', userEvent.venue)
+		data.append('description', userEvent.description)
+		data.append('startDetails', userEvent.startDetails)
+		data.append('endDetails', userEvent.endDetails)
+		data.append('token', localStorage.getItem("token"))
+		data.append('currency', userEvent.currency)
+		data.append('lat', userEvent.lat)
+		data.append('lng', userEvent.lng)
+		data.append('address1', userEvent.address1)
+		data.append('address2', userEvent.address2)
+		data.append('address3', userEvent.address3)
+		data.append('address4', userEvent.address4)
+		data.append('eventPassword', userEvent.eventPassword)
+		data.append('globalRefundPolicy', userEvent.globalRefundPolicy)
+		data.append('globalRefundOptions', JSON.stringify(userEvent.globalRefundOptions))
+		data.append('region', userEvent.region)
+		data.append('tickets', userEvent.tickets)
+		data.append('ticketTypesEquivalent', userEvent.ticketTypesEquivalent)
+		
+		userEvent.tickets.forEach(item => {
+			data.append(`tickets[]`, JSON.stringify(item));
+		  });
+		
+	
 		axios.post(`${process.env.REACT_APP_API}/image`, data)
 			.then(res => {
-				axios.patch(`${process.env.REACT_APP_API}/events/${res.data._id}`, eventData)
-				.then(res => {console.log(res)})
-				.catch(err =>{console.log(err)})
+				console.log('res', res)
+				
+				// axios.patch(`${process.env.REACT_APP_API}/events/${res.data._id}`, eventData)
+				// .then(res => {console.log(res)})
+				// .catch(err =>{console.log(err)})
 				})
 
 				.catch(err => {
@@ -172,12 +181,14 @@ class CreateEvent extends React.Component {
 	      userEvent[field] = e.target.value;
 	    }
 	    this.setState({ userEvent })
-	}//checked
+	}
 
-	changeSellingTimes = (e, field1, ticketNumber, field2) => {
+	changeSellingTimes = (e, field1, ticketNumber, field2, numberOfTickets) => {
+
+		console.log('numberOfTickets', numberOfTickets);
+		
 
 		let userEvent = this.state.userEvent
-
 
 		userEvent.tickets[ticketNumber][field1] = e.target.value
 
@@ -185,6 +196,9 @@ class CreateEvent extends React.Component {
 			userEvent.tickets[ticketNumber][field2] = Date.now()
 		} else if(e.target.value === 'whenPreviousSoldOut'){
 			userEvent.tickets[ticketNumber][field2] = ''
+			if(numberOfTickets === 2){
+				userEvent.tickets[1]['sellWhenTicketNumberSoldOut'] = 1
+			}
 		} else if(e.target.value === 'eventBegins'){
 			userEvent.tickets[ticketNumber][field2] = userEvent.startDetails
 		} else if (e.target.value ==='eventEnds'){
@@ -224,34 +238,13 @@ class CreateEvent extends React.Component {
 			userEvent.lng = lng
 			this.setState({ userEvent })
   		})
-	}//checked
+	}
 
 	getLatLngAfterDrag = (event) => {
 		let userEvent = this.state.userEvent
 		userEvent.lat = event.latLng.lat()
 		userEvent.lng = event.latLng.lng()
 		this.setState({ userEvent })
-	}//checked
-
-	getTicketNames = (chargeForTicketsStatus) => {
-
-		if(chargeForTicketsStatus === 'chargeForTickets'){
-			return this.state.userEvent.tickets.filter(e=>e.chargeForTicketsStatus==='chargeForTickets').map(e => e.ticketType)
-		}else if(chargeForTicketsStatus === 'freeTickets'){
-			return this.state.userEvent.tickets.filter(e=>e.chargeForTicketsStatus==='freeTickets').map(e => e.ticketType)	
-		}
-
-
-	}
-
-	handleBooleanChange = (e, field) => {
-		let userEvent = this.state.userEvent
-		if (e.target.value ==='true'){
-			userEvent.ticketTypesEquivalent = true
-		} else if(e.target.value ==='false'){
-			userEvent.ticketTypesEquivalent = false
-		}
-			   this.setState({ userEvent })
 	}
 
 	handleRefundChange = (e, field, i)=>{
@@ -312,23 +305,12 @@ class CreateEvent extends React.Component {
 			this.setState({ userEvent })
 		}
 
-	validTicketCheck = (e, i) => {
-		let userEvent = this.state.userEvent
-		console.log('e.target.value', e.target.value)
-		console.log('i', i)
-		if(e.target.value !== ''){
-			userEvent.tickets[i].waitingForTicketThatDoesntExistToSellOut = false
-		}
-		this.setState({ userEvent })
-		}
-
-
 
 
   render() {
 	  const { step } = this.state
-	  const{ title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets } = this.state.userEvent
-	  const values = { title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets }
+	  const{ title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets,globalRefundOptions, globalRefundPolicy } = this.state.userEvent
+	  const values = { title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets, globalRefundOptions,globalRefundPolicy }
 
 	  switch(step){
 		  case 1:
@@ -363,23 +345,36 @@ class CreateEvent extends React.Component {
 			case 4:
 				return(
 					<Tickets
-						values={values}
+						addTicket={this.addTicket}
+						changeField={this.changeField}
+						changeSellingTimes={this.changeSellingTimes}
+						changeTicketDetails = {this.changeTicketDetails}
+						deleteTicket={this.deleteTicket}
+						errorIfSecondTimeIsNotBeforeFirstTime={this.errorIfSecondTimeIsNotBeforeFirstTime}
+						handleBooleanChange={this.handleBooleanChange}
 						nextStep={this.nextStep}
 						prevStep={this.prevStep}
 						tickets = {this.state.userEvent.tickets}
-						changeTicketDetails = {this.changeTicketDetails}
-						validTicketCheck = {this.validTicketCheck}
-						errorIfSecondTimeIsNotBeforeFirstTime={this.errorIfSecondTimeIsNotBeforeFirstTime}
-						changeSellingTimes={this.changeSellingTimes}
-						deleteTicket={this.deleteTicket}
+						values={values}
 						waitingForTicketThatDoesntExistToSellOut={this.waitingForTicketThatDoesntExistToSellOut}
-						addTicket={this.addTicket}
-						handleBooleanChange={this.handleBooleanChange}
 					/>
 				)
+
+			case 5:
+				return(
+				<Cancellations		
+					handleRefundChange={this.handleRefundChange}
+					nextStep={this.nextStep}
+					prevStep={this.prevStep}
+					submit={this.createEvent}
+					values={values}
+				/>
+			)
 	  }
 
   }
 }
 
 export default withRouter(CreateEvent);
+
+

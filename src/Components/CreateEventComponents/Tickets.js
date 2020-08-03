@@ -12,7 +12,11 @@ export class Test extends Component {
 
     continue = (e, values) => {
         e.preventDefault()
-        console.log('values', values)
+        console.log('values.endDetails', values.endDetails)
+        console.log('e.stopSelling', e.stopSelling);
+        console.log('moment(e.stopSelling).isAfter(values.endDetails)', moment(e.stopSellingTime).isAfter(values.endDetails));
+        
+        
         
         const checkForErrors = (values) => {            
             let errors = []
@@ -43,13 +47,20 @@ export class Test extends Component {
                     errors.push(`Please select how to fine customers who purchase ticket ${i+1} but don't turn up`)
                 }
 
-                if(!moment(e.stopSelling).isAfter(e.startSelling)){
+                if( e.startSelling!=="whenPreviousSoldOut" && !moment(e.stopSellingTime).isAfter(e.startSellingTime)){
+
                     errors.push(`You have chosen to stop selling ticket ${i+1} before the time you have chosen to start selling them`)
                 }
-                if(e.startSelling!=='whenPreviousSoldOut'  &&  moment(e.endDetails).isAfter(e.stopSelling)){
-                    errors.push(`You have chosen to stop selling ticket ${i+1} before the time you have chosen to start selling them`)
+                if(moment(e.stopSellingTime).isAfter(values.endDetails)){
+                    errors.push(`You are continuing to sell ticket ${i+1} when the event is over. Please change your stop selling time`)
                 }
-                if(e.startSelling ==='whenPreviousSoldOut' && !validTicketTypeIDs.includes(e.sellWhenTicketNumberSoldOut)){
+                if(e.startSelling ==='whenPreviousSoldOut' && !validTicketTypeIDs.includes(Number(e.sellWhenTicketNumberSoldOut))){
+
+                    console.log('validTicketTypeIDs', validTicketTypeIDs)
+                    console.log('e.sellWhenTicketNumberSoldOut', e.sellWhenTicketNumberSoldOut);
+                    
+                    
+
                     errors.push(`You have chosen not to sell ticket ${i+1} until a ticket that doesn't exist sells out`)
                 }
             })
@@ -77,28 +88,33 @@ export class Test extends Component {
         const {values} = this.props
         let startSelling = values.tickets.map((e,i) => {
             if(e.startSelling === 'whenPreviousSoldOut'){
-                return(
-                    <div>
-                        <select
-                            required
-                            value={values.tickets[i].sellWhenTicketNumberSoldOut}
-                            onChange={(event) => {this.props.changeTicketDetails(event, 'sellWhenTicketNumberSoldOut', i); this.props.validTicketCheck(event, i)}}
-                        >
-            
-                            <option value=''>When which ticket is sold out?</option>
                 
-                            {values.tickets.filter((e, ind) => ind<i).map(	(e, index) => {
-                                return (
-                                    <option key={index} value={e.ticketTypeID}>
-                                        {e.ticketType}
-                                    </option>
-                                )}	
-                            )}
-                        </select>
-        
-                    </div>
+                if(i===1){return(<div></div>)
+                }else{
+    
+                    return(
+                        <div>
+                            <select
+                                required
+                                value={values.tickets[i].sellWhenTicketNumberSoldOut}
+                                onChange={(event) => {this.props.changeTicketDetails(event, 'sellWhenTicketNumberSoldOut', i)}}
+                            >
+                
+                                <option value=''>When which ticket is sold out?</option>
+                    
+                                {values.tickets.filter((e, ind) => ind<i).map(	(e, index) => {
+                                    return (
+                                        <option key={index} value={e.ticketTypeID}>
+                                            {e.ticketType}
+                                        </option>
+                                    )}	
+                                )}
+                            </select>   
+                        </div>
+                    )
 
-                )
+                }
+   
             } else if(e.startSelling == 'specific'){
                 return(
                     <div>                 
@@ -216,12 +232,12 @@ export class Test extends Component {
                             <div>       
                                 <select
                                     required value={values.tickets[i].startSelling}
-                                    onChange={event => this.props.changeSellingTimes(event, 'startSelling', i, 'startSellingTime')}
+                                    onChange={event => this.props.changeSellingTimes(event, 'startSelling', i, 'startSellingTime', values.tickets.length)}
                                 >
                                     <option value='' disabled>Start Selling Tickets</option>
                                     <option value="now">Now</option>
                                     <option value="specific">Specific Date and Time</option>
-                                    <option value="whenPreviousSoldOut" disabled={i==0}>When A Previous Ticket Is Sold Out</option>
+                                    {i===1 ? <option value="whenPreviousSoldOut">When {values.tickets[0].ticketType} Is Sold Out</option>:<option value="whenPreviousSoldOut" disabled={i==0}>When A Previous Ticket Is Sold Out</option>}  
                                 </select>
                             </div>
 
