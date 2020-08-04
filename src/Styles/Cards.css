@@ -1,0 +1,26 @@
+.card {
+	border: 1px solid #e2e2e2;
+	border-radius: 6px;
+}
+
+.card > .content {
+	padding: 20px;
+	margin: 0;
+}
+
+.card small + form {
+	margin-top: 40px;
+}
+
+
+.card p.footer {
+	margin-bottom: 0;
+	font-size: 15px;
+}
+
+.warning {
+	margin-bottom: 0;
+	line-height: 130%;
+	font-size: 15px;
+	color: tomato
+}

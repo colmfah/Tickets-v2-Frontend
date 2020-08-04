@@ -1,0 +1,32 @@
+nav {
+	padding: 10px 0%;
+
+    border-bottom: 1px solid #e2e2e2;
+}
+
+#loggedIn {
+    display: grid;
+    grid-template-columns: 8fr 1fr 1fr 1fr 1fr;
+    grid-column-gap: 10px;
+    text-align: center;
+    padding-right: 2%;
+}
+
+#loggedOut {
+
+    display: grid;
+    grid-template-columns: 10fr 1fr 1fr 1fr;
+    grid-column-gap: 2%;
+    text-align: center;
+    padding-right: 2%;
+}
+
+
+nav a, #logOut {
+    color:#26542a;
+}
+
+#logOut:hover {
+    text-decoration: underline;
+}
+

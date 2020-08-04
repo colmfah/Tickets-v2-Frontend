@@ -3,6 +3,12 @@ import axios from "axios"
 import { Link } from "react-router-dom"
 import Nav from "./Nav"
 import React from "react"
+import '../Styles/Grid.css'
+import '../Styles/Cards.css'
+import '../Styles/Forms.css'
+import '../Styles/Buttons.css'
+import '../Styles/Global.css'
+import '../Styles/Nav.css'
 
 class SignUp extends React.Component {
   state = {
@@ -30,40 +36,56 @@ class SignUp extends React.Component {
     return (
       <>
       	<Nav />
-					<form onSubmit={this.signup}>
-      
-            <input
-              required
-              value={this.state.user.name}
-              onChange={event => this.changeField(event, 'name')}
-              type={'text'}
-              placeholder={'Your Name'}
-            />
-            <br />
 
-            <input
-              required
-              value={this.state.user.email}
-              onChange={event => this.changeField(event, 'email')}
-              type={'email'}
-              placeholder={'Email Address'}
-            />
-            <br />
+        <div className="grid center middle tall">
+          <div></div>
+          <div className="card">
+            <div class ="content">
 
-            <input
-              required
-              value={this.state.user.password}
-              minLength={"8"}
-              onChange={event => this.changeField(event, 'password')}
-              type={'password'}
-              placeholder={'Password'}
-            />
-            <br />
-				
 
-							<button>Sign Up</button>     
-				  </form>
-            {this.state.message!==''? <div>{this.state.message}</div>: <div>Already Have An Account? <Link to="/login"> Login</Link></div>}
+              <form onSubmit={this.signup}>
+                <div className="group">
+                  <input
+                    required
+                    value={this.state.user.name}
+                    onChange={event => this.changeField(event, 'name')}
+                    type={'text'}
+                    placeholder={'Your Name'}
+                  />
+                </div>
+         
+                <div className="group">
+                  <input
+                    required
+                    value={this.state.user.email}
+                    onChange={event => this.changeField(event, 'email')}
+                    type={'email'}
+                    placeholder={'Email Address'}
+                  />
+                </div>
+            
+                <div className="group">
+                  <input
+                    required
+                    value={this.state.user.password}
+                    minLength={"8"}
+                    onChange={event => this.changeField(event, 'password')}
+                    type={'password'}
+                    placeholder={'Password'}
+                  />
+                </div>
+             
+            
+                  <button className="primary">Sign Up</button>
+             
+              </form>
+              {this.state.message!==''? <p className="warning">{this.state.message}</p> : <p className="footer">Already have an account? <Link to="/login">Login</Link> </p>}
+
+              
+            </div>
+          </div>
+          <div></div>
+        </div>
       </>
     )
   }

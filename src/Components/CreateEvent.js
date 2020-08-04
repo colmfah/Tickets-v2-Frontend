@@ -156,9 +156,6 @@ class CreateEvent extends React.Component {
 			.then(res => {
 				console.log('res', res)
 				
-				// axios.patch(`${process.env.REACT_APP_API}/events/${res.data._id}`, eventData)
-				// .then(res => {console.log(res)})
-				// .catch(err =>{console.log(err)})
 				})
 
 				.catch(err => {
@@ -331,6 +328,7 @@ class CreateEvent extends React.Component {
 					getLatLngAfterDrag={this.getLatLngAfterDrag}
 					nextStep={this.nextStep}
 					prevStep={this.prevStep}
+					values={values}
 				/>
 			)
 			case 3:

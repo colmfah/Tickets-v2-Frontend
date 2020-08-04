@@ -28,7 +28,20 @@ class Map extends React.Component{
         this.props.prevStep()
     }
 
+
+
+    // if(values.venue=== ''){
+    //     errors.push(`Please name the venue in which your event is taking place`)
+    // }
+    // if(values.address1 === ''){
+    //     errors.push(`Please fill out the first line of the address of the venue`)
+    // }
+    // if(values.address2 === ''){
+    //     errors.push(`Please fill out the second line of the address of the venue`)
+    // }
+
     render(){
+        const {values} = this.props
         const AsyncMap = withScriptjs(
             withGoogleMap(
                 props => (      
@@ -78,6 +91,58 @@ class Map extends React.Component{
 
         return(
             <> 
+
+                <div className="group">
+                    <input
+                        required
+                        value={values.venue}
+                        onChange={event => this.props.changeField(event, 'venue')}
+                        type='text'
+                        placeholder='Name of Venue'
+                    />
+                </div>
+
+                <div className="group">
+                    <input
+                        required
+                        value={values.address1}
+                        onChange={event => this.props.changeField(event, 'address1')}
+                        type='text'
+                        placeholder='Street Address'
+                        onBlur={this.props.getLatLng}
+                    />
+                </div>
+                        
+                <div className="group">
+                    <input
+                        required
+                        value={values.address2}
+                        onChange={(event) => this.props.changeField(event, 'address2')}
+                        type='text'
+                        placeholder='Address Line 2'
+                        onBlur={this.props.getLatLng}
+                    />
+                </div>
+                        
+                <div className="group">
+                    <input
+                        value={values.address3}
+                        onChange={(event) => this.props.changeField(event, 'address3')}
+                        type='text'
+                        placeholder='Address Line 3 (optional)'
+                        onBlur={this.props.getLatLng}
+                    />
+                </div>
+                        
+                <div className="group">
+                    <input
+                        value={values.address4}
+                        onChange={event => this.props.changeField(event, 'address4')}
+                        type='text'
+                        placeholder='Address Line 4 (optional)'
+                        onBlur={this.props.getLatLng}
+                    />
+                </div>
                 {map}
                 <button onClick={event => this.continue(event)}>Continue</button>   <button onClick={event => this.goBack(event)}>Go Back</button>
             </>

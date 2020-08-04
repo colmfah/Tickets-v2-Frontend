@@ -1,13 +1,20 @@
 import React, { Component } from 'react'
-
+import Nav from "../Nav";
 import moment from "moment";
 import DatePicker from "react-datepicker";
+import '../../Styles/Grid.css'
+import '../../Styles/Cards.css'
+import '../../Styles/Forms.css'
+import '../../Styles/Buttons.css'
+import '../../Styles/Global.css'
+import '../../Styles/Nav.css'
 
 export class EventDetails extends Component {
 
     state= {errors: []}
 
-    continue = (e, values) => {    
+    continue = (e, values) => { 
+        e.preventDefault()   
         const checkForErrors = (values) => {            
             let errors = []
 
@@ -20,15 +27,7 @@ export class EventDetails extends Component {
             if(values.region === ''){
                 errors.push(`Please select a region`)
             }
-            if(values.venue=== ''){
-                errors.push(`Please name the venue in which your event is taking place`)
-            }
-            if(values.address1 === ''){
-                errors.push(`Please fill out the first line of the address of the venue`)
-            }
-            if(values.address2 === ''){
-                errors.push(`Please fill out the second line of the address of the venue`)
-            }
+
             if(values.startDetails === ''){
                 errors.push(`Please provide a start time`)
             }
@@ -61,132 +60,104 @@ export class EventDetails extends Component {
         const {values} = this.props
         return (
             <>
-                <h2>Event Details</h2>
-                <div>
-                <input
-                    required
-                    value={values.title}
-                    onChange={(event) => this.props.changeField(event, 'title')}
-                    type='text'
-                    placeholder='Event Name'
-                    />
-                </div>
-        
-                <div>
-                    <textarea
-                        value={values.description}
-                        required
-                        onChange={event => this.props.changeField(event, 'description')}
-                        type='text'
-                        placeholder='Describe the event'
-                    />
-                </div>
-        
-                <div>
-                    <select
-                        required		
-                        value={values.region}
-                        onChange={event=>this.props.changeField(event, 'region')}
-                    >
-                        <option value="" disabled>Select your Region</option>
-                        <option value="dublin">Dublin</option>
-                        <option value="cork">Cork</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-        
-                <div>
-                    <input
-                        required
-                        value={values.venue}
-                        onChange={event => this.props.changeField(event, 'venue')}
-                        type='text'
-                        placeholder='Name of Venue'
-                    />
-                </div>
-        
-        
-                <div>
-                    <input
-                        required
-                        value={values.address1}
-                        onChange={event => this.props.changeField(event, 'address1')}
-                        type='text'
-                        placeholder='Street Address'
-                        onBlur={this.props.getLatLng}
-                    />
-                </div>
-        
-                <div>
-                    <input
-                        required
-                        value={values.address2}
-                        onChange={(event) => this.props.changeField(event, 'address2')}
-                        type='text'
-                        placeholder='Address Line 2'
-                        onBlur={this.props.getLatLng}
-                    />
-                </div>
-        
-                <div>
-                    <input
-                        value={values.address3}
-                        onChange={(event) => this.props.changeField(event, 'address3')}
-                        type='text'
-                        placeholder='Address Line 3 (optional)'
-                        onBlur={this.props.getLatLng}
-                    />
-                </div>
-        
-                <div>
-                    <input
-                        value={values.address4}
-                        onChange={event => this.props.changeField(event, 'address4')}
-                        type='text'
-                        placeholder='Address Line 4 (optional)'
-                        onBlur={this.props.getLatLng}
-                    />
-                </div>
-        
-                <div>
-                    <DatePicker
-                        timeIntervals={15}
-                        selected={values.startDetails}
-                        onChange={(event) => this.props.changeField(event, "startDetails")}
-                        showTimeSelect
-                        dateFormat="Pp"
-                        required
-                        placeholderText={'Date & Time Event Starts'}
-                    />
-                </div>
-        
-               
-        
-                <div>
-                    <DatePicker
-                        timeIntervals={15}
-                        selected={values.endDetails}
-                        onChange={event => this.props.changeField(event, "endDetails")}
-                        showTimeSelect
-                        dateFormat="Pp"
-                        required
-                        placeholderText={'Date & Time Event Ends'}
-                    />
-                </div>
-        
-                <div>
-                    <input
-                        value={values.eventPassword}
-                        required
-                        onChange={event => this.props.changeField(event, 'eventPassword')}
-                        type='password'
-                        placeholder='password to check customers in'
-                    />
-                </div>
 
-                <button onClick={event => this.continue(event, values)}>Continue</button>
+                <Nav />
 
-                {this.state.errors.map((e,i) => <div key={i}>{e}</div>)}
+                <div className="grid center tall middle">
+                    <div></div>
+                    <div className="card">
+                        <div class ="content">
+
+                            <form>
+                       
+                                <div className="group">
+                                    <input
+                                        required
+                                        value={values.title}
+                                        onChange={(event) => this.props.changeField(event, 'title')}
+                                        type='text'
+                                        placeholder='Event Name'
+                                        />
+                                </div>
+                        
+                                <div className="group">
+                                    <textarea
+                                        value={values.description}
+                                        required
+                                        onChange={event => this.props.changeField(event, 'description')}
+                                        type='text'
+                                        placeholder='Describe The Event'
+                                    />
+                                </div>
+                        
+                                <div className="group">
+                                    <select
+                                        required		
+                                        value={values.region}
+                                        onChange={event=>this.props.changeField(event, 'region')}
+                                    >
+                                        <option value="" disabled>Select your Region</option>
+                                        <option value="dublin">Dublin</option>
+                                        <option value="cork">Cork</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                        
+
+                        
+                        
+                                <div className="group">
+                                    <DatePicker
+                                        className="datePicker"
+                                        timeIntervals={15}
+                                        selected={values.startDetails}
+                                        onChange={(event) => this.props.changeField(event, "startDetails")}
+                                        showTimeSelect
+                                        dateFormat="Pp"
+                                        required
+                                        placeholderText={'Date & Time Event Starts'}
+                                    />
+                                </div>
+                        
+                            
+                        
+                                <div className="group datepicker">
+                                    <DatePicker
+                                        timeIntervals={15}
+                                        selected={values.endDetails}
+                                        onChange={event => this.props.changeField(event, "endDetails")}
+                                        showTimeSelect
+                                        dateFormat="Pp"
+                                        required
+                                        placeholderText={'Date & Time Event Ends'}
+                                    />
+                                </div>
+                        
+                                <div className="group">
+                                    <input
+                                        value={values.eventPassword}
+                                        required
+                                        onChange={event => this.props.changeField(event, 'eventPassword')}
+                                        type='password'
+                                        placeholder='password to check customers in'
+                                    />
+                                </div>
+
+                                <button className="primary" onClick={event => this.continue(event, values)}>Continue</button>
+
+                            </form>
+
+                            <div className="warning">
+                                <ul>
+                                {this.state.errors.map((e,i) => <li  key={i}>{e}</li>)}
+                                </ul>
+                            </div>
+
+                            
+                        </div>
+                    </div>
+                    <div></div>
+                </div>
 
             </>
   

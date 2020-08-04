@@ -1,0 +1,13 @@
+button.primary,
+.button.primary {
+	background: #00988f;
+	color: white;
+	padding: 14px 20px;
+	font-size: 16px;
+	border-radius: 4px;
+	border: none;
+	display: inline-block;
+	text-decoration: none;
+	box-sizing: border-box;
+	vertical-align: top;
+}

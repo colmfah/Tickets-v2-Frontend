@@ -1,0 +1,23 @@
+.grid {
+	display: grid;
+}
+
+.grid.center {
+    grid-template-columns: 1fr minmax(auto , 400px) 1fr;
+	justify-content: center;
+}
+
+.grid.middle {
+	align-content: center;
+}
+
+.grid.tall {
+	height: 95vh;
+}
+
+/* .grid.image {
+	background-image: url('../images/thailand.jpg');
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+} */
