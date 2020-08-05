@@ -3,7 +3,7 @@ import { withRouter } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
 import Test from './Test'
-import Nav from "./Nav";
+
 import EventDetails from "./CreateEventComponents/EventDetails";
 import RefundPolicy from './RefundPolicy'
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,6 +12,7 @@ import Image from './CreateEventComponents/Image'
 import Tickets from './CreateEventComponents/Tickets'
 import Cancellations from './CreateEventComponents/Cancellations'
 import Geocode from "react-geocode"
+import AddressDetails from "./CreateEventComponents/AddressDetails";
 
 
 
@@ -164,6 +165,9 @@ class CreateEvent extends React.Component {
 	}
 
 	changeField = (e, field, boolean) => {
+
+		console.log('change field triggered');
+		
 		
 		let userEvent = this.state.userEvent
 		if (field === "image") {
@@ -306,31 +310,37 @@ class CreateEvent extends React.Component {
 
   render() {
 	  const { step } = this.state
-	  const{ title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets,globalRefundOptions, globalRefundPolicy } = this.state.userEvent
-	  const values = { title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets, globalRefundOptions,globalRefundPolicy }
+	  const{ title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets,globalRefundOptions, globalRefundPolicy, lat, lng } = this.state.userEvent
+	  const values = { title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets, globalRefundOptions,globalRefundPolicy, lat, lng }
 
 	  switch(step){
-		  case 1:
+
+
+
+
+		  case 10:
 			return(
 				<EventDetails 
 					nextStep={this.nextStep}
 					changeField={this.changeField}
 					values={values}
-					getLatLng = {this.getLatLng}
+					
 				/>
 			)
-			case 2: return(
-				<Map
-					google={this.props.google}
-					center={{lat: this.state.userEvent.lat, lng: this.state.userEvent.lng}}
-					height='300px'
-					zoom={15}
-					getLatLngAfterDrag={this.getLatLngAfterDrag}
-					nextStep={this.nextStep}
-					prevStep={this.prevStep}
-					values={values}
-				/>
-			)
+
+			case 2:
+				return(
+					<AddressDetails
+						changeField={this.changeField}
+						getLatLng = {this.getLatLng}
+						getLatLngAfterDrag={this.getLatLngAfterDrag} 
+						nextStep={this.nextStep}
+						prevStep={this.prevStep}
+						values={values}
+					/>
+				)
+	
+
 			case 3:
 				return(
 					<Image
@@ -340,7 +350,7 @@ class CreateEvent extends React.Component {
 						changeField={this.changeField}
 					/>
 				)
-			case 4:
+			case 1:
 				return(
 					<Tickets
 						addTicket={this.addTicket}

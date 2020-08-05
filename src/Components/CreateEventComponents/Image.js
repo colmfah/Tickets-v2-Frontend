@@ -1,4 +1,11 @@
 import React, { Component } from 'react'
+import Nav from "../Nav";
+import '../../Styles/Grid.css'
+import '../../Styles/Cards.css'
+import '../../Styles/Forms.css'
+import '../../Styles/Buttons.css'
+import '../../Styles/Global.css'
+import '../../Styles/Nav.css'
 
 export class Image extends Component {
 
@@ -35,7 +42,7 @@ export class Image extends Component {
         }
 
         if(!validFile){
-            errors.push('Please upload a jpeg gif or png file')
+            errors.push('Please upload a jpeg, gif or png file')
         }
 
         if(fileSize > 30000000){
@@ -52,22 +59,38 @@ export class Image extends Component {
     render() {
         const {values} = this.props
         return (
-            <div> 
-                <div>Upload Image</div>           
-                <input
-                    required
-                    type="file"
-                    onChange={this.fileUploaded}
-                />
-                <br />
-                <button onClick={event => this.continue(event, values)}>Continue</button>   <button onClick={event => this.goBack(event)}>Go Back</button>
-                {this.state.errors.map((e,i)=> {return (
-                    <div key={i}>
-                        <div>{e}</div>
+            
+            <> 
+                <Nav />
+
+                <div className="grid center middle tall">
+                    <div></div>
+                    <div className="card">
+                        <div class ="content">
+
+                            <div id="fileUploadText">Upload Image</div>
+                            <form>  
+                                <div id="fileUpload">
+                                    <input
+                                        required
+                                        type="file"
+                                        onChange={this.fileUploaded}
+                                        title="Upload Image"
+                                        placeholder="Upload Image"
+                                    />
+                                </div>
+                                <div className="buttonContainer">
+                                    <button className="primary" onClick={event => this.continue(event, values)}>Continue</button>   
+                                    <button className="primary rhsbutton" onClick={event => this.goBack(event)}>Go Back</button>
+                                </div>
+                                
+                                <ul className="warning">{this.state.errors.map((e,i) => <li key={i}>{e}</li>)}</ul>
+                            </form> 
+                        </div>
                     </div>
-                
-                )})}
-            </div>
+                    <div></div>
+                </div>  
+            </>
         )
     }
 }

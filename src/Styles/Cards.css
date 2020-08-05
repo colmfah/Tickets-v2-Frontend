@@ -1,6 +1,7 @@
 .card {
 	border: 1px solid #e2e2e2;
 	border-radius: 6px;
+	
 }
 
 .card > .content {
@@ -24,3 +25,56 @@
 	font-size: 15px;
 	color: tomato
 }
+
+.wrapper > .content {
+	position: relative;
+	padding: 20px;
+	border: 1px solid #e2e2e2;
+	border-radius: 6px;
+}
+
+.wrapper > .content + .content {
+	margin-top: 0%;
+}
+
+.ticketNumber {
+	position: absolute;
+	top: 0;
+	left: 0%; /* this line of code will sort things out for you :) */
+	border-radius: 6px;
+	width: 6%;
+	line-height: 6%;
+	padding: 1%;
+	font-weight: bold;
+	
+	background: #00988f;
+	/* border: 3px solid #000; */
+	color: white;
+	text-align: center;
+	font: 20px Arial, sans-serif;
+	/* position: absolute; */
+}
+
+
+
+/* width: 120px;
+line-height: 120px;
+border-radius: 50%;
+text-align: center;
+font-size: 32px;
+border: 2px solid #666; */
+
+
+
+
+
+/* form label {
+	display: block;
+	margin-bottom: 8px;
+	color: #8a8a8a;
+} */
+
+/* form.small label {
+	color: black;
+} */
+

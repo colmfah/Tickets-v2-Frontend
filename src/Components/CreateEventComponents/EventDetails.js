@@ -58,6 +58,8 @@ export class EventDetails extends Component {
     
     render() {
         const {values} = this.props
+        let selectColor
+        values.region === '' ? selectColor = 'rgb(118, 118, 118)' : selectColor = 'black'
         return (
             <>
 
@@ -94,7 +96,8 @@ export class EventDetails extends Component {
                                     <select
                                         required		
                                         value={values.region}
-                                        onChange={event=>this.props.changeField(event, 'region')}
+                                        onChange={event=>this.props.changeField(event, 'region')}                                 
+                                        style={{ color: selectColor }}
                                     >
                                         <option value="" disabled>Select your Region</option>
                                         <option value="dublin">Dublin</option>
@@ -139,7 +142,7 @@ export class EventDetails extends Component {
                                         required
                                         onChange={event => this.props.changeField(event, 'eventPassword')}
                                         type='password'
-                                        placeholder='password to check customers in'
+                                        placeholder='Password To Check Customers In'
                                     />
                                 </div>
 
