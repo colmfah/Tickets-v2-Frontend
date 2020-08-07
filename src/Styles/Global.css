@@ -46,8 +46,10 @@ h1 {
 input[type=text],
 select,
 textarea {
-	border: 1px solid #e2e2e2;
+	/* border: 1px solid #e2e2e2; */
 }
+
+
 
 textarea {
 	resize: none;
