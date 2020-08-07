@@ -315,10 +315,13 @@ class CreateEvent extends React.Component {
 
 	  switch(step){
 
+		case 100:
+			return(
+				<Test	
+				/>
+			)
 
-
-
-		  case 10:
+		  case 1:
 			return(
 				<EventDetails 
 					nextStep={this.nextStep}
@@ -350,7 +353,7 @@ class CreateEvent extends React.Component {
 						changeField={this.changeField}
 					/>
 				)
-			case 1:
+			case 4:
 				return(
 					<Tickets
 						addTicket={this.addTicket}

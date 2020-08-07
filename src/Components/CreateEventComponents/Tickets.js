@@ -2,13 +2,18 @@ import React, { Component } from 'react'
 import Nav from "../Nav";
 import DatePicker from "react-datepicker";
 import moment from "moment";
+import { unstable_batchedUpdates } from 'react-dom';
 
 export class Test extends Component {
 
     state = {
-        errors: []
+        errors: [],
+        newTicketCreated: false
     }
 
+    addTicket = () => {
+        this.setState({newTicketCreated: true})
+    }
 
     continue = (e, values) => {
         e.preventDefault()
@@ -84,7 +89,36 @@ export class Test extends Component {
         this.props.prevStep()
     }
 
+    getCoordinates = () => {
+        console.log('get coordinages triggered');
+
+        let rect = document.getElementById("test").getBoundingClientRect()
+
+        console.log('rect.top', rect.top);
+        
+      
+
+// var rect = element.getBoundingClientRect();
+// console.log(rect.top, rect.right, rect.bottom, rect.left);
+   
+    }
+
+    componentDidUpdate(prevProps, prevState){
+
+        if(this.state.newTicketCreated){		
+            document.getElementById(`ticket${this.props.tickets.length -1}`).scrollIntoView();
+            this.setState({newTicketCreated: false})
+        }
+    }
+
+    newTicketTest = () => {
+        let tickets = this.state.tickets
+        tickets.push({})
+        this.setState({tickets})
+    }
+
     render() {
+
         const {values} = this.props
 
         let chargeForTicketsStatusColor = values.tickets.map(e => {
@@ -160,14 +194,16 @@ export class Test extends Component {
         return (
             <> 
 
+ 
+
                 <Nav />
-                <div className="grid center middle longForm">
-                    <div></div>
+                {/* <div className="grid center middle longForm">
+                    <div></div> */}
                     <div className="wrapper">
                     {values.tickets.map((e, i) => {
                         return (
  
-                                <div class ="content">
+                                <div class ="content createTicket" id={`ticket${i}`} >
                                     <div 
                                         className="ticketNumber"
                                         style={{display: values.tickets.length === 1? 'none' : 'block' }}
@@ -186,6 +222,8 @@ export class Test extends Component {
                                                 placeholder="Ticket Name eg. General Admission"
                                             />     
                                         </div>
+
+                                        
                                         <div className="group">
                                             <textarea
                                                 type="text"
@@ -246,9 +284,9 @@ export class Test extends Component {
                                                 onChange={event => this.props.changeTicketDetails(event, 'hold', i)}
                                                 style={{ color: holdColor[i] }}
                                             >
-                                                <option value="" disabled>Select How To Fine Customers</option>
-                                                <option value="hold">Place hold on customers' credit credit before event begins</option>
-                                                <option value="noHold">Trust customers to provide chargable credit card (no hold placed)</option>
+                                                <option value="" disabled>Place hold on customers' credit credit?</option>
+                                                <option value="hold"> Yes</option>
+                                                <option value="noHold">No</option>
                                             </select>
                                         </div>
                                         : <div className="group"></div>        
@@ -319,24 +357,35 @@ export class Test extends Component {
                                                 onClick={event => this.props.deleteTicket(event, i) }>Delete Ticket
                                             </button>
                                         }
-                                                        
-                                    
+
                                     </form>
-                            
-                            
+
                                 </div>
-                
                         )
                     })}
 
+                    </div>    
+
+                    <div className="grid center middle longForm">
+                    <div></div>
+
+                    <ul>
+                        {this.state.errors.map((e,i) => <li className="warning" key={i}>{e}</li>)} 
+                    </ul>
                     
-                        <button className="primary" onClick={(e) => this.props.addTicket(e)}>Create Another Ticket</button>
+                        
                     <div className="buttonContainer">
-                        <button className="primary" onClick={event => this.continue(event, values)}>Continue</button>   
+                        <button className="primary" onClick={(e) => { this.addTicket(); this.props.addTicket(e)  }}>Create Another Ticket</button>
+                    </div>
+
+                    <div className="buttonContainer">
+                        <button className="primary lhsbutton" onClick={event => this.continue(event, values)}>Continue</button>   
                         <button className="secondary rhsbutton" onClick={event => this.goBack(event)}>Go Back</button>
                     </div>
 
+                    <div></div>
                     </div>
+
 
                     
 
@@ -358,10 +407,9 @@ export class Test extends Component {
 
                
                   
-                    <div></div>
-                </div>
+                    {/* <div></div>
+                </div> */}
            
-            {this.state.errors.map((e,i) => <div key={i}>{e}</div>)}
             </>
         )
     }

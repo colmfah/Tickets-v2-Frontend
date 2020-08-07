@@ -26,55 +26,55 @@
 	color: tomato
 }
 
+.wrapper {
+	text-align: center;
+}
+
 .wrapper > .content {
 	position: relative;
 	padding: 20px;
 	border: 1px solid #e2e2e2;
 	border-radius: 6px;
+	display: inline-block;
+	width: 400px;
+	padding: 20px;
+	margin-left: 30px; 
 }
 
 .wrapper > .content + .content {
 	margin-top: 0%;
 }
 
+
+
 .ticketNumber {
 	position: absolute;
 	top: 0;
-	left: 0%; /* this line of code will sort things out for you :) */
+	left: 0%; 
 	border-radius: 6px;
 	width: 6%;
 	line-height: 6%;
 	padding: 1%;
 	font-weight: bold;
-	
-	background: #00988f;
-	/* border: 3px solid #000; */
+	background: #8a8a8a;
 	color: white;
 	text-align: center;
 	font: 20px Arial, sans-serif;
-	/* position: absolute; */
 }
 
+@media only screen and (max-width: 400px) {
+	.wrapper > .content  {
+	  width: 90vw;
+	  padding: 0;
+	  margin-left:0;
+	}
+
+	.ticketNumber {
+		left:93%;
+	}
+
+  }
 
 
-/* width: 120px;
-line-height: 120px;
-border-radius: 50%;
-text-align: center;
-font-size: 32px;
-border: 2px solid #666; */
 
-
-
-
-
-/* form label {
-	display: block;
-	margin-bottom: 8px;
-	color: #8a8a8a;
-} */
-
-/* form.small label {
-	color: black;
-} */
 

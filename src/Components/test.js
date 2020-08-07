@@ -10,20 +10,19 @@ class Test extends React.Component {
 
 
   
-	
 
 
   render() {
     return (
     <>
-
-        <div className = "grid gridRow">
-            <div id="blue"></div>
-            <div id="red"></div>
-            <div id="purple"> </div>
-        </div>
-
-
+   
+   <div class="testFormGrid">
+    
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+  
+    </div>
     </>
     )
   }

@@ -38,7 +38,8 @@ h1 {
 }
 
 .content {
-	margin: 50px 0;
+	margin-top: 50px;
+	margin-bottom: 30px;
 	position: relative;
 }
 
@@ -62,7 +63,8 @@ textarea:focus {
 input:focus,
 select:focus,
 textarea:focus {
-	border-color: #00988f;
+	/* border-color: #00988f; */
+	border-color: #ff8c00;
 }
 
 h3 small {
@@ -77,4 +79,16 @@ h2 {
 
 a:hover {
     text-decoration: underline;
+}
+
+.testFormGrid {
+
+		background-color: blue;
+	  /*   width: 400px;
+		 height: 90vh; */
+		width: 400px;
+		height: 400px;
+		grid: display;
+		grid-template-columns: 1fr 1fr 1fr;
+
 }
