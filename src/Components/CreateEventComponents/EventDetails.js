@@ -64,28 +64,21 @@ export class EventDetails extends Component {
         e.preventDefault()
         let region = e.target.value
         let borderColors = this.state.borderColors
-        let regionErrors = []
-        if(e.target.value === ''){
-            regionErrors.push('Please Select A Region')
-            borderColors.title = 'tomato'  
-        }else{
-            borderColors.region = '#00988f'  
+        if(e.target.value !== ''){
+            borderColors.region = '#00988f' 
+        }else{       
         }
-        this.setState({region, borderColors, regionErrors})
+        this.setState({region, borderColors})
     }
 
     changeTitle = (e) => {
         e.preventDefault()
         let title = e.target.value
         let borderColors = this.state.borderColors      
-        let titleErrors = []
-        if(e.target.value === ''){
-            titleErrors.push('Please Name Your Event')
-            borderColors.title = 'tomato'  
-        }else{
-            borderColors.title = '#00988f'  
+        if(e.target.value !== ''){
+            borderColors.title = '#00988f' 
         }
-        this.setState({title, borderColors, titleErrors})
+        this.setState({title, borderColors})
     }
 
     changeDescription = (e) => {
@@ -96,12 +89,16 @@ export class EventDetails extends Component {
         this.setState({borderColors, description})
     }
 
-    changeStartDetails = (e) => {
+    changeStartDetails(e){
     
-        e.preventDefault()
+       e.preventDefault()
         let borderColors = this.state.borderColors
         let startDetails = this.state.startDetails
         let startDetailsErrors = []
+
+        console.log('e', e)
+
+        
 
         console.log('moment(e)', moment(e).format('DD MM YY HH:mm'))
         console.log('moment()', moment().format('DD MM YY HH:mm'));
@@ -234,7 +231,7 @@ export class EventDetails extends Component {
                                                     required		
                                                     value={this.state.region}
                                                     onBlur = {event => this.changeRegion(event)}
-                                                    onChange={event => this.changeRegion.bind(this, event)}                               
+                                                    onChange={event => this.changeRegion(event)}                               
                                                     style={{ color: selectColor, borderColor: this.state.borderColors.region }}
                                                 >
                                                     <option value="" disabled>Select your Region</option>
@@ -254,7 +251,7 @@ export class EventDetails extends Component {
                                                     timeIntervals={15}
                                                     selected={this.state.startDetails}
                                                     onBlur = {(event)=> this.changeStartDetails(event)}
-                                                    onChange={(event)=> this.changeStartDetails(event)}
+                                                    onChange={(event)=> this.changeStartDetails.bind(this)}
                                                     showTimeSelect
                                                     dateFormat="d MMM yyyy HH:mm"
                                                     required

@@ -1,31 +1,23 @@
-import React from "react";
-import '../Styles/Grid.css'
-import '../Styles/Cards.css'
-import '../Styles/Forms.css'
-import '../Styles/Buttons.css'
-import '../Styles/Global.css'
-import '../Styles/Nav.css'
+import React, { Component } from 'react'
 
-class Test extends React.Component {
+import moment from "moment";
+import DatePicker from "react-datepicker";
 
 
-  
+export class EventDetails extends Component {
 
 
-  render() {
-    return (
-    <>
-   
-   <div class="testFormGrid">
     
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
+    render() {
+
+        return (
+            <>
+
+
+            </>
   
-    </div>
-    </>
-    )
-  }
+        )
+    }
 }
 
-export default Test;
+export default EventDetails
