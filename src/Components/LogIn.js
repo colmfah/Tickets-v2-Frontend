@@ -15,7 +15,11 @@ class LogIn extends React.Component {
       email: "",
       password: ""
     },
-    message: ""
+    message: "",
+    borderColors:{
+      email: 'none',
+      password: 'none'
+  }
   }
 
   changeField = (e, field) => {
@@ -37,47 +41,65 @@ class LogIn extends React.Component {
     })
   }
 
+
   render() {
     return (
       <>
-      	<Nav />
-        <div className="grid center middle tall">
-          <div></div>
-          <div className="card">
-            <div class ="content">
+       <div className="pageGrid2Rows">
+         <div className="navBar" ><Nav /></div>
 
-              <form onSubmit={this.login}>
-                <div className="group">
-                  <input
-                    required
-                    value={this.state.user.email}
-                    onChange={event => this.changeField(event, 'email')}
-                    type={'email'}
-                    placeholder={'Email Address'}
-                  />
+          
+          <div className="formColumnGrid">
+            <div></div>
+
+
+
+            <div className ="formRowGrid">
+              <div></div>
+
+              <div className="theForm card">
+                <div class ="content">
+
+                  <form onSubmit={this.login}>
+                    <div className="group">
+                      <input
+                        className = "toggleBorder"
+                        required
+                        value={this.state.user.email}
+                        onChange={event => this.changeField(event, 'email')}
+                        type={'email'}
+                        placeholder={'Email Address'}
+                      />
+                    </div>
+
+                    <div className="group">
+                      <input
+                        className = "toggleBorder"
+                        required
+                        value={this.state.user.password}
+                        onChange={event => this.changeField(event, 'password')}
+                        type={'password'}
+                        placeholder={'Password'}
+                      />
+                    </div>
+                  
+                    <button className="primary" onClick={event => {this.login(event)}}>Log In</button>
+
+                    <p className="warning">{this.state.message}</p>
+                    <p className="footer">Don't have an account? <Link to="/signup">Sign Up</Link>  </p>
+                    <p className="footer"><Link to="/forgotPassword">Forgot Your Password?</Link></p>
+                  </form>
                 </div>
+              </div>
 
-                <div className="group">
-                  <input
-                    required
-                    value={this.state.user.password}
-                    onChange={event => this.changeField(event, 'password')}
-                    type={'password'}
-                    placeholder={'Password'}
-                  />
-                </div>
-              
-                <button className="primary" onClick={event => {this.login(event)}}>Log In</button>
-
-                <p className="warning">{this.state.message}</p>
-                <p className="footer">Don't have an account? <Link to="/signup">Sign Up</Link>  </p>
-                <p className="footer"><Link to="/forgotPassword">Forgot Your Password?</Link></p>
-              </form>
+              <div></div>
             </div>
+
+
           </div>
         </div>
-      </>
-    );
+        </>
+    )
   }
 }
 

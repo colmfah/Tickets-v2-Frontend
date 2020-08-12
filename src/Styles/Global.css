@@ -43,11 +43,11 @@ h1 {
 	position: relative;
 }
 
-input[type=text],
+/* input[type=text],
 select,
 textarea {
-	/* border: 1px solid #e2e2e2; */
-}
+	border: 1px solid #e2e2e2;
+}  */
 
 
 
@@ -62,12 +62,19 @@ textarea:focus {
 	outline: none;
 }
 
-input:focus,
+/* input:focus,
 select:focus,
-textarea:focus {
-	/* border-color: #00988f; */
+textarea:focus,
+.datePickerDiv:focus-within
+ {
+
+	border-color: #ff8c00;
+} */
+
+.toggleBorder:focus{
 	border-color: #ff8c00;
 }
+
 
 h3 small {
 	font-size: 15px;

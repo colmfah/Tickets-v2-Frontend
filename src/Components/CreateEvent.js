@@ -170,19 +170,25 @@ class CreateEvent extends React.Component {
 		
 		
 		let userEvent = this.state.userEvent
-		if (field === "image") {
-			userEvent.image = new FormData()
-			userEvent.image.append('file', e.target.files[0])
-			this.setState({ userEvent })
-		}else if (field === "startDetails" || field === "endDetails") {
-	        userEvent[field] = e
-		}else if(boolean){
-			e.target.value === 'true' ? userEvent[field]=true : userEvent[field]=false			
-		}else {
-	      userEvent[field] = e.target.value;
-	    }
-	    this.setState({ userEvent })
+
+		console.log('userEvent', userEvent)
+		
+
+	// 	if (field === "image") {
+	// 		userEvent.image = new FormData()
+	// 		userEvent.image.append('file', e.target.files[0])
+	// 		this.setState({ userEvent })
+	// 	}else if (field === "startDetails" || field === "endDetails") {
+	//         userEvent[field] = e
+	// 	}else if(boolean){
+	// 		e.target.value === 'true' ? userEvent[field]=true : userEvent[field]=false			
+	// 	}else {
+	//       userEvent[field] = e.target.value;
+	//     }
+	//     this.setState({ userEvent })
 	}
+
+
 
 	changeSellingTimes = (e, field1, ticketNumber, field2, numberOfTickets) => {
 
@@ -228,23 +234,6 @@ class CreateEvent extends React.Component {
 		e.preventDefault()
 		let userEvent = this.state.userEvent
 		userEvent.tickets.splice(ticketNumber, 1)
-		this.setState({ userEvent })
-	}
-
-	getLatLng = () => {
-		let userEvent = this.state.userEvent
-		Geocode.fromAddress(`${userEvent.venue}, ${userEvent.address1}, ${userEvent.address2}, ${userEvent.address3}, ${userEvent.address4}`).then(response => {
-			const { lat, lng } = response.results[0].geometry.location;
-			userEvent.lat = lat
-			userEvent.lng = lng
-			this.setState({ userEvent })
-  		})
-	}
-
-	getLatLngAfterDrag = (event) => {
-		let userEvent = this.state.userEvent
-		userEvent.lat = event.latLng.lat()
-		userEvent.lng = event.latLng.lng()
 		this.setState({ userEvent })
 	}
 
@@ -295,6 +284,16 @@ class CreateEvent extends React.Component {
 		this.setState({step: step-1})
 	}
 
+	saveDataToParent = (data) => {		
+		let userEvent = this.state.userEvent
+		let newData = Object.entries(data)
+		newData.forEach(e => {
+			userEvent[e[0]] = e[1]
+		})
+		this.setState({userEvent})
+	}
+
+
 	setDefaultstopSellingTime = (time) => {
 	let userEvent = this.state.userEvent
 	userEvent.tickets = userEvent.tickets.map(	(e,i) => {
@@ -321,30 +320,29 @@ class CreateEvent extends React.Component {
 				/>
 			)
 
-		  case 1:
+		  case 10:
 			return(
 				<EventDetails 
 					nextStep={this.nextStep}
-					changeField={this.changeField}
-					values={values}
-					
+					saveDataToParent={this.saveDataToParent}
+					values={values}					
 				/>
 			)
 
-			case 2:
+			case 10:
 				return(
 					<AddressDetails
-						changeField={this.changeField}
-						getLatLng = {this.getLatLng}
+						changeField={this.changeField}		
 						getLatLngAfterDrag={this.getLatLngAfterDrag} 
 						nextStep={this.nextStep}
 						prevStep={this.prevStep}
+						saveDataToParent={this.saveDataToParent}
 						values={values}
 					/>
 				)
 	
 
-			case 3:
+			case 1:
 				return(
 					<Image
 						values={values}
@@ -353,7 +351,7 @@ class CreateEvent extends React.Component {
 						changeField={this.changeField}
 					/>
 				)
-			case 4:
+			case 2:
 				return(
 					<Tickets
 						addTicket={this.addTicket}

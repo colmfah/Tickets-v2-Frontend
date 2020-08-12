@@ -11,19 +11,24 @@ import '../../Styles/Nav.css'
 
 export class EventDetails extends Component {
 
-    constructor(){
-        super()
-        this.changeStartDetails= this.changeStartDetails.bind(this)
-        }
+    // constructor(){
+    //     super()
+    //     this.changeStartDetails= this.changeStartDetails.bind(this)
+    //     }
 
     state= {
-        errors: [],
+        errors: {        
+            title: '',
+            region: '',
+            startDetails: '',
+            endDetails: ''
+        },
         borderColors:{
             title: 'none',
             description: 'none',
             region: 'none',
-            startDetails: '#e2e2e2',
-            endDetails: '#e2e2e2',
+            startDetails: 'none',
+            endDetails: 'none',
             eventPassword: 'none',  
         },
         region: '',
@@ -32,147 +37,203 @@ export class EventDetails extends Component {
         startDetails: '',
         endDetails: '',
         eventPassword: '',
-
-
-
-        titleErrors: [],
-        regionErrors: [],
-        startDetailsErrors: [],
     }
+
     componentDidMount(){
-        //initialise state to the values from props (in case user 'goes back')
-    }
-
-    changeField = (e, field) => {
         
-        e.preventDefault()
-        let stateCopy = this.state
-        let value 
-        if (field === "startDetails" || field === "endDetails") {value = e}
-        else{value = e.target.value }
-        stateCopy[field] = value
-        if(field === 'description' || e.target.value !== ''){
-            stateCopy.borderColors[field] = '#00988f'
-        }else{
-            stateCopy.borderColors[field] = 'tomato'  
-        }
-        this.setState(stateCopy)
-      
+        const {values} = this.props
+
+        this.setState({
+            region: values.region,
+            title: values.title,
+            description: values.description,
+            startDetails: values.startDetails,
+            endDetails: values.endDetails,
+            eventPassword: values.eventPassword
+        })
     }
 
-    changeRegion = (e) => {
-        e.preventDefault()
-        let region = e.target.value
-        let borderColors = this.state.borderColors
-        if(e.target.value !== ''){
-            borderColors.region = '#00988f' 
-        }else{       
-        }
-        this.setState({region, borderColors})
-    }
-
-    changeTitle = (e) => {
-        e.preventDefault()
-        let title = e.target.value
-        let borderColors = this.state.borderColors      
-        if(e.target.value !== ''){
-            borderColors.title = '#00988f' 
-        }
-        this.setState({title, borderColors})
-    }
-
-    changeDescription = (e) => {
-        e.preventDefault()
+    changeDescription(e){
         let description = e.target.value
         let borderColors = this.state.borderColors
         borderColors.description = '#00988f' 
         this.setState({borderColors, description})
     }
 
+    checkDescriptionError(){
+        let borderColors = this.state.borderColors
+        borderColors.description = '#00988f'  
+        this.setState({ borderColors})
+    }
+
+    changeEndDetails(e){
+        let endDetails = e
+        let errors = this.state.errors
+        errors.endDetails = ''
+        this.setState({endDetails, errors})
+    }
+
+    checkEndDetailsError(){        
+        let borderColors = this.state.borderColors
+        let errors = this.state.errors
+        if(this.state.endDetails === ''){
+            errors.endDetails = 'Please Provide An End Time'
+            borderColors.endDetails = 'tomato'
+        }else if(!moment(this.state.endDetails).isAfter(moment(this.state.startDetails))){
+            errors.endDetails ='Your Event Must End After It Starts'
+            borderColors.endDetails = 'tomato'
+        }else{
+            errors.endDetails = ''
+            borderColors.endDetails = '#00988f'       
+        }
+
+        this.setState({ borderColors, errors})
+        
+    }
+
+    changePassword(e){
+        let eventPassword = e.target.value
+        let errors = this.state.errors
+        errors.eventPassword = ''      
+        this.setState({eventPassword, errors})
+    }
+
+    checkPasswordError(){
+        let borderColors = this.state.borderColors
+        let errors = this.state.errors
+        if(this.state.eventPassword.length < 6){
+            errors.eventPassword = 'Your Password Must Be At Least 6 Characters'
+            borderColors.eventPassword = 'tomato'
+        }
+        else{
+            errors.eventPassword = ''
+            borderColors.eventPassword = '#00988f'       
+        }
+        this.setState({ borderColors, errors})
+    }
+
+    changeRegion(e){
+        let region = e.target.value
+        let errors = this.state.errors
+        errors.region = ''     
+        this.setState({region, errors})
+        console.log('this.state.region1', this.state.region);
+        this.checkRegionError(region)
+    }
+
+    checkRegionError(region){       
+
+        console.log('region', region);
+        
+        let borderColors = this.state.borderColors
+        let errors = this.state.errors
+        
+        if(region === ''){
+            errors.region = 'Please Select Your Region'
+            borderColors.region = 'tomato'
+        }else{
+            errors.region = ''
+            borderColors.region = '#00988f' 
+        }
+        this.setState({errors, borderColors})
+    }
+
+    changeTitle(e){
+        let title = e.target.value
+        let errors = this.state.errors
+        errors.title = ''      
+        this.setState({title, errors})
+        this.checkTitleError(title)
+    }
+
+    checkTitleError(title){
+        let borderColors = this.state.borderColors
+        let errors = this.state.errors
+        if(title === ''){
+            errors.title = 'Please Name Your Event'
+            borderColors.title = 'tomato'
+        }
+        else{
+            errors.title = ''
+            borderColors.title = '#00988f'       
+        }
+        this.setState({ borderColors, errors})
+    }
+
     changeStartDetails(e){
-    
-       e.preventDefault()
+        let startDetails = e
+        let errors = this.state.errors
+        errors.startDetails = ''
+        this.setState({startDetails, errors})
+    }
+
+    checkStartDetailsError(){    
         let borderColors = this.state.borderColors
         let startDetails = this.state.startDetails
-        let startDetailsErrors = []
-
-        console.log('e', e)
-
-        
-
-        console.log('moment(e)', moment(e).format('DD MM YY HH:mm'))
-        console.log('moment()', moment().format('DD MM YY HH:mm'));
-        console.log('!moment(e).isAfter(moment())', !moment(e).isAfter(moment()));
-        
-        
-        
-
-        if(!moment(e).isAfter(moment())){
-            startDetailsErrors.push('Your Event Must Start In The Future')
+        let errors = this.state.errors
+        if(this.state.startDetails === ''){
+            errors.startDetails = 'Please Provide A Start Time'
+            borderColors.startDetails = 'tomato'
+        }
+        else if(!moment(startDetails).isAfter(moment())){
+            errors.startDetails = 'Your Event Must Start In The Future'
             borderColors.startDetails = 'tomato'
         }else{
-            startDetails = e
+            errors.startDetails = ''
             borderColors.startDetails = '#00988f'       
         }
-        this.setState({startDetails, borderColors, startDetailsErrors})
+        this.setState({borderColors, errors})
     }
 
-    continue = (e, values) => { 
+    continue(e){ 
         e.preventDefault()   
-        const checkForErrors = (values) => {            
-            let errors = []
+        
+        this.checkTitleError(this.state.title)
+        this.checkRegionError(this.state.region)
+        this.checkStartDetailsError()
+        this.checkEndDetailsError()
+        this.checkPasswordError()
 
-            if(values.title === ''){
-                errors.push(`Please name your event`)
-            }
-            if(values.description === ''){
-                errors.push(`Please provide a description for your event`)
-            }
-            if(values.region === ''){
-                errors.push(`Please select a region`)
-            }
 
-            if(values.startDetails === ''){
-                errors.push(`Please provide a start time`)
-            }
-            if(values.startDetails === ''){
-                errors.push(`Please provide an end time`)
-            }
-            if(values.eventPassword.length < 6){
-                errors.push(`Please provide a password with at least 6 characters`)
-            }
-            if(!moment(values.endDetails).isAfter(values.startDetails)){
-                errors.push(`You have chosen an end time that is before your start time`)
-            }
+        let errors = Object.entries(this.state.errors)
+        let elementsWithErrors = []
 
-            return errors
-        }
+        errors.forEach(e => {
+            if(e[1]!==''){
+                elementsWithErrors.push(e[0])
+            }
+        })
 
-        let errors = checkForErrors(values)
-
-        if(errors.length === 0 ){
-            // this.props.getLatLng()
-            this.props.nextStep() 
+        if(elementsWithErrors.length > 0 ){
+            document.getElementById(elementsWithErrors[0]).scrollIntoView({behavior: "smooth"})
         }else{
-            this.setState({errors})
+            this.props.saveDataToParent({
+                region: this.state.region,
+                title: this.state.title,
+                description: this.state.description,
+                startDetails: this.state.startDetails,
+                endDetails: this.state.endDetails,
+                eventPassword: this.state.eventPassword
+            })
+            this.props.nextStep() 
         }
-
     }
 
-    //  
-
-    borderColor = (e, field) => {
+    turnBorderOrange(e, field){
         e.preventDefault()
-        let value 
-        if (field === "startDetails" || field === "endDetails") {value = e}
-        else{value = e.target.value }
+        console.log('border orange');
         
-        let borderColors = this.state.borderColors
-        value === '' ? borderColors[field] = 'tomato' : borderColors[field] = '#00988f'
-        if(field ==='description'){borderColors[field] = '#00988f'}
 
+        let borderColors = this.state.borderColors
+        borderColors[field] = '#ff8c00'
+        console.log(borderColors);
+        
         this.setState({borderColors})
     }
+
+
+   
+
 
     
     render() {
@@ -198,13 +259,14 @@ export class EventDetails extends Component {
                                     <div class ="content">
 
                                         <form>
-                                            {this.state.titleErrors.map((e,i)=><p className='warning' key={i}>{e}</p>)} 
+                                            <p className='warning' id="title">{this.state.errors.title}</p>
                                             <div className="group">
                                                 <input
                                                     required
                                                     value={this.state.title}
                                                     onChange={event => this.changeTitle(event)}
-                                                    onBlur = {event => this.changeTitle(event)}
+                                                    onFocus={event => this.turnBorderOrange(event, 'title')}
+                                                    onBlur={event => this.checkTitleError(this.state.title)}
                                                     type='text'
                                                     placeholder='Event Name'
                                                     style={{borderColor: this.state.borderColors.title}}
@@ -217,21 +279,23 @@ export class EventDetails extends Component {
                                                 <textarea
                                                     value={this.state.description}
                                                     required
-                                                    onBlur = {event => this.changeDescription(event)}
                                                     onChange={event => this.changeDescription(event)}
+                                                    onFocus={event => this.turnBorderOrange(event, 'description')}
+                                                    onBlur={event => this.checkDescriptionError(event)}
                                                     type='text'
                                                     placeholder='Describe The Event'
                                                     style={{borderColor: this.state.borderColors.description}}
                                                 />
                                             </div>
                                             
-                                            {this.state.regionErrors.map((e,i)=><p className='warning'>{e}</p>)}
+                                            <p className='warning' id="region">{this.state.errors.region}</p>
                                             <div className="group">
                                                 <select
                                                     required		
                                                     value={this.state.region}
-                                                    onBlur = {event => this.changeRegion(event)}
-                                                    onChange={event => this.changeRegion(event)}                               
+                                                    onChange={event => this.changeRegion(event)} 
+                                                    onFocus={event => this.turnBorderOrange(event, 'region')}
+                                                    onBlur={event => this.checkRegionError(this.state.region)}                           
                                                     style={{ color: selectColor, borderColor: this.state.borderColors.region }}
                                                 >
                                                     <option value="" disabled>Select your Region</option>
@@ -243,15 +307,15 @@ export class EventDetails extends Component {
                                             </div>
                                     
 
-                                    
-                                            {this.state.startDetailsErrors.map((e,i)=><p className='warning' key={i}>{e}</p>)}
+                                            <p className='warning' id="startDetails">{this.state.errors.startDetails}</p>
                                             <div className="group datePickerDiv" style={{borderColor: this.state.borderColors.startDetails }}>
                                                 <DatePicker
                                                     className="datePicker"
                                                     timeIntervals={15}
                                                     selected={this.state.startDetails}
-                                                    onBlur = {(event)=> this.changeStartDetails(event)}
-                                                    onChange={(event)=> this.changeStartDetails.bind(this)}
+                                                    onChange={event => this.changeStartDetails(event)}
+                                                    onFocus={event => this.turnBorderOrange(event, 'startDetails')}
+                                                    onBlur={event =>this.checkStartDetailsError(event)}
                                                     showTimeSelect
                                                     dateFormat="d MMM yyyy HH:mm"
                                                     required
@@ -262,27 +326,30 @@ export class EventDetails extends Component {
                                             
                                     
                                         
-                                    
+                                            <p className='warning' id="endDetails">{this.state.errors.endDetails}</p>
                                             <div className="group datePickerDiv" style={{borderColor: this.state.borderColors.endDetails }}>
                                                 <DatePicker
                                                     className="datePicker"
                                                     timeIntervals={15}
                                                     selected={this.state.endDetails}
-                                                    onBlur = {event => this.borderColor(event, 'endDetails')}
-                                                    onChange={event => this.changeField(event, "endDetails")}
+                                                    onChange={event => this.changeEndDetails(event)}
+                                                    onBlur={event =>this.checkEndDetailsError(event)}
+                                                    onFocus={event => this.turnBorderOrange(event, 'endDetails')}
                                                     showTimeSelect
                                                     dateFormat="d MMM yyyy HH:mm"
                                                     required
                                                     placeholderText={'Date & Time Event Ends'}
                                                 />
                                             </div>
-                                    
+
+                                            <p className='warning' id="eventPassword">{this.state.errors.eventPassword}</p>
                                             <div className="group">
                                                 <input
                                                     value={this.state.eventPassword}
                                                     required
-                                                    onBlur = {event => this.borderColor(event, 'eventPassword')}
-                                                    onChange={event => this.changeField(event, 'eventPassword')}
+                                                    onChange={event => this.changePassword(event)}
+                                                    onBlur={event =>this.checkPasswordError(event)}
+                                                    onFocus={event => this.turnBorderOrange(event, 'eventPassword')}
                                                     type='password'
                                                     placeholder='Password To Check Customers In'
                                                     style={{borderColor: this.state.borderColors.eventPassword}}
@@ -292,12 +359,6 @@ export class EventDetails extends Component {
                                             <button className="primary" onClick={event => this.continue(event, values)}>Continue</button>
 
                                         </form>
-
-                                        <div className="warning">
-                                            <ul>
-                                            {this.state.errors.map((e,i) => <li  key={i}>{e}</li>)}
-                                            </ul>
-                                        </div>
                                         
                                     </div>
                                 </div>

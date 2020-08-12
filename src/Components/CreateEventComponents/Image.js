@@ -10,17 +10,17 @@ import '../../Styles/Nav.css'
 export class Image extends Component {
 
     state = {
-        errors: []
+        errorMessage: ''
     }
 
     continue = (e, values) => {
         e.preventDefault()
-        let errors = this.state.errors
+        let stateCopy = this.state
         if(values.image === ''){
-            errors.push(`You must upload an image`)
+            stateCopy.errorMessage = `You must upload an image`
         }
-        this.setState({errors})
-        if(errors.length === 0){
+        this.setState(stateCopy)
+        if(stateCopy.errorMessage === ''){
             this.props.nextStep()
         }    
     }
@@ -34,7 +34,7 @@ export class Image extends Component {
 
         let fileType = event.target.files[0].type
         let fileSize = event.target.files[0].size        
-        let errors = []
+        let errorMessage = ''
         let validFile = false
 
         if(fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/gif'){ 
@@ -42,16 +42,16 @@ export class Image extends Component {
         }
 
         if(!validFile){
-            errors.push('Please upload a jpeg, gif or png file')
+            errorMessage = 'Please upload a jpeg, gif or png file'
         }
 
         if(fileSize > 30000000){
-            errors.push('Please upload a file that is under 30 MB')    
+            errorMessage = 'Please upload a file that is under 30 MB'    
         }
 
-        this.setState({errors})
+        this.setState({errorMessage})
 
-        if(errors.length === 0){
+        if(errorMessage === '') {
             this.props.changeField(event, 'image')
         }
     }  
@@ -61,35 +61,46 @@ export class Image extends Component {
         return (
             
             <> 
-                <Nav />
+                <div className="pageGrid2Rows">
+                
+                    <div className="navBar"><Nav /></div>
+               
+                    <div className ="formRowGrid">  
+                        <div></div>
+                        <div className="formColumnGrid">
+                            <div></div>
 
-                <div className="grid center middle tall">
-                    <div></div>
-                    <div className="card">
-                        <div class ="content">
 
-                            <div id="fileUploadText">Upload Image</div>
-                            <form>  
-                                <div id="fileUpload">
-                                    <input
-                                        required
-                                        type="file"
-                                        onChange={this.fileUploaded}
-                                        title="Upload Image"
-                                        placeholder="Upload Image"
-                                    />
+                            <div className="theForm card">
+                                <div class ="content">
+                                <p className='warning' id="error">{this.state.errorMessage}</p>
+                                    <div id="fileUploadText">Upload Image</div>
+                                    <form>  
+                                        <div id="fileUpload">
+                                            <input
+                                                required
+                                                type="file"
+                                                onChange={this.fileUploaded}
+                                                title="Upload Image"
+                                                placeholder="Upload Image"
+                                            />
+                                        </div>
+                                        <div className="buttonContainer">
+                                            <button className="primary" onClick={event => this.continue(event, values)}>Continue</button>   
+                                            <button className="primary rhsbutton" onClick={event => this.goBack(event)}>Go Back</button>
+                                        </div>
+                                        
+                                    </form> 
                                 </div>
-                                <div className="buttonContainer">
-                                    <button className="primary" onClick={event => this.continue(event, values)}>Continue</button>   
-                                    <button className="primary rhsbutton" onClick={event => this.goBack(event)}>Go Back</button>
-                                </div>
-                                
-                                <ul className="warning">{this.state.errors.map((e,i) => <li key={i}>{e}</li>)}</ul>
-                            </form> 
-                        </div>
+                            </div>
+
+                            <div></div>
+                        </div> 
+                        <div></div> 
+
                     </div>
-                    <div></div>
-                </div>  
+
+                </div>
             </>
         )
     }

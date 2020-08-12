@@ -35,56 +35,69 @@ class SignUp extends React.Component {
   render() {
     return (
       <>
-      	<Nav />
+        <div className="pageGrid2Rows">
+          
+          <div className="navBar" > <Nav /></div>  
+               
 
-        <div className="grid center middle tall">
-          <div></div>
-          <div className="card">
-            <div class ="content">
+          <div className="formColumnGrid">
+            <div></div>
+
+            <div className ="formRowGrid">
+              <div></div>
+              <div className="theForm card">
+                <div class ="content">
 
 
-              <form onSubmit={this.signup}>
-                <div className="group">
-                  <input
-                    required
-                    value={this.state.user.name}
-                    onChange={event => this.changeField(event, 'name')}
-                    type={'text'}
-                    placeholder={'Your Name'}
-                  />
-                </div>
-         
-                <div className="group">
-                  <input
-                    required
-                    value={this.state.user.email}
-                    onChange={event => this.changeField(event, 'email')}
-                    type={'email'}
-                    placeholder={'Email Address'}
-                  />
-                </div>
+                  <form onSubmit={this.signup}>
+                    <div className="group">
+                      <input
+                        className = "toggleBorder"
+                        required
+                        value={this.state.user.name}
+                        onChange={event => this.changeField(event, 'name')}
+                        type={'text'}
+                        placeholder={'Your Name'}
+                      />
+                    </div>
             
-                <div className="group">
-                  <input
-                    required
-                    value={this.state.user.password}
-                    minLength={"8"}
-                    onChange={event => this.changeField(event, 'password')}
-                    type={'password'}
-                    placeholder={'Password'}
-                  />
-                </div>
-             
-            
-                  <button className="primary">Sign Up</button>
-             
-              </form>
-              {this.state.message!==''? <p className="warning">{this.state.message}</p> : <p className="footer">Already have an account? <Link to="/login">Login</Link> </p>}
+                    <div className="group">
+                      <input
+                        className = "toggleBorder"
+                        required
+                        value={this.state.user.email}
+                        onChange={event => this.changeField(event, 'email')}
+                        type={'email'}
+                        placeholder={'Email Address'}
+                      />
+                    </div>
+                
+                    <div className="group">
+                      <input
+                        className = "toggleBorder"
+                        required
+                        value={this.state.user.password}
+                        minLength={"8"}
+                        onChange={event => this.changeField(event, 'password')}
+                        type={'password'}
+                        placeholder={'Password'}
+                      />
+                    </div>
+                
+                
+                      <button className="primary">Sign Up</button>
+                
+                  </form>
+                  <p className="warning">{this.state.message}</p>
+                  <p className="footer">Already have an account? <Link to="/login">Login</Link> </p>
 
-              
+                  
+                </div>
+              </div>
+              <div></div>
             </div>
+            <div></div>
           </div>
-          <div></div>
         </div>
       </>
     )
