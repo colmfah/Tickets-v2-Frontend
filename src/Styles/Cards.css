@@ -23,26 +23,29 @@
 	margin-bottom: 0;
 	line-height: 130%;
 	font-size: 15px;
-	color: tomato
+	color: tomato;
+	text-align: left
 }
 
 .wrapper {
 	text-align: center;
+
+
 }
 
 .wrapper > .content {
 	position: relative;
-	padding: 20px;
+	padding: 3.5%;
 	border: 1px solid #e2e2e2;
 	border-radius: 6px;
 	display: inline-block;
 	width: 400px;
-	padding: 20px;
-	margin-left: 30px; 
+	margin: 2%;
 }
 
 .wrapper > .content + .content {
 	margin-top: 0%;
+	/* margin-left: 0%; */
 }
 
 
@@ -62,11 +65,14 @@
 	font: 20px Arial, sans-serif;
 }
 
+.navBar{
+	overflow:hidden
+}
+
 @media only screen and (max-width: 400px) {
 	.wrapper > .content  {
 	  width: 90vw;
-	  padding: 0;
-	  margin-left:0;
+	  padding: 2%;
 	}
 
 	.ticketNumber {

@@ -11,11 +11,6 @@ import '../../Styles/Nav.css'
 
 export class EventDetails extends Component {
 
-    // constructor(){
-    //     super()
-    //     this.changeStartDetails= this.changeStartDetails.bind(this)
-    //     }
-
     state= {
         errors: {        
             title: '',

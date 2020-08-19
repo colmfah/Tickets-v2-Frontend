@@ -17,6 +17,8 @@ form input, form textarea{
 	border: 1px solid #e2e2e2;
 }
 
+
+
 .datePicker {
 	border-width: 0
 }
@@ -64,18 +66,19 @@ form textarea {
   }
 
   .buttonContainer {
-	  margin-top: 30px;
+	  margin-top: 3%;
 	  display: inline-block;
 	  width: 100%;
 	  text-align: center;
   }
 
-  .wrapper + .buttonContainer {
+  #firstButtonContainer{
 	  margin-top: 0
   }
 
   .buttonContainer + .buttonContainer {
-	  width: 100%
+	  width: 100%;
+	  margin-bottom: 3%
   }
 
   .rhsbutton {
@@ -101,6 +104,13 @@ form textarea {
 
   #fileUploadText{
 	color: rgb(118, 118, 118)
+}
+
+/* <div class ="content createTicket" id={`ticket${i}`} > */
+
+
+.createTicket {
+	height: 900px;
 }
 
 @media only screen and (max-width: 400px) {

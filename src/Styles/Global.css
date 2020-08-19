@@ -43,11 +43,19 @@ h1 {
 	position: relative;
 }
 
-/* input[type=text],
-select,
-textarea {
-	border: 1px solid #e2e2e2;
-}  */
+.currencyInput{
+	position: relative;
+    background-color: #dedede;
+    display: inline;
+}
+
+.currencyInput:before {
+    content: '€';
+    position: absolute;
+    top: 0;
+    left: 1%;
+    z-index: 1;
+}
 
 
 
@@ -62,14 +70,7 @@ textarea:focus {
 	outline: none;
 }
 
-/* input:focus,
-select:focus,
-textarea:focus,
-.datePickerDiv:focus-within
- {
 
-	border-color: #ff8c00;
-} */
 
 .toggleBorder:focus{
 	border-color: #ff8c00;
@@ -90,14 +91,3 @@ a:hover {
     text-decoration: underline;
 }
 
-.testFormGrid {
-
-		background-color: blue;
-	  /*   width: 400px;
-		 height: 90vh; */
-		width: 400px;
-		height: 400px;
-		grid: display;
-		grid-template-columns: 1fr 1fr 1fr;
-
-}

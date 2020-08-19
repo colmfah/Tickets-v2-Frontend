@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 
+import '../Styles/Test.css'
+
 import moment from "moment";
 import DatePicker from "react-datepicker";
 
@@ -7,36 +9,49 @@ import DatePicker from "react-datepicker";
 export class EventDetails extends Component {
 
     state = {
-        startDetails: ''
+        tickets: [{}]
     }
 
+    createNewTicket(e){
+        e.preventDefault()
+        let tickets = this.state.tickets
+        tickets.push({})
+        this.setState({tickets})
+    }
 
-    changeStartDetails(e){
-         let startDetails = e
-         console.log('moment(e)', moment(e).format('DD MM YY HH:mm'))
-         this.setState({startDetails})
-     }
-
+    deleteTicket(e, ticketNumber){
+        e.preventDefault()
+        e.preventDefault()
+		let tickets = this.state.tickets
+		tickets.splice(ticketNumber, 1)
+		this.setState({ tickets})
+    }
 
     
     render() {
 
+
         return (
             <>
-                <form>
-                <DatePicker
-                    className="datePicker"
-                    timeIntervals={15}
-                    selected={this.state.startDetails}
-                    // onBlur = {(event)=> this.changeStartDetails(event)}
-                    onChange={event => this.changeStartDetails(event)}
-                    showTimeSelect
-                    dateFormat="d MMM yyyy HH:mm"
-                    required
-                    placeholderText={'Date & Time Event Starts'}
-                />
-                </form>
-          
+                <div id="ticketPageGrid">
+
+                    <div className="navBar">Nav</div>
+
+                    <div id="tickets">Tickets
+
+                        {this.state.tickets.map((e,i)=> <div className="ticket" key={i}>
+                            Ticket
+                            <button onClick={event => this.deleteTicket(event, i)}    >Delete</button>
+                        </div>)}
+  
+                    </div>
+
+                    <div id="buttons">
+                        <button onClick={event => this.createNewTicket(event)}>Create New Ticket</button>
+                    
+                    </div>
+
+                </div>
 
             </>
   

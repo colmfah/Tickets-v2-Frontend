@@ -10,19 +10,21 @@ import '../../Styles/Nav.css'
 export class Image extends Component {
 
     state = {
-        errorMessage: ''
+        errorMessage: '',
+        borderColor: 'none',
     }
 
     continue = (e, values) => {
         e.preventDefault()
         let stateCopy = this.state
-        if(values.image === ''){
-            stateCopy.errorMessage = `You must upload an image`
-        }
-        this.setState(stateCopy)
-        if(stateCopy.errorMessage === ''){
+        if(stateCopy.errorMessage === '' && values.image !== ''){
             this.props.nextStep()
-        }    
+        }   
+        else if(values.image === '' && stateCopy.errorMessage === ''){
+            stateCopy.errorMessage = `You must upload an image`
+            stateCopy.borderColor = 'tomato'
+            this.setState(stateCopy)
+        }
     }
 
     goBack = (e) => {
@@ -32,6 +34,7 @@ export class Image extends Component {
 
     fileUploaded = (event) => {
 
+        let stateCopy = this.state
         let fileType = event.target.files[0].type
         let fileSize = event.target.files[0].size        
         let errorMessage = ''
@@ -42,19 +45,30 @@ export class Image extends Component {
         }
 
         if(!validFile){
-            errorMessage = 'Please upload a jpeg, gif or png file'
+            stateCopy.errorMessage = 'Please upload a jpeg, gif or png file'
+            stateCopy.borderColor = 'tomato'
+        }else if(fileSize > 30000000){
+            stateCopy.errorMessage = 'Please upload a file that is under 30 MB' 
+            stateCopy.borderColor = 'tomato'   
+        }else{
+            stateCopy.errorMessage = ''
         }
 
-        if(fileSize > 30000000){
-            errorMessage = 'Please upload a file that is under 30 MB'    
-        }
-
-        this.setState({errorMessage})
-
-        if(errorMessage === '') {
+        if(stateCopy.errorMessage === '') {
+            stateCopy.borderColor = '#00988f'  
             this.props.changeField(event, 'image')
         }
+
+        this.setState(stateCopy)
     }  
+
+    turnBorderOrange(e){
+        e.preventDefault()
+        let stateCopy = this.state
+        stateCopy.borderColor = '#ff8c00'
+        stateCopy.errorMessage = ''       
+        this.setState(stateCopy)
+    }
 
     render() {
         const {values} = this.props
@@ -73,16 +87,19 @@ export class Image extends Component {
 
                             <div className="theForm card">
                                 <div class ="content">
-                                <p className='warning' id="error">{this.state.errorMessage}</p>
+                                
                                     <div id="fileUploadText">Upload Image</div>
                                     <form>  
                                         <div id="fileUpload">
+                                            <p className='warning' id="error">{this.state.errorMessage}</p>
                                             <input
                                                 required
                                                 type="file"
                                                 onChange={this.fileUploaded}
                                                 title="Upload Image"
                                                 placeholder="Upload Image"
+                                                onFocus={event => this.turnBorderOrange(event)}
+                                                style={{borderColor: this.state.borderColor}}
                                             />
                                         </div>
                                         <div className="buttonContainer">

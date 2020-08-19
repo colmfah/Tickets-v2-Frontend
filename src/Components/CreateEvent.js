@@ -20,7 +20,7 @@ class CreateEvent extends React.Component {
 
 	constructor(){
 	super()
-	this.addTicket= this.addTicket.bind(this)
+	// this.addTicket= this.addTicket.bind(this)
 	this.changeTicketDetails= this.changeTicketDetails.bind(this)
 	}
 
@@ -90,34 +90,34 @@ class CreateEvent extends React.Component {
 	}
 
 
-	addTicket = (e) => {
-		e.preventDefault()
-		let userEvent = this.state.userEvent
-		userEvent.tickets.push({
-			chargeForTicketsStatus: '',
-			chargeForNoShows: '',
-			ticketType: '',
-			ticketTypeID: userEvent.totalTicketsCreated + 1,
-			price: '',
-			numberOfTickets: '',
-			sellWhenTicketNumberSoldOut: '',
-			startSelling: '',
-			stopSelling: '',
-			startSellingTime: Date.now(),
-			stopSellingTime: userEvent.endDetails,
-			ticketDescription: '',
-			hold: '',
-			refunds: {optionSelected: '',
-							refundUntil: '',
-							howToResell: '',
-							resellAtSpecificPrice: '',
-							minimumPrice: ''
-							}
-		}
-		)
-		userEvent.totalTicketsCreated += 1
-		this.setState({ userEvent })
-	}
+	// addTicket = (e) => {
+	// 	e.preventDefault()
+	// 	let userEvent = this.state.userEvent
+	// 	userEvent.tickets.push({
+	// 		chargeForTicketsStatus: '',
+	// 		chargeForNoShows: '',
+	// 		ticketType: '',
+	// 		ticketTypeID: userEvent.totalTicketsCreated + 1,
+	// 		price: '',
+	// 		numberOfTickets: '',
+	// 		sellWhenTicketNumberSoldOut: '',
+	// 		startSelling: '',
+	// 		stopSelling: '',
+	// 		startSellingTime: Date.now(),
+	// 		stopSellingTime: userEvent.endDetails,
+	// 		ticketDescription: '',
+	// 		hold: '',
+	// 		refunds: {optionSelected: '',
+	// 						refundUntil: '',
+	// 						howToResell: '',
+	// 						resellAtSpecificPrice: '',
+	// 						minimumPrice: ''
+	// 						}
+	// 	}
+	// 	)
+	// 	userEvent.totalTicketsCreated += 1
+	// 	this.setState({ userEvent })
+	// }
 
 	createEvent = e => {
 		e.preventDefault()
@@ -164,55 +164,50 @@ class CreateEvent extends React.Component {
 			})
 	}
 
-	changeField = (e, field, boolean) => {
-
-		console.log('change field triggered');
-		
-		
+	changeField = (e, field, boolean) => {		
 		let userEvent = this.state.userEvent
-
-		console.log('userEvent', userEvent)
 		
-
-	// 	if (field === "image") {
-	// 		userEvent.image = new FormData()
-	// 		userEvent.image.append('file', e.target.files[0])
-	// 		this.setState({ userEvent })
-	// 	}else if (field === "startDetails" || field === "endDetails") {
-	//         userEvent[field] = e
-	// 	}else if(boolean){
-	// 		e.target.value === 'true' ? userEvent[field]=true : userEvent[field]=false			
-	// 	}else {
-	//       userEvent[field] = e.target.value;
-	//     }
-	//     this.setState({ userEvent })
-	}
-
-
-
-	changeSellingTimes = (e, field1, ticketNumber, field2, numberOfTickets) => {
-
-		console.log('numberOfTickets', numberOfTickets);
-		
-
-		let userEvent = this.state.userEvent
-
-		userEvent.tickets[ticketNumber][field1] = e.target.value
-
-		if(e.target.value === 'now'){
-			userEvent.tickets[ticketNumber][field2] = Date.now()
-		} else if(e.target.value === 'whenPreviousSoldOut'){
-			userEvent.tickets[ticketNumber][field2] = ''
-			if(numberOfTickets === 2){
-				userEvent.tickets[1]['sellWhenTicketNumberSoldOut'] = 1
-			}
-		} else if(e.target.value === 'eventBegins'){
-			userEvent.tickets[ticketNumber][field2] = userEvent.startDetails
-		} else if (e.target.value ==='eventEnds'){
-			userEvent.tickets[ticketNumber][field2] = userEvent.endDetails
+		if (field === "image") {
+			userEvent.image = new FormData()
+			userEvent.image.append('file', e.target.files[0])
+			this.setState({ userEvent })
 		}
-		this.setState({ userEvent })
+		
+		// else if (field === "startDetails" || field === "endDetails") {
+	    //     userEvent[field] = e
+		// }else if(boolean){
+		// 	e.target.value === 'true' ? userEvent[field]=true : userEvent[field]=false			
+		// }else {
+	    //   userEvent[field] = e.target.value;
+	    // }
+	    this.setState({ userEvent })
 	}
+
+
+
+	// changeSellingTimes = (e, field1, ticketNumber, field2, numberOfTickets) => {
+
+	// 	console.log('numberOfTickets', numberOfTickets);
+		
+
+	// 	let userEvent = this.state.userEvent
+
+	// 	userEvent.tickets[ticketNumber][field1] = e.target.value
+
+	// 	if(e.target.value === 'now'){
+	// 		userEvent.tickets[ticketNumber][field2] = Date.now()
+	// 	} else if(e.target.value === 'whenPreviousSoldOut'){
+	// 		userEvent.tickets[ticketNumber][field2] = ''
+	// 		if(numberOfTickets === 2){
+	// 			userEvent.tickets[1]['sellWhenTicketNumberSoldOut'] = 1
+	// 		}
+	// 	} else if(e.target.value === 'eventBegins'){
+	// 		userEvent.tickets[ticketNumber][field2] = userEvent.startDetails
+	// 	} else if (e.target.value ==='eventEnds'){
+	// 		userEvent.tickets[ticketNumber][field2] = userEvent.endDetails
+	// 	}
+	// 	this.setState({ userEvent })
+	// }
 
 	changeTicketDetails = (e, field, ticketNumber) => {
 
@@ -230,12 +225,12 @@ class CreateEvent extends React.Component {
 			this.setState({ userEvent })
 	}
 
-	deleteTicket = (e, ticketNumber) => {
-		e.preventDefault()
-		let userEvent = this.state.userEvent
-		userEvent.tickets.splice(ticketNumber, 1)
-		this.setState({ userEvent })
-	}
+	// deleteTicket = (e, ticketNumber) => {
+	// 	e.preventDefault()
+	// 	let userEvent = this.state.userEvent
+	// 	userEvent.tickets.splice(ticketNumber, 1)
+	// 	this.setState({ userEvent })
+	// }
 
 	handleRefundChange = (e, field, i)=>{
 
@@ -314,9 +309,10 @@ class CreateEvent extends React.Component {
 
 	  switch(step){
 
-		case 100:
+		case 10:
 			return(
-				<Test	
+				<Test
+					values={values}	
 				/>
 			)
 
@@ -342,7 +338,7 @@ class CreateEvent extends React.Component {
 				)
 	
 
-			case 1:
+			case 10:
 				return(
 					<Image
 						values={values}
@@ -351,7 +347,7 @@ class CreateEvent extends React.Component {
 						changeField={this.changeField}
 					/>
 				)
-			case 2:
+			case 1:
 				return(
 					<Tickets
 						addTicket={this.addTicket}

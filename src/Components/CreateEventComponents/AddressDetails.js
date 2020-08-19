@@ -150,9 +150,6 @@ class AddressDetails extends React.Component {
 
     turnBorderOrange(e, field){
         e.preventDefault()
-        console.log('border orange');
-        
-
         let borderColors = this.state.borderColors
         borderColors[field] = '#ff8c00'
         console.log(borderColors);
@@ -166,6 +163,7 @@ class AddressDetails extends React.Component {
         stateCopy.errors[field] = ''
         this.setState(stateCopy)
     }
+
 
 	render() {
 
