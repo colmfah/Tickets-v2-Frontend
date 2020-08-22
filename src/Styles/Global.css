@@ -90,4 +90,7 @@ h2 {
 a:hover {
     text-decoration: underline;
 }
-
+/* 
+input[type='file'] {
+	color: transparent;
+  } */

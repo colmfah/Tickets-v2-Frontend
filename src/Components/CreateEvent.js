@@ -65,7 +65,7 @@ class CreateEvent extends React.Component {
 			chargeForTicketsStatus: '',
 			chargeForNoShows: '',
 			stopSelling: '',
-			startSellingTime: Date.now(),
+			startSellingTime: '',
 			stopSellingTime: '',
 			ticketDescription: '',
 			hold: '',
@@ -74,7 +74,33 @@ class CreateEvent extends React.Component {
 							howToResell: '',
 							resellAtSpecificPrice: '',
 							minimumPrice: '',
-						}
+						},
+			borderColors: {
+				ticketType: 'none',
+				ticketDescription: 'none',
+				chargeForTicketsStatus: 'none',
+				chargeForNoShows: 'none',
+				price: 'none',
+				hold: 'none',
+				startSelling: 'none',
+				startSellingTime: 'none',
+				stopSelling: 'none',
+				stopSellingTime: 'none',
+				sellWhenTicketNumberSoldOut: 'none',
+			},
+			errors:{
+				ticketType: '',
+				ticketDescription: '',
+				chargeForTicketsStatus: '',
+				chargeForNoShows: '',
+				price: '',
+				hold: '',
+				startSelling: '',
+				startSellingTime: '',
+				stopSelling: '',
+				stopSellingTime: '',
+				sellWhenTicketNumberSoldOut: ''
+			}
 		}],
 		globalRefundPolicy: true,
 		globalRefundOptions: {optionSelected: '',
@@ -90,34 +116,59 @@ class CreateEvent extends React.Component {
 	}
 
 
-	// addTicket = (e) => {
-	// 	e.preventDefault()
-	// 	let userEvent = this.state.userEvent
-	// 	userEvent.tickets.push({
-	// 		chargeForTicketsStatus: '',
-	// 		chargeForNoShows: '',
-	// 		ticketType: '',
-	// 		ticketTypeID: userEvent.totalTicketsCreated + 1,
-	// 		price: '',
-	// 		numberOfTickets: '',
-	// 		sellWhenTicketNumberSoldOut: '',
-	// 		startSelling: '',
-	// 		stopSelling: '',
-	// 		startSellingTime: Date.now(),
-	// 		stopSellingTime: userEvent.endDetails,
-	// 		ticketDescription: '',
-	// 		hold: '',
-	// 		refunds: {optionSelected: '',
-	// 						refundUntil: '',
-	// 						howToResell: '',
-	// 						resellAtSpecificPrice: '',
-	// 						minimumPrice: ''
-	// 						}
-	// 	}
-	// 	)
-	// 	userEvent.totalTicketsCreated += 1
-	// 	this.setState({ userEvent })
-	// }
+	addTicket = () => {		
+		let userEvent = this.state.userEvent
+		userEvent.tickets.push({
+			chargeForTicketsStatus: '',
+			chargeForNoShows: '',
+			ticketType: '',
+			ticketTypeID: userEvent.totalTicketsCreated + 1,
+			price: '',
+			numberOfTickets: '',
+			sellWhenTicketNumberSoldOut: '',
+			startSelling: '',
+			stopSelling: '',
+			startSellingTime: '',
+			stopSellingTime: userEvent.endDetails,
+			ticketDescription: '',
+			hold: '',
+			refunds: {optionSelected: '',
+							refundUntil: '',
+							howToResell: '',
+							resellAtSpecificPrice: '',
+							minimumPrice: ''
+							},
+			borderColors: {
+				ticketType: 'none',
+				ticketDescription: 'none',
+				chargeForTicketsStatus: 'none',
+				chargeForNoShows: 'none',
+				price: 'none',
+				hold: 'none',
+				startSelling: 'none',
+				startSellingTime: 'none',
+				stopSelling: 'none',
+				stopSellingTime: 'none',
+				sellWhenTicketNumberSoldOut: 'none',
+			},
+			errors:{
+				ticketType: '',
+				ticketDescription: '',
+				chargeForTicketsStatus: '',
+				chargeForNoShows: '',
+				price: '',
+				hold: '',
+				startSelling: '',
+				startSellingTime: '',
+				stopSelling: '',
+				stopSellingTime: '',
+				sellWhenTicketNumberSoldOut: ''
+			}
+		}
+		)
+		userEvent.totalTicketsCreated += 1
+		this.setState({ userEvent })
+	}
 
 	createEvent = e => {
 		e.preventDefault()
@@ -166,48 +217,120 @@ class CreateEvent extends React.Component {
 
 	changeField = (e, field, boolean) => {		
 		let userEvent = this.state.userEvent
-		
+				
 		if (field === "image") {
 			userEvent.image = new FormData()
 			userEvent.image.append('file', e.target.files[0])
 			this.setState({ userEvent })
 		}
 		
-		// else if (field === "startDetails" || field === "endDetails") {
-	    //     userEvent[field] = e
-		// }else if(boolean){
+		else if (field === "startDetails" || field === "endDetails") {
+	        userEvent[field] = e
+		}
+		
+		//else if(boolean){
 		// 	e.target.value === 'true' ? userEvent[field]=true : userEvent[field]=false			
-		// }else {
-	    //   userEvent[field] = e.target.value;
-	    // }
+		// }
+		else {
+	      userEvent[field] = e.target.value;
+	    }
 	    this.setState({ userEvent })
 	}
 
+	checkForErrors = (field, i, finalCheck) => {	
+		
+		let userEvent = this.state.userEvent
 
+        let warning = ''
 
-	// changeSellingTimes = (e, field1, ticketNumber, field2, numberOfTickets) => {
+        if(userEvent.tickets[i][field] === ''){
 
-	// 	console.log('numberOfTickets', numberOfTickets);
+            
+            if(field ==='ticketType'){
+                warning = 'Please Name Your Ticket'
+            }else if(field === 'chargeForTicketsStatus'){
+                warning = 'Please Select An Option'
+            }else if(field === 'chargeForNoShows'){
+                warning = 'Please Select How Much To Charge. Select €0 If You Do Not Want To Charge No Shows'
+            }else if(field === 'hold'){
+                warning = 'Please Select How To Fine Customers Who Do Not Turn Up'
+            }else if(field === 'startSelling'){
+                warning = 'Please Select When To Start Selling'
+            }else if(field === 'stopSelling'){
+                warning = 'Please Select When To Stop Selling'
+            }else if(field === 'sellWhenTicketNumberSoldOut'){
+                warning = 'Please Select Which Ticket Must Sell Out'
+            }else if(field ==='numberOfTickets'){
+                warning = 'Please Select Number Of Tickets'
+            }else if(field ==='price'){
+				warning = 'Please Select A Price. If tickets are free select €0'
+			}
+   
+        }else if((field === 'chargeForNoShows' && userEvent.tickets[i].chargeForNoShows < 0) || (field === 'price' && userEvent.tickets[i].price < 0)){
+            warning = 'Value Must Be Positive'
+
+        }else if (field === 'price' && userEvent.tickets[i].price > 0 && userEvent.tickets[i].price < 1){
+            warning = 'If Tickets Are Not Free, The Minimum Price Allowed Is €1'
+		}
+		
+		// else if (field === 'sellWhenTicketNumberSoldOut'){
+		// 	let tickets = this.state.userEvent.tickets.map(f => f.ticketTypeID)
+
+		// 	console.log('tickets', tickets)
+		// 	console.log('userEvent.tickets[i].sellWhenTicketNumberSoldOut', Number(userEvent.tickets[i].sellWhenTicketNumberSoldOut));
+			
+		// 	console.log('!tickets.includes(userEvent.tickets[i].sellWhenTicketNumberSoldOut)', !tickets.includes(userEvent.tickets[i].sellWhenTicketNumberSoldOut));
+		// 	console.log('tickets.includes(userEvent.tickets[i].sellWhenTicketNumberSoldOut)', tickets.includes(userEvent.tickets[i].sellWhenTicketNumberSoldOut));
+			
+			
+
+        //     if(!tickets.includes(Number(userEvent.tickets[i].sellWhenTicketNumberSoldOut))){
+        //         warning = 'sellWhenTicketNumberSoldOut'
+        //     }
+
+		// }
+		
+ 
+        userEvent.tickets[i].errors[field] = warning
+        let color 
+        warning === '' ? color = '#00988f' : color = 'tomato'
+        userEvent.tickets[i].borderColors[field] = color
+
+        this.setState({userEvent})
+
+        if(finalCheck && warning !== ''){return field}
+	}
+				
+		
 		
 
-	// 	let userEvent = this.state.userEvent
+	changeSellingTimes = (e, ticketNumber, field1, field2, values) => {
 
-	// 	userEvent.tickets[ticketNumber][field1] = e.target.value
 
-	// 	if(e.target.value === 'now'){
-	// 		userEvent.tickets[ticketNumber][field2] = Date.now()
-	// 	} else if(e.target.value === 'whenPreviousSoldOut'){
-	// 		userEvent.tickets[ticketNumber][field2] = ''
-	// 		if(numberOfTickets === 2){
-	// 			userEvent.tickets[1]['sellWhenTicketNumberSoldOut'] = 1
-	// 		}
-	// 	} else if(e.target.value === 'eventBegins'){
-	// 		userEvent.tickets[ticketNumber][field2] = userEvent.startDetails
-	// 	} else if (e.target.value ==='eventEnds'){
-	// 		userEvent.tickets[ticketNumber][field2] = userEvent.endDetails
-	// 	}
-	// 	this.setState({ userEvent })
-	// }
+		let userEvent = this.state.userEvent
+
+		userEvent.tickets[ticketNumber][field1] = e.target.value
+
+		if(e.target.value === 'now'){
+			userEvent.tickets[ticketNumber][field2] = Date.now()
+			
+		} else if(e.target.value === 'whenPreviousSoldOut'){
+			userEvent.tickets[ticketNumber][field2] = ''
+			if(ticketNumber === 1){
+				userEvent.tickets[1]['sellWhenTicketNumberSoldOut'] = 1
+			}
+		} else if(e.target.value === 'eventBegins'){
+			userEvent.tickets[ticketNumber][field2] = values.startDetails
+		} else if (e.target.value ==='eventEnds'){
+			userEvent.tickets[ticketNumber][field2] = values.endDetails
+        }else if(e.target.value === 'specific' && field1 === 'startSelling'){			
+			userEvent.tickets[ticketNumber][field2] = ''
+		}
+
+        this.setState({ userEvent })
+        
+        this.checkForTimeErrors(ticketNumber, field1, field2, values)
+    }
 
 	changeTicketDetails = (e, field, ticketNumber) => {
 
@@ -222,15 +345,87 @@ class CreateEvent extends React.Component {
 
 			userEvent.tickets[ticketNumber][field] = e.target.value
 		}
-			this.setState({ userEvent })
+		this.setState({ userEvent })
+
+		this.checkForErrors(field, ticketNumber)
+				
 	}
 
-	// deleteTicket = (e, ticketNumber) => {
-	// 	e.preventDefault()
-	// 	let userEvent = this.state.userEvent
-	// 	userEvent.tickets.splice(ticketNumber, 1)
-	// 	this.setState({ userEvent })
-	// }
+	checkForDescriptionErrors = (i) =>{
+        let userEvent = this.state.userEvent
+        userEvent.tickets[i].borderColors.ticketDescription = '#00988f' 
+        this.setState({userEvent})
+	}
+	
+	checkForTimeErrors = (i, field1, field2, values, finalCheck) =>{
+
+        let userEvent = this.state.userEvent
+        let warning = ''
+        if(userEvent.tickets[i][field1] === ''){
+            warning = 'Please Select A Time'
+        }else if(moment(field2).isAfter(moment(values.endDetails))){
+            warning = 'Tickets Cannot Be Sold After Your Event Has Ended'
+        }
+
+        
+        userEvent.tickets[i].errors[field1] = warning
+        let color 
+        warning === '' ? color = '#00988f' : color = 'tomato'
+
+        userEvent.tickets[i].borderColors[field1] = color
+
+        this.setState({userEvent})
+
+        if(finalCheck){
+            if(warning === 'Please Select A Time'){
+                return field1
+            }else if(warning === 'Tickets Cannot Be Sold After Your Event Has Ended') {
+                return field2
+            }
+        }
+
+    }
+
+
+
+	updateTickets( tickets){
+
+		this.setState({tickets})
+	}
+
+	deleteTicket = (e, i) => {
+		e.preventDefault()
+		let userEvent = this.state.userEvent
+		userEvent.tickets = userEvent.tickets.map(f => {
+			
+			if(Number(f.sellWhenTicketNumberSoldOut) === i+1){
+				console.log('triggered', i+1)
+				
+				f.sellWhenTicketNumberSoldOut = ''
+				f.startSelling = ''
+			}
+			return f
+		})
+		userEvent.tickets.splice(i, 1)
+		this.setState({ userEvent })
+	}
+
+	getLatLng = () => {
+        let userEvent = this.state.userEvent        
+		Geocode.fromAddress(`${userEvent.venue}, ${userEvent.address1}, ${userEvent.address2}, ${userEvent.address3}, ${userEvent.address4}`).then(response => {            
+			const { lat, lng } = response.results[0].geometry.location;
+			userEvent.lat = lat
+            userEvent.lng = lng 
+            this.setState(userEvent)
+          })
+    }
+
+	getLatLngAfterDrag = (event) => {
+		let userEvent = this.state.userEvent
+		userEvent.lat = event.latLng.lat()
+		userEvent.lng = event.latLng.lng()
+        this.setState(userEvent)
+    }
 
 	handleRefundChange = (e, field, i)=>{
 
@@ -279,26 +474,88 @@ class CreateEvent extends React.Component {
 		this.setState({step: step-1})
 	}
 
-	saveDataToParent = (data) => {		
-		let userEvent = this.state.userEvent
-		let newData = Object.entries(data)
-		newData.forEach(e => {
-			userEvent[e[0]] = e[1]
-		})
+	
+
+
+	// setDefaultstopSellingTime = (time) => {
+	// let userEvent = this.state.userEvent
+	// userEvent.tickets = userEvent.tickets.map(	(e,i) => {
+	// 	if (e.stopSelling === 'eventEnds'){
+	// 		e.stopSellingTime = Date.parse(time); return e}
+	// 		else if(e.stopSelling === 'eventBegins'){
+	// 			e.stopSellingTime = Date.parse(time); return e}
+	// 	}		)
+	// 		this.setState({ userEvent })
+	// 	}
+
+	startSellingSpecificTimeErrors = (i, field, values, finalCheck) => {
+     
+        
+        let userEvent = this.state.userEvent
+        let warning = ''
+
+        if(userEvent.tickets[i][field] === ''){
+
+            warning = 'Please Select When You Want To Start Selling These Tickets'
+    
+        }else if(moment(userEvent.tickets[i].startSellingTime).isAfter(moment(values.endDetails))){
+
+            warning = 'You Cannot Sell Tickets After The Event Ends'
+        }
+
+        userEvent.tickets[i].errors[field] = warning
+        let color 
+        warning === '' ? color = '#00988f' : color = 'tomato'
+        userEvent.tickets[i].borderColors[field] = color
+
+        this.setState({userEvent})
+
+        if(finalCheck && warning !== ''){return field}
+
+	}
+	
+	stopSellingSpecificTimeErrors = (i, field, values, finalCheck) => {
+         
+        let userEvent = this.state.userEvent
+        let warning = ''
+
+        if(userEvent.tickets[i][field] === ''){
+
+            warning = 'Please Select When You Want To Stop Selling These Tickets'
+    
+        }else if(moment(userEvent.tickets[i].startSellingTime).isAfter(moment(values.endDetails))){
+
+            warning = 'You Cannot Sell Tickets After The Event Ends'
+
+        }else if(userEvent.tickets[i].startSelling!=='whenPreviousSoldOut' &&  !moment(this.state.userEvent.tickets[i].stopSellingTime).isAfter(moment(this.state.userEvent.tickets[i].startSellingTime))){
+
+            warning = 'You Have Selected To Stop Selling Tickets Before You Start Selling Them'
+        }
+
+        userEvent.tickets[i].errors[field] = warning
+        let color 
+        warning === '' ? color = '#00988f' : color = 'tomato'
+        userEvent.tickets[i].borderColors[field] = color
+
+        this.setState({ userEvent })
+
+        if(finalCheck && warning !== ''){return field}
+
+    }
+
+	setSpecificTime = (e, i, field) =>{
+		
+		let userEvent = this.state.userEvent       
+        userEvent.tickets[i][field] = e   
+        this.setState({userEvent})
+    }
+
+	turnBorderOrange = (field, i) => { 
+		let userEvent = this.state.userEvent      
+		userEvent.tickets[i].borderColors[field] = '#ff8c00' 
+		userEvent.tickets[i].errors[field]=''  			
 		this.setState({userEvent})
 	}
-
-
-	setDefaultstopSellingTime = (time) => {
-	let userEvent = this.state.userEvent
-	userEvent.tickets = userEvent.tickets.map(	(e,i) => {
-		if (e.stopSelling === 'eventEnds'){
-			e.stopSellingTime = Date.parse(time); return e}
-			else if(e.stopSelling === 'eventBegins'){
-				e.stopSellingTime = Date.parse(time); return e}
-		}		)
-			this.setState({ userEvent })
-		}
 
 
 
@@ -309,18 +566,18 @@ class CreateEvent extends React.Component {
 
 	  switch(step){
 
-		case 10:
-			return(
-				<Test
-					values={values}	
-				/>
-			)
+		// case 10:
+		// 	return(
+		// 		<Test
+		// 			values={values}	
+		// 		/>
+		// 	)
 
 		  case 10:
 			return(
 				<EventDetails 
+					changeField={this.changeField}	
 					nextStep={this.nextStep}
-					saveDataToParent={this.saveDataToParent}
 					values={values}					
 				/>
 			)
@@ -328,11 +585,11 @@ class CreateEvent extends React.Component {
 			case 10:
 				return(
 					<AddressDetails
-						changeField={this.changeField}		
+						changeField={this.changeField}	
+						getLatLng={this.getLatLng} 	
 						getLatLngAfterDrag={this.getLatLngAfterDrag} 
 						nextStep={this.nextStep}
 						prevStep={this.prevStep}
-						saveDataToParent={this.saveDataToParent}
 						values={values}
 					/>
 				)
@@ -351,21 +608,27 @@ class CreateEvent extends React.Component {
 				return(
 					<Tickets
 						addTicket={this.addTicket}
-						changeField={this.changeField}
-						changeSellingTimes={this.changeSellingTimes}
+						changeSellingTimes = {this.changeSellingTimes }
 						changeTicketDetails = {this.changeTicketDetails}
+						checkForDescriptionErrors={this.checkForDescriptionErrors}
+						checkForErrors={this.checkForErrors}
+						checkForTimeErrors={this.checkForTimeErrors}
+						updateTickets={this.updateTickets}
 						deleteTicket={this.deleteTicket}
-						errorIfSecondTimeIsNotBeforeFirstTime={this.errorIfSecondTimeIsNotBeforeFirstTime}
-						handleBooleanChange={this.handleBooleanChange}
+						// handleBooleanChange={this.handleBooleanChange}
 						nextStep={this.nextStep}
 						prevStep={this.prevStep}
-						tickets = {this.state.userEvent.tickets}
+						saveDataToParent={this.saveDataToParent}
+						setSpecificTime={this.setSpecificTime}
+						startSellingSpecificTimeErrors={this.startSellingSpecificTimeErrors}
+						stopSellingSpecificTimeErrors={this.stopSellingSpecificTimeErrors}
+						turnBorderOrange={this.turnBorderOrange}
 						values={values}
-						waitingForTicketThatDoesntExistToSellOut={this.waitingForTicketThatDoesntExistToSellOut}
+						// waitingForTicketThatDoesntExistToSellOut={this.waitingForTicketThatDoesntExistToSellOut}
 					/>
 				)
 
-			case 5:
+			case 2:
 				return(
 				<Cancellations		
 					handleRefundChange={this.handleRefundChange}

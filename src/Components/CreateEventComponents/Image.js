@@ -88,7 +88,7 @@ export class Image extends Component {
                             <div className="theForm card">
                                 <div class ="content">
                                 
-                                    <div id="fileUploadText">Upload Image</div>
+                                <div id="fileUploadText">   {values.image === '' ? 'Upload Image' : 'Image Successfully Uploaded' }</div>
                                     <form>  
                                         <div id="fileUpload">
                                             <p className='warning' id="error">{this.state.errorMessage}</p>
@@ -99,7 +99,8 @@ export class Image extends Component {
                                                 title="Upload Image"
                                                 placeholder="Upload Image"
                                                 onFocus={event => this.turnBorderOrange(event)}
-                                                style={{borderColor: this.state.borderColor}}
+                                                style={values.image === '' ?  {borderColor: this.state.borderColor} : {borderColor: this.state.borderColor, color: 'transparent'}}
+                                                
                                             />
                                         </div>
                                         <div className="buttonContainer">

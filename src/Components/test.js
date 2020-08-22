@@ -33,25 +33,7 @@ export class EventDetails extends Component {
 
         return (
             <>
-                <div id="ticketPageGrid">
 
-                    <div className="navBar">Nav</div>
-
-                    <div id="tickets">Tickets
-
-                        {this.state.tickets.map((e,i)=> <div className="ticket" key={i}>
-                            Ticket
-                            <button onClick={event => this.deleteTicket(event, i)}    >Delete</button>
-                        </div>)}
-  
-                    </div>
-
-                    <div id="buttons">
-                        <button onClick={event => this.createNewTicket(event)}>Create New Ticket</button>
-                    
-                    </div>
-
-                </div>
 
             </>
   

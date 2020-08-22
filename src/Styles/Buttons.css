@@ -27,6 +27,11 @@ button.secondary,
 	vertical-align: top;
 }
 
+button.deleteTicketButton {
+	margin-top: 10%;
+}
+
+
 
 
 

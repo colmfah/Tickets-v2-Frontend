@@ -13,9 +13,17 @@
 }
 
 
+
 #centerTicketsInRow{
 	display: grid;
 	grid-template-rows: 1fr auto 1fr
+}
+
+.threeRowGridToCenterContent{
+
+	display: grid;
+	grid-template-rows: 1fr auto 1fr
+
 }
 
 

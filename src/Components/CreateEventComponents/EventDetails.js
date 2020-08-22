@@ -25,13 +25,7 @@ export class EventDetails extends Component {
             startDetails: 'none',
             endDetails: 'none',
             eventPassword: 'none',  
-        },
-        region: '',
-        title: '',
-        description: '',
-        startDetails: '',
-        endDetails: '',
-        eventPassword: '',
+        }
     }
 
     componentDidMount(){
@@ -68,13 +62,44 @@ export class EventDetails extends Component {
         this.setState({endDetails, errors})
     }
 
-    checkEndDetailsError(){        
+    changePassword(e){
+        let eventPassword = e.target.value
+        let errors = this.state.errors
+        errors.eventPassword = ''      
+        this.setState({eventPassword, errors})
+    }
+
+    changeRegion(e){
+        this.props.changeField(e, 'region')
+        let region = e.target.value
+        let errors = this.state.errors
+        errors.region = ''   
+        this.setState({errors}) 
+        this.checkRegionError(region)       
+    }
+
+    changeTitle(e){
+        let title = e.target.value
+        let errors = this.state.errors
+        errors.title = ''      
+        this.setState({title, errors})
+        this.checkTitleError(title)
+    }
+
+    changeStartDetails(e){
+        let startDetails = e
+        let errors = this.state.errors
+        errors.startDetails = ''
+        this.setState({startDetails, errors})
+    }
+
+    checkEndDetailsError(values){        
         let borderColors = this.state.borderColors
         let errors = this.state.errors
-        if(this.state.endDetails === ''){
+        if(values.endDetails === ''){
             errors.endDetails = 'Please Provide An End Time'
             borderColors.endDetails = 'tomato'
-        }else if(!moment(this.state.endDetails).isAfter(moment(this.state.startDetails))){
+        }else if(!moment(values.endDetails).isAfter(moment(values.startDetails))){
             errors.endDetails ='Your Event Must End After It Starts'
             borderColors.endDetails = 'tomato'
         }else{
@@ -86,17 +111,10 @@ export class EventDetails extends Component {
         
     }
 
-    changePassword(e){
-        let eventPassword = e.target.value
-        let errors = this.state.errors
-        errors.eventPassword = ''      
-        this.setState({eventPassword, errors})
-    }
-
-    checkPasswordError(){
+    checkPasswordError(values){
         let borderColors = this.state.borderColors
         let errors = this.state.errors
-        if(this.state.eventPassword.length < 6){
+        if(values.eventPassword.length < 6){
             errors.eventPassword = 'Your Password Must Be At Least 6 Characters'
             borderColors.eventPassword = 'tomato'
         }
@@ -107,18 +125,7 @@ export class EventDetails extends Component {
         this.setState({ borderColors, errors})
     }
 
-    changeRegion(e){
-        let region = e.target.value
-        let errors = this.state.errors
-        errors.region = ''     
-        this.setState({region, errors})
-        console.log('this.state.region1', this.state.region);
-        this.checkRegionError(region)
-    }
-
-    checkRegionError(region){       
-
-        console.log('region', region);
+    checkRegionError(region){   
         
         let borderColors = this.state.borderColors
         let errors = this.state.errors
@@ -133,12 +140,22 @@ export class EventDetails extends Component {
         this.setState({errors, borderColors})
     }
 
-    changeTitle(e){
-        let title = e.target.value
+    checkStartDetailsError(values){    
+        let borderColors = this.state.borderColors
+        let startDetails = values.startDetails
         let errors = this.state.errors
-        errors.title = ''      
-        this.setState({title, errors})
-        this.checkTitleError(title)
+        if(startDetails === ''){
+            errors.startDetails = 'Please Provide A Start Time'
+            borderColors.startDetails = 'tomato'
+        }
+        else if(!moment(startDetails).isAfter(moment())){
+            errors.startDetails = 'Your Event Must Start In The Future'
+            borderColors.startDetails = 'tomato'
+        }else{
+            errors.startDetails = ''
+            borderColors.startDetails = '#00988f'       
+        }
+        this.setState({borderColors, errors})
     }
 
     checkTitleError(title){
@@ -155,39 +172,13 @@ export class EventDetails extends Component {
         this.setState({ borderColors, errors})
     }
 
-    changeStartDetails(e){
-        let startDetails = e
-        let errors = this.state.errors
-        errors.startDetails = ''
-        this.setState({startDetails, errors})
-    }
-
-    checkStartDetailsError(){    
-        let borderColors = this.state.borderColors
-        let startDetails = this.state.startDetails
-        let errors = this.state.errors
-        if(this.state.startDetails === ''){
-            errors.startDetails = 'Please Provide A Start Time'
-            borderColors.startDetails = 'tomato'
-        }
-        else if(!moment(startDetails).isAfter(moment())){
-            errors.startDetails = 'Your Event Must Start In The Future'
-            borderColors.startDetails = 'tomato'
-        }else{
-            errors.startDetails = ''
-            borderColors.startDetails = '#00988f'       
-        }
-        this.setState({borderColors, errors})
-    }
-
-    continue(e){ 
-        e.preventDefault()   
+    continue(values){ 
         
-        this.checkTitleError(this.state.title)
-        this.checkRegionError(this.state.region)
-        this.checkStartDetailsError()
-        this.checkEndDetailsError()
-        this.checkPasswordError()
+        this.checkTitleError(values.title)
+        this.checkRegionError(values.region)
+        this.checkStartDetailsError(values)
+        this.checkEndDetailsError(values)
+        this.checkPasswordError(values)
 
 
         let errors = Object.entries(this.state.errors)
@@ -202,14 +193,7 @@ export class EventDetails extends Component {
         if(elementsWithErrors.length > 0 ){
             document.getElementById(elementsWithErrors[0]).scrollIntoView({behavior: "smooth"})
         }else{
-            this.props.saveDataToParent({
-                region: this.state.region,
-                title: this.state.title,
-                description: this.state.description,
-                startDetails: this.state.startDetails,
-                endDetails: this.state.endDetails,
-                eventPassword: this.state.eventPassword
-            })
+ 
             this.props.nextStep() 
         }
     }
@@ -234,7 +218,7 @@ export class EventDetails extends Component {
     render() {
         const {values} = this.props
         let selectColor
-        this.state.region === '' ? selectColor = 'rgb(118, 118, 118)' : selectColor = 'black'
+        values.region === '' ? selectColor = 'rgb(118, 118, 118)' : selectColor = 'black'
 
 
 
@@ -258,10 +242,10 @@ export class EventDetails extends Component {
                                             <div className="group">
                                                 <input
                                                     required
-                                                    value={this.state.title}
-                                                    onChange={event => this.changeTitle(event)}
+                                                    value={values.title}
+                                                    onChange={event => this.props.changeField(event, 'title')}
                                                     onFocus={event => this.turnBorderOrange(event, 'title')}
-                                                    onBlur={event => this.checkTitleError(this.state.title)}
+                                                    onBlur={event => this.checkTitleError(values.title)}
                                                     type='text'
                                                     placeholder='Event Name'
                                                     style={{borderColor: this.state.borderColors.title}}
@@ -272,9 +256,9 @@ export class EventDetails extends Component {
                                     
                                             <div className="group">
                                                 <textarea
-                                                    value={this.state.description}
+                                                    value={values.description}
                                                     required
-                                                    onChange={event => this.changeDescription(event)}
+                                                    onChange={event => this.props.changeField(event, 'description')}
                                                     onFocus={event => this.turnBorderOrange(event, 'description')}
                                                     onBlur={event => this.checkDescriptionError(event)}
                                                     type='text'
@@ -287,10 +271,11 @@ export class EventDetails extends Component {
                                             <div className="group">
                                                 <select
                                                     required		
-                                                    value={this.state.region}
-                                                    onChange={event => this.changeRegion(event)} 
+                                                    value={values.region}
+                                                    // onChange={event => this.changeRegion(event)} 
+                                                    onChange={event => this.changeRegion(event)}
                                                     onFocus={event => this.turnBorderOrange(event, 'region')}
-                                                    onBlur={event => this.checkRegionError(this.state.region)}                           
+                                                    onBlur={event => this.checkRegionError(values.region)}                           
                                                     style={{ color: selectColor, borderColor: this.state.borderColors.region }}
                                                 >
                                                     <option value="" disabled>Select your Region</option>
@@ -307,10 +292,10 @@ export class EventDetails extends Component {
                                                 <DatePicker
                                                     className="datePicker"
                                                     timeIntervals={15}
-                                                    selected={this.state.startDetails}
-                                                    onChange={event => this.changeStartDetails(event)}
+                                                    selected={values.startDetails}
+                                                    onChange={event => this.props.changeField(event, 'startDetails')}
                                                     onFocus={event => this.turnBorderOrange(event, 'startDetails')}
-                                                    onBlur={event =>this.checkStartDetailsError(event)}
+                                                    onBlur={() =>this.checkStartDetailsError(values)}
                                                     showTimeSelect
                                                     dateFormat="d MMM yyyy HH:mm"
                                                     required
@@ -326,9 +311,9 @@ export class EventDetails extends Component {
                                                 <DatePicker
                                                     className="datePicker"
                                                     timeIntervals={15}
-                                                    selected={this.state.endDetails}
-                                                    onChange={event => this.changeEndDetails(event)}
-                                                    onBlur={event =>this.checkEndDetailsError(event)}
+                                                    selected={values.endDetails}
+                                                    onChange={event => this.props.changeField(event, 'endDetails')}
+                                                    onBlur={() =>this.checkEndDetailsError(values)}
                                                     onFocus={event => this.turnBorderOrange(event, 'endDetails')}
                                                     showTimeSelect
                                                     dateFormat="d MMM yyyy HH:mm"
@@ -340,10 +325,10 @@ export class EventDetails extends Component {
                                             <p className='warning' id="eventPassword">{this.state.errors.eventPassword}</p>
                                             <div className="group">
                                                 <input
-                                                    value={this.state.eventPassword}
+                                                    value={values.eventPassword}
                                                     required
-                                                    onChange={event => this.changePassword(event)}
-                                                    onBlur={event =>this.checkPasswordError(event)}
+                                                    onChange={event => this.props.changeField(event, 'eventPassword')}
+                                                    onBlur={() =>this.checkPasswordError(values)}
                                                     onFocus={event => this.turnBorderOrange(event, 'eventPassword')}
                                                     type='password'
                                                     placeholder='Password To Check Customers In'
@@ -351,7 +336,7 @@ export class EventDetails extends Component {
                                                 />
                                             </div>
 
-                                            <button className="primary" onClick={event => this.continue(event, values)}>Continue</button>
+                                            <button className="primary" onClick={() => this.continue(values)}>Continue</button>
 
                                         </form>
                                         

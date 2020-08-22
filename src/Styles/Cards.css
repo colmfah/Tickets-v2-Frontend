@@ -27,26 +27,36 @@
 	text-align: left
 }
 
-.wrapper {
+/* .wrapper {
 	text-align: center;
 
+} */
 
+.wrapper {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
 }
+
+
+
 
 .wrapper > .content {
 	position: relative;
 	padding: 3.5%;
 	border: 1px solid #e2e2e2;
 	border-radius: 6px;
-	display: inline-block;
+	/* display: inline-block; */
 	width: 400px;
 	margin: 2%;
 }
 
-.wrapper > .content + .content {
+/* .wrapper > .content + .content {
 	margin-top: 0%;
-	/* margin-left: 0%; */
-}
+} */
+
+
+
 
 
 
@@ -68,6 +78,18 @@
 .navBar{
 	overflow:hidden
 }
+
+@media only screen and (max-width: 1045px) {
+	.wrapper > .content {
+		display: inline-block;
+	}
+
+	.wrapper {
+		text-align: center;
+		display: inline;
+	}
+
+  }
 
 @media only screen and (max-width: 400px) {
 	.wrapper > .content  {

@@ -109,9 +109,7 @@ form textarea {
 /* <div class ="content createTicket" id={`ticket${i}`} > */
 
 
-.createTicket {
-	height: 900px;
-}
+
 
 @media only screen and (max-width: 400px) {
 

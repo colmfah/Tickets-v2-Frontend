@@ -54,445 +54,128 @@ export class Test extends Component {
 
     componentDidUpdate(prevProps, prevState){
 
+        //copy values from parent state....if component updated for reason other than newTicketCreated...what about warnings?
+
         if(this.state.newTicketCreated){		
             document.getElementById(`ticket${this.state.tickets.length -1}`).scrollIntoView({behavior: "smooth"})
             let stateCopy = this.state
             stateCopy.newTicketCreated = false
             this.setState(stateCopy)
         }
+
+        console.log('component did mount')
     }
 
 
-    newTicket(e){
-        e.preventDefault()
-        let tickets = this.state.tickets
-        let ticketsCreated = this.state.ticketsCreated
-        let newTicketCreated = true
-        ticketsCreated++
-        tickets.push({
-            ticketType: '',
-            ticketNumber: 1,
-            ticketDescription: '',
-            chargeForTicketsStatus: '',
-            chargeForNoShows: '',
-            price: '',
-            hold: '',
-            startSelling: '',
-            startSellingTime: '',
-            stopSelling: '',
-            stopSellingTime: '',
-            sellWhenTicketNumberSoldOut: '',
-            numberOfTickets: '',
-            borderColors: {
-                ticketType: 'none',
-                ticketDescription: 'none',
-                chargeForTicketsStatus: 'none',
-                chargeForNoShows: 'none',
-                price: 'none',
-                hold: 'none',
-                startSelling: 'none',
-                startSellingTime: 'none',
-                stopSelling: 'none',
-                stopSellingTime: 'none',
-                sellWhenTicketNumberSoldOut: 'none',
-            },
-            errors:{
-                ticketType: '',
-                ticketDescription: '',
-                chargeForTicketsStatus: '',
-                chargeForNoShows: '',
-                price: '',
-                hold: '',
-                startSelling: '',
-                startSellingTime: '',
-                stopSelling: '',
-                stopSellingTime: '',
-                sellWhenTicketNumberSoldOut: ''
-            }
-        })
-        this.setState({tickets, ticketsCreated, newTicketCreated})
-    }
 
-    continue = (e, values) => {
-        e.preventDefault()
-        console.log('values.endDetails', values.endDetails)
-        console.log('e.stopSelling', e.stopSelling);
-        console.log('moment(e.stopSelling).isAfter(values.endDetails)', moment(e.stopSellingTime).isAfter(values.endDetails));
+    continue = (values) => {
+
+
         
+
+
+   
         
-        
-        const checkForErrors = (values) => {            
-            let errors = []
-            let validTicketTypeIDs = this.state.tickets.map(e=>e.ticketTypeID)
-            this.state.tickets.forEach((e,i) => {
-                if(e.ticketType === ''){
-                    errors.push(`Please provide a name for ticket ${i+1}`)
-                } 
-                if(e.numberOfTickets === ''){
-                    errors.push(`Please fill out the number of tickets you wish to sell for ticket ${i+1}`)
-                } 
-                if(e.startSelling === ''){
-                    errors.push(`Please fill out the time to start selling ticket ${i+1}`)
-                }
-                if(e.stopSelling === ''){
-                    errors.push(`Please fill out the time to stop selling ticket ${i+1}`)
-                }
-                if(e.chargeForTicketsStatus === ''){
-                    errors.push(`Please select whether ticket ${i+1} is a paid ticket or free ticket`)
-                }
-                if(e.chargeForTicketsStatus === 'freeTickets' && e.chargeForNoShows === ''){
-                    errors.push(`Please fill out how much you want to fine customers who don't turn up for ticket ${i+1}`)
-                }else if (e.chargeForTicketsStatus !== 'freeTickets' && e.price === ''){
-                    errors.push(`Please fill out the price for ticket ${i+1}`)
-                }
+        let errors = []
 
-                if(e.chargeForTicketsStatus === 'freeTickets' && e.chargeForNoShows > 0 && e.hold === ''){
-                    errors.push(`Please select how to fine customers who purchase ticket ${i+1} but don't turn up`)
-                }
+        values.tickets.forEach((e,i) => {
 
-                if( e.startSelling!=="whenPreviousSoldOut" && !moment(e.stopSellingTime).isAfter(e.startSellingTime)){
+            console.log('e.startSelling', e.startSelling)
+            console.log('i', i);
+            console.log('---------');
+            
+            
 
-                    errors.push(`You have chosen to stop selling ticket ${i+1} before the time you have chosen to start selling them`)
-                }
-                if(moment(e.stopSellingTime).isAfter(values.endDetails)){
-                    errors.push(`You are continuing to sell ticket ${i+1} when the event is over. Please change your stop selling time`)
-                }
-                if(e.startSelling ==='whenPreviousSoldOut' && !validTicketTypeIDs.includes(Number(e.sellWhenTicketNumberSoldOut))){
+            let ticketErrors = [i]
 
-                    console.log('validTicketTypeIDs', validTicketTypeIDs)
-                    console.log('e.sellWhenTicketNumberSoldOut', e.sellWhenTicketNumberSoldOut);
-                    
-                    
-
-                    errors.push(`You have chosen not to sell ticket ${i+1} until a ticket that doesn't exist sells out`)
-                }
-            })
-
-            if(this.state.tickets.length > 1 && values.ticketTypesEquivalent === ''){
-                errors.push(`Please select whether or not your ticket types are equivalent`)
-            }
-
-            return errors
-        }
-
-        let errors = checkForErrors(values)
-
-        errors.length === 0 ? this.props.nextStep() : this.setState({errors})
-        
-    }
-
-    changeSellingTimes = (e, ticketNumber, field1, field2, values) => {
-
-        console.log(typeof(e))
-
-		let tickets = this.state.tickets
-
-		tickets[ticketNumber][field1] = e.target.value
-
-		if(e.target.value === 'now'){
-			tickets[ticketNumber][field2] = Date.now()
-		} else if(e.target.value === 'whenPreviousSoldOut'){
-			tickets[ticketNumber][field2] = ''
-			if(tickets[ticketNumber].numberOfTickets === 2){
-				tickets[1]['sellWhenTicketNumberSoldOut'] = 1
-			}
-		} else if(e.target.value === 'eventBegins'){
-			tickets[ticketNumber][field2] = values.startDetails
-		} else if (e.target.value ==='eventEnds'){
-			tickets[ticketNumber][field2] = values.endDetails
-        }
-
-        this.setState({ tickets })
-        
-        this.checkForTimeErrors(e, ticketNumber, field1, field2, values)
-    }
-
-    changeTicketDetails(e, field, i, values){
-        e.preventDefault()
-        let tickets = this.state.tickets
-        tickets[i][field] = e.target.value
-
-        this.setState({tickets})
-
-        if(field==='chargeForTicketsStatus' || field === 'chargeForNoShows' || field === 'chargeForNoShows' || field ==='price' || field === 'hold' || field === 'numberOfTickets' || field ==='sellWhenTicketNumberSoldOut'){
-            this.checkForErrors(e,field,i)
-        }
-    }
-
-    checkForDescriptionErrors(e, i){
-        e.preventDefault()
-        let tickets = this.state.tickets
-        tickets[i].borderColors.ticketDescription = '#00988f' 
-        this.setState({tickets})
-    }
-
-    checkForErrors(e, field, i){
-        e.preventDefault()
-        let tickets = this.state.tickets
-        let warning = ''
-
-        if(tickets[i][field] === ''){
+            ticketErrors.push( this.props.checkForErrors( 'ticketType', i, true)  )
+            ticketErrors.push(  this.props.checkForErrors( 'chargeForTicketsStatus', i, true)  )
+            ticketErrors.push(  this.props.checkForErrors( 'startSelling', i, true)  )
+            ticketErrors.push(  this.props.checkForErrors( 'stopSelling', i, true)  )   
+            ticketErrors.push(  this.props.checkForErrors( 'numberOfTickets', i, true)  )
+            ticketErrors.push(  this.props.checkForTimeErrors(i, 'startSelling', 'startSellingTime', values, true) )
+            ticketErrors.push(  this.props.checkForTimeErrors(i, 'stopSelling', 'stopSellingTime', values, true) )
 
             
-            if(field ==='ticketType'){
-                warning = 'Please Name Your Ticket'
-            }else if(field === 'chargeForTicketsStatus'){
-                warning = 'Please Select An Option'
-            }else if(field === 'chargeForNoShows'){
-                warning = 'Please Select How Much To Charge. Select €0 If You Do Not Want To Charge No Shows'
-            }else if(field === 'hold'){
-                warning = 'Please Select How To Fine Customers Who Do Not Turn Up'
-            }else if(field === 'startSelling'){
-                warning = 'Please Select When To Start Selling'
-            }else if(field === 'stopSelling'){
-                warning = 'Please Select When To Stop Selling'
-            }else if(field === 'sellWhenTicketNumberSoldOut'){
-                warning = 'Please Select Which Ticket Must Sell Out'
+
+
+            if(e.chargeForTicketsStatus === 'freeTickets'){
+                ticketErrors.push(  this.props.checkForErrors( 'chargeForNoShows', i, true)  )
+            }else{
+                ticketErrors.push(  this.props.checkForErrors( 'price', i, true)  )
             }
-   
-        }else if((field === 'chargeForNoShows' && tickets[i].chargeForNoShows < 0) || (field === 'price' && tickets[i].price < 0)){
-            warning = 'Value Must Be Positive'
 
-        }else if (field === 'price' && tickets[i].price > 0 && tickets[i].price < 1){
-            warning = 'If Tickets Are Not Free, The Minimum Price Allowed Is €1'
-        }
- 
-        tickets[i].errors[field] = warning
-        let color 
-        warning === '' ? color = '#00988f' : color = 'tomato'
-        tickets[i].borderColors[field] = color
+            if(e.chargeForNoShows > 0){
+                ticketErrors.push(  this.props.checkForErrors( 'hold', i, true)  )
+            }
 
-        this.setState({tickets})
+            if(e.startSelling ==='whenPreviousSoldOut'){
+                ticketErrors.push(  this.props.checkForErrors( 'sellWhenTicketNumberSoldOut', i, true)  )
 
-    }
+                
+            }else if(e.startSelling === 'specific'){
+                ticketErrors.push(  this.props.startSellingSpecificTimeErrors (i, 'startSellingTime', values) )
+            }else if(e.startSelling ==='whenPreviousSoldOut'){
+                console.log('else if triggered');
+                
+                this.checkTicketExists(e)
+            }
 
-
-    checkForTimeErrors(e, i, field1, field2, values){
-        e.preventDefault()
-        let tickets = this.state.tickets
-        let warning = ''
-        if(tickets[i][field1] === ''){
-            warning = 'Please Select A Time'
-        }else if(moment(field2).isAfter(moment(values.endDetails))){
-            warning = 'Tickets Cannot Be Sold After Your Event Has Ended'
-        }
+            if(e.stopSelling === 'specific'){
+                ticketErrors.push(  this.props.stopSellingSpecificTimeErrors (i, 'stopSellingTime', values) )
+            }
 
         
-        tickets[i].errors[field1] = warning
-        let color 
-        warning === '' ? color = '#00988f' : color = 'tomato'
 
-        tickets[i].borderColors[field1] = color
+            
 
-        this.setState({tickets})
+            errors.push(ticketErrors)
+            
+        })
 
-    }
-
-    deleteTicket = (e, ticketNumber) => {
-		e.preventDefault()
-		let tickets = this.state.tickets
-		tickets.splice(ticketNumber, 1)
-		this.setState({ tickets })
-    }
-
-    // getCoordinates = () => {
-
-    //     let rect = document.getElementById("test").getBoundingClientRect()
-   
-    // }
-
-    goBack = (e) => {
+        errors = errors.map(e => e.filter(f => f!== undefined))
+        errors = errors.filter(e => e.length>1)
         
-     
-        this.props.prevStep()
-    }
+        if(errors.length === 0){
+
+            this.props.nextStep() 
+
+        }else{
+            console.log('ticket', `ticket${errors[0][0]}`);
+            console.log('error', errors[0][1]);
+            document.getElementById(`ticket${errors[0][0]}`).getElementsByClassName(errors[0][1])[0].scrollIntoView({behavior: "smooth"})
+        } 
 
 
-    setSpecificTime(e, i, field, values){
-        let tickets = this.state.tickets        
-        tickets[i][field] = e
         
-        this.setState({tickets})
-
-        if(field === 'startSellingTime'){
-            this.startSellingSpecificTimeErrors(e, i, field, values)
-        }else if(field === 'stopSellingTime'){
-            this.stopSellingSpecificTimeErrors(e, i, field, values)
-        }
     }
-
-
-    startSellingSpecificTimeErrors = (e, i, field, values) => {
-
-        console.log('start selling error check triggered');
-        
-        let tickets = this.state.tickets
-        let warning = ''
-
-        if(tickets[i][field] === ''){
-
-            warning = 'Please Select When You Want To Start Selling These Tickets'
-    
-        }else if(moment(e).isAfter(moment(values.endDetails))){
-
-            warning = 'You Cannot Sell Tickets After The Event Ends'
-        }
-
-        tickets[i].errors[field] = warning
-        let color 
-        warning === '' ? color = '#00988f' : color = 'tomato'
-        tickets[i].borderColors[field] = color
-
-        this.setState({tickets})
-
-    }
-
-    stopSellingSpecificTimeErrors = (e, i, field, values) => {
-
-        console.log('!moment(e).isAfter(moment(this.state.startDetails))', !moment(e).isAfter(moment(this.state.startDetails)));
-        
-
-        let tickets = this.state.tickets
-        let warning = ''
-
-        if(tickets[i][field] === ''){
-
-            warning = 'Please Select When You Want To Stop Selling These Tickets'
-    
-        }else if(moment(e).isAfter(moment(values.endDetails))){
-
-            warning = 'You Cannot Sell Tickets After The Event Ends'
-
-        }else if(!moment(e).isAfter(moment(this.state.startDetails))){
-
-            warning = 'You Have Selected To Stop Selling Tickets Before You Start Selling Them'
-        }
-
-        tickets[i].errors[field] = warning
-        let color 
-        warning === '' ? color = '#00988f' : color = 'tomato'
-        tickets[i].borderColors[field] = color
-
-        this.setState({tickets})
-
-    }
-
-    turnBorderOrange(e, field, i){
-        e.preventDefault()        
-        let tickets = this.state.tickets
-        tickets[i].borderColors[field] = '#ff8c00' 
-        tickets[i].errors[field]=''  
-        console.log('tickets', tickets);
-         
-        this.setState({tickets})
-    }
-
-
-
-
-
- 
-    
-    
-
 
 
     render() {
 
         const {values} = this.props
 
-        let chargeForTicketsStatusColor = this.state.tickets.map(e => {
+        let chargeForTicketsStatusColor = values.tickets.map(e => {
             if(e.chargeForTicketsStatus === ''){return 'rgb(118, 118, 118)'}else{return 'black'}
         })
-        let holdColor = this.state.tickets.map(e => {
+        let holdColor = values.tickets.map(e => {
             if(e.hold === ''){return 'rgb(118, 118, 118)'}else{return 'black'}
         })
-        let startSellingColor = this.state.tickets.map(e => {
+        let startSellingColor = values.tickets.map(e => {
             if(e.startSelling === ''){return 'rgb(118, 118, 118)'}else{return 'black'}
         })
-        let stopSellingColor = this.state.tickets.map(e => {
+        let stopSellingColor = values.tickets.map(e => {
             if(e.stopSelling === ''){return 'rgb(118, 118, 118)'}else{return 'black'}
         })
-        let sellWhenTicketNumberSoldOutColor = this.state.tickets.map(e => {
+        let sellWhenTicketNumberSoldOutColor = values.tickets.map(e => {
             if(e.sellWhenTicketNumberSoldOut=== ''){return 'rgb(118, 118, 118)'}else{return 'black'}
         })
 
-        let numberOfTicketsColor = this.state.tickets.map(e => {
+        let numberOfTicketsColor = values.tickets.map(e => {
             if(e.numberOfTickets === ''){return 'rgb(118, 118, 118)'}else{return 'black'}
         })
 
 
-
-
-        
-        
-        
-
-
-
-        let startSelling = this.state.tickets.map((e,i) => {
-            if(e.startSelling === 'whenPreviousSoldOut'){
-                
-                if(i===1){return(<div className="group"></div>)
-                }else{
-    
-                    return(
-                        <div>
-                            <p className="warning">{this.state.tickets[i].errors.sellWhenTicketNumberSoldOut}</p>
-                            <div className="group">
-                                <select
-                                    required
-                                    value={this.state.tickets[i].sellWhenTicketNumberSoldOut}
-                                    onBlur={event => this.checkForErrors(event, 'sellWhenTicketNumberSoldOut', i)}
-                                    onChange={event => this.changeTicketDetails(event, 'sellWhenTicketNumberSoldOut', i)}
-                                    onFocus={event => this.turnBorderOrange(event, 'sellWhenTicketNumberSoldOut', i)}
-                                    style={{  borderColor: this.state.tickets[i].borderColors.sellWhenTicketNumberSoldOut, color: sellWhenTicketNumberSoldOutColor[i] }}
-                                >
-                    
-                                    <option value=''>When which ticket is sold out?</option>
-                        
-                                    {this.state.tickets.filter((e, ind) => ind<i).map(	(e, index) => {
-                                        return (
-                                            <option key={index} value={e.ticketTypeID}>
-                                                {e.ticketType}
-                                            </option>
-                                        )}	
-                                    )}
-                                </select>   
-                            </div>
-                        </div>
-                    )
-
-                }
-   
-            } else if(e.startSelling == 'specific'){
-                return(
-                    <div>
-                        <p className="warning">{this.state.tickets[i].errors.startSellingTime}</p>
-                        <div className="group datePickerDiv"
-                            style={{ borderColor: this.state.tickets[i].borderColors.startSellingTime }}  
-                        >                 
-                            <DatePicker
-                                className="datePicker"
-                                timeIntervals={15}
-                                onBlur={event => this.startSellingSpecificTimeErrors(event, i, 'startSellingTime', values)}
-                                onChange={event => this.setSpecificTime(event, i, 'startSellingTime', values)}
-                                onFocus={event => this.turnBorderOrange(event, 'startSellingTime', i)}
-                                selected={this.state.tickets[i].startSellingTime}
-                                placeholderText='Select Date And Time'
-                                showTimeSelect
-                                dateFormat="Pp"
-                                required
-                                />
-                        </div>
-                    </div>
-                )
-            }else{return <div></div>}
-        })
-
-
-
-        
 
 
         return (
@@ -507,208 +190,267 @@ export class Test extends Component {
                         <div></div>
                         <div className="wrapper">
                  
-                            {this.state.tickets.map((e, i) => {
+                            {values.tickets.map((e, i) => {
                                 return (
     
-                                    <div className ="content createTicket" id={`ticket${i}`} >
+                                    <div className = "content threeRowGridToCenterContent" id={`ticket${i}`} >
+                                        <div></div>
+                                        <div>
+   
+                                            <div 
+                                                className="ticketNumber"
+                                                style={{display: values.tickets.length === 1? 'none' : 'block' }}
+                                            >
+                                                {i+1}
+                                            </div> 
 
-                                        <div 
-                                            className="ticketNumber"
-                                            style={{display: this.state.tickets.length === 1? 'none' : 'block' }}
-                                        >
-                                            {i+1}
-                                        </div> 
+                                            <form key={i}>
+                                                <p className="warning ticketType">{values.tickets[i].errors.ticketType}</p>
+                                                <div className="group">
+                                                    <input
+                                                        required
+                                                        type="text"
+                                                        value={values.tickets[i].ticketType}
+                                                        onBlur={() => this.props.checkForErrors('ticketType', i, false)}
+                                                        onChange={event => this.props.changeTicketDetails(event, 'ticketType', i)}
+                                                        onFocus={() => this.props.turnBorderOrange( 'ticketType', i)}
+                                                        placeholder="Ticket Name eg. General Admission"
+                                                        style={{borderColor: values.tickets[i].borderColors.ticketType}}
+                                                    />     
+                                                </div>
 
-                                        <form key={i}>
-                                            <p className="warning">{this.state.tickets[i].errors.ticketType}</p>
-                                            <div className="group">
-                                                <input
-                                                    required
-                                                    type="text"
-                                                    value={this.state.tickets[i].ticketType}
-                                                    onBlur={event => this.checkForErrors(event, 'ticketType', i)}
-                                                    onChange={event => this.changeTicketDetails(event, 'ticketType', i)}
-                                                    onFocus={event => this.turnBorderOrange(event, 'ticketType', i)}
-                                                    placeholder="Ticket Name eg. General Admission"
-                                                    style={{borderColor: this.state.tickets[i].borderColors.ticketType}}
-                                                />     
-                                            </div>
+                                                <p className="warning" >{values.tickets[i].errors.ticketDescription}</p>
+                                                <div className="group">
+                                                    <textarea
+                                                        type="text"
+                                                        value={values.tickets[i].ticketDescription}
+                                                        onBlur={() => this.props.checkForDescriptionErrors(i)}
+                                                        onChange={event => this.props.changeTicketDetails(event, 'ticketDescription', i)}
+                                                        onFocus={() => this.props.turnBorderOrange( 'ticketDescription', i)}
+                                                        placeholder="Ticket Description (optional)"
+                                                        style={{borderColor: values.tickets[i].borderColors.ticketDescription}}
+                                                    />          
+                                                </div>
 
-                                            <p className="warning">{this.state.tickets[i].errors.ticketDescription}</p>
-                                            <div className="group">
-                                                <textarea
-                                                    type="text"
-                                                    value={this.state.tickets[i].ticketDescription}
-                                                    onBlur={event => this.checkForDescriptionErrors(event, i)}
-                                                    onChange={event => this.changeTicketDetails(event, 'ticketDescription', i)}
-                                                    onFocus={event => this.turnBorderOrange(event, 'ticketDescription', i)}
-                                                    placeholder="Ticket Description (optional)"
-                                                    style={{borderColor: this.state.tickets[i].borderColors.ticketDescription}}
-                                                />          
-                                            </div>
+                                                <p className="warning chargeForTicketsStatus" >{values.tickets[i].errors.chargeForTicketsStatus}</p>
+                                                <div className="group">					          
+                                                    <select
+                                                        required 
+                                                        value={values.tickets[i].chargeForTicketsStatus}
+                                                        onBlur={() => this.props.checkForErrors('chargeForTicketsStatus', i)}
+                                                        onChange={event => this.props.changeTicketDetails(event, 'chargeForTicketsStatus', i)}
+                                                        onFocus={() => this.props.turnBorderOrange( 'chargeForTicketsStatus', i)}			
+                                                        style={{ color: chargeForTicketsStatusColor[i], borderColor: values.tickets[i].borderColors.chargeForTicketsStatus }}
+                                                    >
+                                                    <option value="" disabled>Select Ticket Type</option>
+                                                    <option value="chargeForTickets" disabled>Charge For Tickets</option>
+                                                    <option value="freeTickets">Free Tickets</option>
+                                                    
+                                                    </select>
+                                                </div>
 
-                                            <p className="warning">{this.state.tickets[i].errors.chargeForTicketsStatus}</p>
-                                            <div className="group">					          
-                                                <select
-                                                    required 
-                                                    value={this.state.tickets[i].chargeForTicketsStatus}
-                                                    onBlur={event => this.checkForErrors(event,'chargeForTicketsStatus', i)}
-                                                    onChange={event => this.changeTicketDetails(event, 'chargeForTicketsStatus', i)}
-                                                    onFocus={event => this.turnBorderOrange(event, 'chargeForTicketsStatus', i)}			
-                                                    style={{ color: chargeForTicketsStatusColor[i], borderColor: this.state.tickets[i].borderColors.chargeForTicketsStatus }}
-                                                >
-                                                <option value="" disabled>Select Ticket Type</option>
-                                                <option value="chargeForTickets" disabled>Charge For Tickets</option>
-                                                <option value="freeTickets">Free Tickets</option>
+
+                                                {values.tickets[i].chargeForTicketsStatus === 'freeTickets' ?
+                                                    <div>
+                                                        <p className="warning chargeForNoShows" >{values.tickets[i].errors.chargeForNoShows}</p>
+                                                        <div className={values.tickets[i].chargeForNoShows === '' ? "group" : "group currencyInput"}>
+                                                            <input
+                                                                required
+                                                                type="number"
+                                                                value={values.tickets[i].chargeForNoShows}
+                                                                onChange={event => this.props.changeTicketDetails(event, 'chargeForNoShows', i)}
+                                                                onBlur={() => this.props.checkForErrors('chargeForNoShows', i)}
+                                                                onFocus={() => this.props.turnBorderOrange( 'chargeForNoShows', i)}	
+                                                                placeholder="Fine for customers who don't show up"
+                                                                min={0}
+                                                                style={{borderColor: values.tickets[i].borderColors.chargeForNoShows}}
+                                                            />     
+                                                        </div>
+                                                    </div>
+
+                                                    :
+                                                    <div>
+                                                        <p className="warning price">{values.tickets[i].errors.price}</p>
+                                                        <div className="group">
+                                                            <input
+                                                                required
+                                                                type="number"
+                                                                value={values.tickets[i].price}
+                                                                onChange={event => this.props.changeTicketDetails(event, 'price', i)}
+                                                                onBlur={() => this.props.checkForErrors('price', i)}
+                                                                onFocus={() => this.props.turnBorderOrange( 'price', i)}	
+                                                                placeholder="Price"
+                                                                min={0}
+                                                                style={{borderColor: values.tickets[i].borderColors.price}}
+                                                            />
+                                                        </div>
+                                                    </div>
                                                 
-                                                </select>
-                                            </div>
+                                                }
 
-
-                                            {this.state.tickets[i].chargeForTicketsStatus === 'freeTickets' ?
+                                                {values.tickets[i].chargeForNoShows > 0 ? 
                                                 <div>
-                                                    <p className="warning">{this.state.tickets[i].errors.chargeForNoShows}</p>
-                                                    <div className={this.state.tickets[i].chargeForNoShows === '' ? "group" : "group currencyInput"}>
-                                                        <input
-                                                            required
-                                                            type="number"
-                                                            value={this.state.tickets[i].chargeForNoShows}
-                                                            onChange={event => this.changeTicketDetails(event, 'chargeForNoShows', i)}
-                                                            onBlur={event => this.checkForErrors(event,'chargeForNoShows', i)}
-                                                            onFocus={event => this.turnBorderOrange(event, 'chargeForNoShows', i)}	
-                                                            placeholder="Fine for customers who don't show up"
-                                                            min={0}
-                                                            style={{borderColor: this.state.tickets[i].borderColors.chargeForNoShows}}
-                                                        />     
-                                                    </div>
-                                                </div>
-
-                                                :
-                                                <div>
-                                                    <p className="warning">{this.state.tickets[i].errors.price}</p>
+                                                    <p className="warning hold">{values.tickets[i].errors.hold}</p>
                                                     <div className="group">
-                                                        <input
-                                                            required
-                                                            type="number"
-                                                            value={this.state.tickets[i].price}
-                                                            onChange={event => this.changeTicketDetails(event, 'price', i)}
-                                                            onBlur={event => this.checkForErrors(event,'price', i)}
-                                                            onFocus={event => this.turnBorderOrange(event, 'price', i)}	
-                                                            placeholder="Price"
-                                                            min={0}
-                                                            style={{borderColor: this.state.tickets[i].borderColors.price}}
-                                                        />
+                                                        <select
+                                                            required 
+                                                            value={values.tickets[i].hold}			
+                                                            onChange={event => this.props.changeTicketDetails(event, 'hold', i)}
+                                                            onBlur={() => this.props.checkForErrors('hold', i)}
+                                                            onFocus={() => this.props.turnBorderOrange( 'hold', i)}	
+                                                            style={{ color: holdColor[i], borderColor: values.tickets[i].borderColors.hold }}          
+                                                        >
+                                                            <option value="" disabled>Place hold on customers' credit credit?</option>
+                                                            <option value="hold"> Yes</option>
+                                                            <option value="noHold">No</option>
+                                                        </select>
                                                     </div>
                                                 </div>
-                                            
-                                            }
+                                                : <div className="group"></div>        
+                                                }	
 
-                                            {this.state.tickets[i].chargeForNoShows > 0 ? 
-                                            <div>
-                                                <p className="warning">{this.state.tickets[i].errors.hold}</p>
+                                                <p className="warning numberOfTickets">{values.tickets[i].errors.numberOfTickets}</p>
+                                                <div className="group">          
+                                                    <input
+                                                        required
+                                                        type="number"
+                                                        min={1}
+                                                        value={values.tickets[i].numberOfTickets}
+                                                        onChange={event => this.props.changeTicketDetails(event, 'numberOfTickets', i)}
+                                                        onBlur={() => this.props.checkForErrors('numberOfTickets', i)}
+                                                        onFocus={() => this.props.turnBorderOrange( 'numberOfTickets', i)}	
+                                                        placeholder="Number of Tickets"
+                                                        style={{ color: numberOfTicketsColor[i], borderColor: values.tickets[i].borderColors.numberOfTickets }}
+                                                    />
+                                                </div>
+
+                                                <p className="warning startSelling">{values.tickets[i].errors.startSelling}</p>
+                                                <div className="group">       
+                                                    <select
+                                                        required 
+                                                        value={values.tickets[i].startSelling}
+                                                        onBlur={() => this.props.checkForErrors('startSelling', i)}
+                                                        onChange={event => this.props.changeSellingTimes(event, i, 'startSelling', 'startSellingTime', values)}
+                                                        onFocus={() => this.props.turnBorderOrange( 'startSelling', i)}
+                                                        style={{ color: startSellingColor[i], borderColor: values.tickets[i].borderColors.startSelling  }}
+                                                    >
+                                                        <option value='' disabled>Start Selling Tickets</option>
+                                                        <option value="now">Now</option>
+                                                        <option value="specific">Specific Date and Time</option>
+                                                        {i===1 ? <option value="whenPreviousSoldOut">When {values.tickets[0].ticketType} Is Sold Out</option>:<option value="whenPreviousSoldOut" disabled={i==0}>When A Previous Ticket Is Sold Out</option>}  
+                                                    </select>
+                                                </div>
+
+                                    
+
+                                            
+                    
+            
+        
+        
+
+                                                <p className="warning sellWhenTicketNumberSoldOut">{values.tickets[i].errors.sellWhenTicketNumberSoldOut}</p>
+                                                {(values.tickets[i].startSelling === 'whenPreviousSoldOut' && i!==1) && 
+                                                    <div className="group">
+                                                        <select
+                                                            required
+                                                            value={values.tickets[i].sellWhenTicketNumberSoldOut}
+                                                            onBlur={() => this.props.checkForErrors('sellWhenTicketNumberSoldOut', i)}
+                                                            onChange={event => this.props.changeTicketDetails(event, 'sellWhenTicketNumberSoldOut', i)}
+                                                            onFocus={() => this.props.turnBorderOrange( 'sellWhenTicketNumberSoldOut', i)}
+                                                            style={{  borderColor: values.tickets[i].borderColors.sellWhenTicketNumberSoldOut, color: sellWhenTicketNumberSoldOutColor[i] }}
+                                                        >
+                                            
+                                                            <option value='' disabled>When which ticket is sold out?</option>
+                                                
+                                                            {values.tickets.filter((e, ind) => ind<i).map(	(e, index) => {
+                                                                return (
+                                                                    <option key={index} value={e.ticketTypeID}>
+                                                                        {e.ticketType}
+                                                                    </option>
+                                                                )}	
+                                                            )}
+                                                        </select>   
+                                                    </div>
+                                                }
+                
+
+            
+    
+
+                                                <p className="warning startSellingTime">{values.tickets[i].errors.startSellingTime}</p>
+                                                {values.tickets[i].startSelling == 'specific' && 
+                                                <div className="group datePickerDiv"
+                                                    style={{ borderColor: values.tickets[i].borderColors.startSellingTime }}  
+                                                >                 
+                                                    <DatePicker
+                                                        className="datePicker"
+                                                        timeIntervals={15}
+                                                        onBlur={() => this.props.startSellingSpecificTimeErrors (i, 'startSellingTime', values)}
+                                                        onChange={event => this.props.setSpecificTime(event, i, 'startSellingTime', values)}
+                                                        onFocus={() => this.props.turnBorderOrange( 'startSellingTime', i)}
+                                                        selected={values.tickets[i].startSellingTime}
+                                                        placeholderText='Select Date And Time'
+                                                        showTimeSelect
+                                                        dateFormat="Pp"
+                                                        required
+                                                        />
+                                                </div>
+                                                }
+
+
+                                                <p className="warning stopSelling">{values.tickets[i].errors.stopSelling}</p>
                                                 <div className="group">
                                                     <select
                                                         required 
-                                                        value={this.state.tickets[i].hold}			
-                                                        onChange={event => this.changeTicketDetails(event, 'hold', i)}
-                                                        onBlur={event => this.checkForErrors(event,'hold', i)}
-                                                        onFocus={event => this.turnBorderOrange(event, 'hold', i)}	
-                                                        style={{ color: holdColor[i], borderColor: this.state.tickets[i].borderColors.hold }}          
+                                                        value={values.tickets[i].stopSelling}
+                                                        onBlur={() => this.props.checkForErrors('stopSelling', i)}
+                                                        onChange={event => this.props.changeSellingTimes(event, i, 'stopSelling', 'stopSellingTime', values)}
+                                                        onFocus={() => this.props.turnBorderOrange( 'stopSelling', i)}
+                                                        style={{ color: stopSellingColor[i], borderColor: values.tickets[i].borderColors.stopSelling }}
                                                     >
-                                                        <option value="" disabled>Place hold on customers' credit credit?</option>
-                                                        <option value="hold"> Yes</option>
-                                                        <option value="noHold">No</option>
+                                                        <option value='' disabled>Stop Selling Tickets</option>
+                                                        <option value="eventBegins">When Event Begins</option>
+                                                        <option value="eventEnds">When Event Ends</option>
+                                                        <option value="specific">At Specific Date and Time</option>
                                                     </select>
                                                 </div>
-                                            </div>
-                                            : <div className="group"></div>        
-                                            }	
-
-                                            <p className="warning">{this.state.tickets[i].errors.numberOfTickets}</p>
-                                            <div className="group">          
-                                                <input
-                                                    required
-                                                    type="number"
-                                                    min={1}
-                                                    value={this.state.tickets[i].numberOfTickets}
-                                                    onChange={event => this.changeTicketDetails(event, 'numberOfTickets', i)}
-                                                    onBlur={event => this.checkForErrors(event,'numberOfTickets', i)}
-                                                    onFocus={event => this.turnBorderOrange(event, 'numberOfTickets', i)}	
-                                                    placeholder="Number of Tickets"
-                                                    style={{ color: numberOfTicketsColor[i], borderColor: this.state.tickets[i].borderColors.numberOfTickets }}
-                                                />
-                                            </div>
-
-                                            <p className="warning">{this.state.tickets[i].errors.startSelling}</p>
-                                            <div className="group">       
-                                                <select
-                                                    required 
-                                                    value={this.state.tickets[i].startSelling}
-                                                    onBlur={event => this.checkForErrors(event,'startSelling', i)}
-                                                    onChange={event => this.changeSellingTimes(event, i, 'startSelling', 'startSellingTime', values)}
-                                                    onFocus={event => this.turnBorderOrange(event, 'startSelling', i)}
-                                                    style={{ color: startSellingColor[i], borderColor: this.state.tickets[i].borderColors.startSelling  }}
-                                                >
-                                                    <option value='' disabled>Start Selling Tickets</option>
-                                                    <option value="now">Now</option>
-                                                    <option value="specific">Specific Date and Time</option>
-                                                    {i===1 ? <option value="whenPreviousSoldOut">When {this.state.tickets[0].ticketType} Is Sold Out</option>:<option value="whenPreviousSoldOut" disabled={i==0}>When A Previous Ticket Is Sold Out</option>}  
-                                                </select>
-                                            </div>
-
-                                            {startSelling[i]}
-
-                                            
-                                            <p className="warning">{this.state.tickets[i].errors.stopSelling}</p>
-                                            <div className="group">
-                                                <select
-                                                    required 
-                                                    value={this.state.tickets[i].stopSelling}
-                                                    onBlur={event => this.checkForErrors(event,'stopSelling', i)}
-                                                    onChange={event => this.changeSellingTimes(event, i, 'stopSelling', 'stopSellingTime', values)}
-                                                    onFocus={event => this.turnBorderOrange(event, 'stopSelling', i)}
-                                                    style={{ color: stopSellingColor[i], borderColor: this.state.tickets[i].borderColors.stopSelling }}
-                                                >
-                                                    <option value='' disabled>Stop Selling Tickets</option>
-                                                    <option value="eventBegins">When Event Begins</option>
-                                                    <option value="eventEnds">When Event Ends</option>
-                                                    <option value="specific">At Specific Date and Time</option>
-                                                </select>
-                                            </div>
 
 
-                                            {this.state.tickets[i].stopSelling == 'specific'  ?
-                                                <div>
-                                                    <p className="warning">{this.state.tickets[i].errors.stopSellingTime}</p>
+
+                                                <p className="warning stopSellingTime">{values.tickets[i].errors.stopSellingTime}</p>
+                                                {values.tickets[i].stopSelling == 'specific'  &&
+
                                                     <div className="group datePickerDiv"
-                                                    style={{ borderColor: this.state.tickets[i].borderColors.stopSellingTime }}  
+                                                    style={{ borderColor: values.tickets[i].borderColors.stopSellingTime }}  
                                                     >  
                                                             <DatePicker
                                                                 className="datePicker"
                                                                 timeIntervals={15}
-                                                                onChange={event => this.setSpecificTime(event, i, 'stopSellingTime', values)}
-                                                                onBlur={event => this.stopSellingSpecificTimeErrors(e, i, 'stopSellingTime', values)}
-                                                                onFocus={event => this.turnBorderOrange(event, 'stopSellingTime', i)}
-                                                                selected={this.state.tickets[i].stopSellingTime}
+                                                                onChange={event => this.props.setSpecificTime(event, i, 'stopSellingTime', values)}
+                                                                onBlur={()=> this.props.stopSellingSpecificTimeErrors(i, 'stopSellingTime', values)}
+                                                                onFocus={() => this.props.turnBorderOrange( 'stopSellingTime', i)}
+                                                                selected={values.tickets[i].stopSellingTime}
                                                                 placeholderText='Select Date And Time'
                                                                 showTimeSelect
                                                                 dateFormat="Pp"
                                                                 required
                                                             />
-
                                                     </div>
-                                                </div>
-                                                : <div className = "group"></div>
-                                            }
+                                                }
 
-                                            {this.state.tickets.length > 1 &&
-                                                <button
-                                                    className = "secondary" 
-                                                    onClick={event => this.deleteTicket(event, i) }>Delete Ticket
-                                                </button>
-                                            }
+                                                {values.tickets.length > 1 &&
+                                                    <button
+                                                        className = "secondary deleteTicketButton" 
+                                                        onClick={(event)=> this.props.deleteTicket(event, i) }>Delete Ticket
+                                                    </button>
+                                                }
 
-                                        </form>
+                                            </form>
+
+                                        </div>
+
+                                        <div></div>
 
                                     </div>
                                 )
@@ -727,12 +469,12 @@ export class Test extends Component {
                     
                         
                         <div className="buttonContainer" id="firstButtonContainer">
-                            <button className="primary" onClick={event => this.newTicket(event)}>Create Another Ticket</button>
+                            <button className="primary" onClick={this.props.addTicket}>Create Another Ticket</button>
                         </div>
 
                         <div className="buttonContainer">
-                            <button className="primary lhsbutton" onClick={event => this.continue(event, values)}>Continue</button>   
-                            <button className="secondary rhsbutton" onClick={event => this.goBack(event)}>Go Back</button>
+                            <button className="primary lhsbutton" onClick={event => this.continue(values)}>Continue</button>   
+                            <button className="secondary rhsbutton" onClick={this.props.prevStep}>Go Back</button>
                         </div>
 
                         <div></div>
@@ -744,7 +486,7 @@ export class Test extends Component {
                 {/* wrapper */}
                 {/* grid center middle longForm */}
 
-                    {/* {this.state.tickets.length > 1 && 		
+                    {/* {values.tickets.length > 1 && 		
 
                         <div className="group">
                             <select
