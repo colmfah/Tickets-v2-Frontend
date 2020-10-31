@@ -5,6 +5,8 @@ import { Elements, StripeProvider } from "react-stripe-elements";
 import CheckoutForm from "./CheckoutForm";
 import SaveCardForm from "./SaveCardForm";
 import Nav from "./Nav";
+import BuyTicket from "./BuyTicket";
+import ColmTicket from "./ColmTicket";
 import LastMinuteTickets from "./LastMinuteTickets";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -13,7 +15,6 @@ import "react-datepicker/dist/react-datepicker.css";
 
 
 class Event extends React.Component {
-
 	constructor(){
 	super()
 	this.changeNumTickets= this.changeNumTickets.bind(this)
@@ -115,13 +116,9 @@ class Event extends React.Component {
 
 	}
 
-
-
 	calculateStripeFee = () => {
 	return (1.23*(0.25 + (0.014)*this.displayTotal()))
 	}
-
-
 
 	calculateTotals = (data) => {
 
@@ -172,6 +169,12 @@ class Event extends React.Component {
 				this.setState({lastMinuteTicketCharges})
 			}
 
+	}
+
+	changeQuantity = (i, quantity) =>{
+		let userEvent = this.state.userEvent
+		userEvent.tickets[i].buy.numTicketsSought = quantity
+		this.setState(userEvent)
 	}
 
 	displayAdminFee = () => {
@@ -323,7 +326,7 @@ class Event extends React.Component {
 	}
 
 
-  render() {
+  render() {		
 
 	{/**this.state.userEvent.tickets.filter(e => e.finalFewTicket === true).length > 0 || this.state.userEvent.tickets.filter(e => e.ticketTypeID > 0 && e.soldOut === false) )&& <div></div>**/}
 
@@ -399,10 +402,6 @@ class Event extends React.Component {
 			</Elements>
 		</StripeProvider>
 
-
-
-
-
 	let paymentDisplay
 
 	if (this.state.userEvent.organiser.stripeAccountID !== ''){
@@ -410,132 +409,120 @@ class Event extends React.Component {
 			paymentDisplay = saveCardDisplay
 		}else{paymentDisplay = useSavedCardDisplay}
 	}
+
+	let locationArray = [this.state.userEvent.venue, this.state.userEvent.address1, this.state.userEvent.address2, this.state.userEvent.address3, this.state.userEvent.address4]
+
+	locationArray.forEach((e,i) => {if(e === ''){locationArray.splice(i,1)}})
+
+	let location = locationArray.join(', ')
+
+	console.log('location', location);
+	
+
 		
 
     return (
       <>
         <Nav />
-              <h3>{this.state.userEvent.organiser.name} Presents:</h3>
-              <h1>{this.state.userEvent.title}</h1>
-              <h3>
-                Date: {moment(this.state.userEvent.startDetails).format("D MMMM")}
-              </h3>
+		<div id='eventImage' >
+			<img src={this.state.userEvent.imageURL}/>
+			
 
-              <h3>
-                Venue: {this.state.userEvent.venue}
-              </h3>
-              <h3>
-                Doors: {moment(this.state.userEvent.startDetails).format("HH:mm")}
-              </h3>
+			<div 	id='eventDetailElements'>
+					<div className='eventDetail'><strong>Location: </strong>{location}</div>
+					<div className='eventDetail'><strong>Starts: </strong> {moment(this.state.userEvent.startDetails).format("ddd, D MMM YYYY HH:mm")}</div>
+					<div className='eventDetail'><strong>Ends: </strong> {moment(this.state.userEvent.endDetails).format("ddd, D MMM YYYY HH:mm")}</div>
+					<div className='eventDetail'><strong>Organiser: </strong>The Organiser</div>
+					{/* <div><strong>Organiser: </strong>{this.state.userEvent.organiser.name}</div> */}
+					<div className='eventDetail'><strong>Cancellation Policy: </strong>{this.state.userEvent.tickets[0].refunds.optionSelected}</div>
+			</div>
 
+			
+			
+		</div>
 
-              <h3> Description: </h3>
-              <p>{this.state.userEvent.description}</p>
+		<h1 className='centerText'>{this.state.userEvent.title}</h1>
 
-							<img src={this.state.userEvent.imageURL}/>
+		<div id='buyTicketButton'>
+			<button className='primary'>Purchase Tickets</button>
+		</div>
 
-							<h4>Purchase Tickets</h4>
+		<div className='wrapperToCenter'>
+			<div id = 'description'>{this.state.userEvent.description}</div>
+		</div>
 
+		<div className = 'sellTickets'>
 
-
-
-
-			{this.state.userEvent.tickets.filter(	e => {return(e.lastMinuteTicket !== true &&
-				(moment(e.startSellingTime).isSameOrBefore(moment())
-				 && moment(e.stopSellingTime).isAfter(moment()))||
-				e.startSelling === 'whenPreviousSoldOut' && this.state.userEvent.tickets.find(f => {
-					if(e.sellWhenTicketNumberSoldOut === f.ticketTypeID && f.ticketsAvailable < 1){
-						return true
-					}
-				} )
-			)}).map(	(e,i) => {return (
-				<div key={i}>
-					<h5>{e.ticketType}</h5>
-					<div>{e.ticketDescription}</div>
-
-					{e.chargeForTicketsStatus==='chargeForTickets' ? <div>Price: {this.state.userEvent.currency}{e.price}</div> : <div>Price: Free</div>}
-
-			{e.chargeForNoShows>0 && <div>Fine for securing ticket and not attending: ${this.state.userEvent.currency}${e.chargeForNoShows} per ticket</div>}
-
-				<div>
-
-			{e.soldOut ? <div>Sold Out</div> : <div>
-						<label>How Many Tickets?</label>
-						<input
-							value={e.buy.numTicketsSought}
-							required
-							onChange={(event) => {this.changeNumTickets(event, i); this.calculateTotals({lastMinuteTicket: false})}}
-							type="number"
-							min={0}
-							max={10}
-							// change to take account of when there are less tickets
-						/>
-						</div>}
+			{this.state.userEvent.tickets.filter(	e => {return(e.lastMinuteTicket !== true)}).map(	(e,i) => {return (
 
 
+				// <BuyTicket 
+				// 	ticketType={e.ticketType}
+				// 	description={e.description}
+				// 	price={e.price}
+				// 	fine={e.chargeForNoShows}
+				// 	quantity={e.buy.numTicketsSought}
+				// 	changeQuantity={this.changeQuantity}
+				// 	i = {i}
+				// />
 
-									</div>
-									<hr />
-								</div>
-								)}	)}
+				<ColmTicket 
+					ticketType={e.ticketType}
+					description={e.description}
+					price={e.price}
+					fine={e.chargeForNoShows}
+					quantity={e.buy.numTicketsSought}
+					changeQuantity={this.changeQuantity}
+					i = {i}
+				/>
 
-
-							
-
-
-								
-									<div>
-									Subtotal: {this.state.purchaseTicketCharges.subTotal}
-									</div>
-									<div>
-									Admin Fee: {this.displayAdminFee()}
-									</div>
-									<div>
-									Grand Total: {this.displayTotal()}
-									</div>
-
-								
-
-					
-
-
-
+				// <div key={i}>
+				// 	<h5>{e.ticketType}</h5>
+				// 	<div>{e.ticketDescription}</div>
+				// 	{e.chargeForTicketsStatus==='chargeForTickets' ? <div>Price: {this.state.userEvent.currency}{e.price}</div> : <div>Price: Free</div>}
+				// 	{e.chargeForNoShows>0 && <div>Fine for securing ticket and not attending: ${this.state.userEvent.currency}${e.chargeForNoShows} per ticket</div>}
 
 
+				// {e.soldOut ? <div>Sold Out</div> : 
+				// 	<div>
+				// 		<label>How Many Tickets?</label>
+				// 		<input
+				// 			value={e.buy.numTicketsSought}
+				// 			required
+				// 			onChange={(event) => {this.changeNumTickets(event, i); this.calculateTotals({lastMinuteTicket: false})}}
+				// 			type="number"
+				// 			min={0}
+				// 			max={10}
+				// 			// change to take account of when there are less tickets
+				// 		/>
+				// 	</div>
+				// }			
+				// 	<hr />
 
-{this.state.userEvent.tickets.filter(e => e.lastMinuteTicket).length > 0 && <h4>Bid For Tickets</h4>}
-{this.state.userEvent.tickets.filter(e => e.lastMinuteTicket).map(f => {return (
-	<LastMinuteTickets
-	 	waitListData={{quantity: f.buy.numTicketsSought,
-			maximumPrice: f.price,
-			expires: f.waitListExpires,
-			specificDate: f.waitListSpecificDate,
-			deliverTogether: f.waitListDeliverTogether
-		}}
-		waitListChange={this.waitListChange}
-		currency={this.state.userEvent.currency}
-		minimumPrice={f.refunds.minimumPrice}
-		placeInOriginalArray={f.placeInOriginalArray}
-		calculateTotals={this.calculateTotals}
-		ticketType={f.ticketType}
-		refundOption={f.refunds.howToResell}
-	/>)})}
+				// </div>
+					)}	)}
 
+				{this.state.userEvent.tickets.filter(e => e.lastMinuteTicket).length > 0 && <h4>Bid For Tickets</h4>}
+				{this.state.userEvent.tickets.filter(e => e.lastMinuteTicket).map(f => {return (
+					<LastMinuteTickets
+						waitListData={{quantity: f.buy.numTicketsSought,
+							maximumPrice: f.price,
+							expires: f.waitListExpires,
+							specificDate: f.waitListSpecificDate,
+							deliverTogether: f.waitListDeliverTogether
+						}}
+						waitListChange={this.waitListChange}
+						currency={this.state.userEvent.currency}
+						minimumPrice={f.refunds.minimumPrice}
+						placeInOriginalArray={f.placeInOriginalArray}
+						calculateTotals={this.calculateTotals}
+						ticketType={f.ticketType}
+						refundOption={f.refunds.howToResell}
+					/>)})}
 
-{this.state.userEvent.tickets.filter(e => e.lastMinuteTicket === true).length >0 && <div><div>Subtotal: {this.state.lastMinuteTicketCharges.subTotal}</div>
-<div>Charges: {this.state.lastMinuteTicketCharges.fixedCharge + this.state.lastMinuteTicketCharges.variableCharge + this.state.lastMinuteTicketCharges.vatOnCharges}</div>
-<div>Total: {this.state.lastMinuteTicketCharges.fixedCharge + this.state.lastMinuteTicketCharges.variableCharge + this.state.lastMinuteTicketCharges.vatOnCharges + this.state.lastMinuteTicketCharges.subTotal}</div>
+			</div>		
 
-
-
-
-
-
-	</div>
-	}
-
-{paymentDisplay}
-
+		
 
       </>
     );

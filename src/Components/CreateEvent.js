@@ -215,7 +215,10 @@ class CreateEvent extends React.Component {
 			})
 	}
 
-	changeField = (e, field, boolean) => {		
+	changeField = (e, field) => {	
+		
+		console.log('field', field);
+		
 		let userEvent = this.state.userEvent
 				
 		if (field === "image") {
@@ -227,13 +230,12 @@ class CreateEvent extends React.Component {
 		else if (field === "startDetails" || field === "endDetails") {
 	        userEvent[field] = e
 		}
-		
-		//else if(boolean){
-		// 	e.target.value === 'true' ? userEvent[field]=true : userEvent[field]=false			
-		// }
+
 		else {
 	      userEvent[field] = e.target.value;
-	    }
+		}
+		console.log('userEvent', userEvent);
+		
 	    this.setState({ userEvent })
 	}
 
@@ -301,9 +303,6 @@ class CreateEvent extends React.Component {
         if(finalCheck && warning !== ''){return field}
 	}
 				
-		
-		
-
 	changeSellingTimes = (e, ticketNumber, field1, field2, values) => {
 
 
@@ -386,8 +385,6 @@ class CreateEvent extends React.Component {
 
     }
 
-
-
 	updateTickets( tickets){
 
 		this.setState({tickets})
@@ -431,25 +428,16 @@ class CreateEvent extends React.Component {
 
 		
 		let userEvent = this.state.userEvent
-		if (i === 'not relevant'){
-			if(field === 'optionSelected' && e.target.value !== 'excessDemand'){
-				userEvent.globalRefundOptions.howToResell = 'specific'
-			}
-			if(e instanceof Date){
-				userEvent.globalRefundOptions[field] = e
-			}else{
-				userEvent.globalRefundOptions[field] = e.target.value
-			}
-		} else {
-			if(field === 'optionSelected' && e.target.value !== 'excessDemand'){
-				userEvent.tickets[i].refunds.howToResell = 'specific'
-			}
-			if(e instanceof Date){
-				userEvent.tickets[i].refunds[field] = e
-			}else{
-				userEvent.tickets[i].refunds[field] = e.target.value
-			}
+		
+		if(field === 'optionSelected' && e.target.value !== 'excessDemand'){
+			userEvent.globalRefundOptions.howToResell = 'specific'
 		}
+		if(e instanceof Date){
+			userEvent.globalRefundOptions[field] = e
+		}else{
+			userEvent.globalRefundOptions[field] = e.target.value
+		}
+	
 		this.setState({ userEvent })
 	}
 
@@ -473,20 +461,6 @@ class CreateEvent extends React.Component {
 		const {step} = this.state
 		this.setState({step: step-1})
 	}
-
-	
-
-
-	// setDefaultstopSellingTime = (time) => {
-	// let userEvent = this.state.userEvent
-	// userEvent.tickets = userEvent.tickets.map(	(e,i) => {
-	// 	if (e.stopSelling === 'eventEnds'){
-	// 		e.stopSellingTime = Date.parse(time); return e}
-	// 		else if(e.stopSelling === 'eventBegins'){
-	// 			e.stopSellingTime = Date.parse(time); return e}
-	// 	}		)
-	// 		this.setState({ userEvent })
-	// 	}
 
 	startSellingSpecificTimeErrors = (i, field, values, finalCheck) => {
      
@@ -562,18 +536,11 @@ class CreateEvent extends React.Component {
   render() {
 	  const { step } = this.state
 	  const{ title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets,globalRefundOptions, globalRefundPolicy, lat, lng } = this.state.userEvent
-	  const values = { title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets, globalRefundOptions,globalRefundPolicy, lat, lng }
+	  const values = { title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets, globalRefundOptions, lat, lng }
 
 	  switch(step){
 
-		// case 10:
-		// 	return(
-		// 		<Test
-		// 			values={values}	
-		// 		/>
-		// 	)
-
-		  case 10:
+		  case 1:
 			return(
 				<EventDetails 
 					changeField={this.changeField}	
@@ -582,7 +549,7 @@ class CreateEvent extends React.Component {
 				/>
 			)
 
-			case 10:
+			case 2:
 				return(
 					<AddressDetails
 						changeField={this.changeField}	
@@ -595,7 +562,7 @@ class CreateEvent extends React.Component {
 				)
 	
 
-			case 10:
+			case 3:
 				return(
 					<Image
 						values={values}
@@ -604,7 +571,7 @@ class CreateEvent extends React.Component {
 						changeField={this.changeField}
 					/>
 				)
-			case 1:
+			case 4:
 				return(
 					<Tickets
 						addTicket={this.addTicket}
@@ -624,13 +591,13 @@ class CreateEvent extends React.Component {
 						stopSellingSpecificTimeErrors={this.stopSellingSpecificTimeErrors}
 						turnBorderOrange={this.turnBorderOrange}
 						values={values}
-						// waitingForTicketThatDoesntExistToSellOut={this.waitingForTicketThatDoesntExistToSellOut}
 					/>
 				)
 
-			case 2:
+			case 5:
 				return(
 				<Cancellations		
+					changeField={this.changeField}
 					handleRefundChange={this.handleRefundChange}
 					nextStep={this.nextStep}
 					prevStep={this.prevStep}

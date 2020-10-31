@@ -272,7 +272,6 @@ export class EventDetails extends Component {
                                                 <select
                                                     required		
                                                     value={values.region}
-                                                    // onChange={event => this.changeRegion(event)} 
                                                     onChange={event => this.changeRegion(event)}
                                                     onFocus={event => this.turnBorderOrange(event, 'region')}
                                                     onBlur={event => this.checkRegionError(values.region)}                           

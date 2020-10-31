@@ -105,7 +105,7 @@ export class Image extends Component {
                                         </div>
                                         <div className="buttonContainer">
                                             <button className="primary" onClick={event => this.continue(event, values)}>Continue</button>   
-                                            <button className="primary rhsbutton" onClick={event => this.goBack(event)}>Go Back</button>
+                                            <button className="secondary rhsbutton" onClick={event => this.goBack(event)}>Go Back</button>
                                         </div>
                                         
                                     </form> 

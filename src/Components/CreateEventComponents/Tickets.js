@@ -483,9 +483,6 @@ export class Test extends Component {
                 </div>
                     
 
-                {/* wrapper */}
-                {/* grid center middle longForm */}
-
                     {/* {values.tickets.length > 1 && 		
 
                         <div className="group">

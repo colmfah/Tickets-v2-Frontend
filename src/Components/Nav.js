@@ -33,27 +33,74 @@ logout = () => {
 
 
 				{this.tokenCheck() ?
-					<div id="loggedIn">
-						<div></div>			
-						<Link to={`/events`} >Events</Link>
-						<Link to={`/createevent`}>Create Event</Link>
-						<Link to={`/tickets`}>My Account</Link>
-						<div id="logOut" onClick={this.logout}>Log Out</div>
-					</div>
+					<ul id="loggedIn">
+				
+						
+						<Link to={`/events`}>	
+							<li>
+								<div class="nav-btn" id="nav-home">
+									<span class="nav-noselect">Events</span>
+								</div>
+							</li>	
+						</Link> 
+
+
+						<Link to={`/createevent`}>	
+							<li>
+								<div class="nav-btn" id="nav-create-event">
+									<span class="nav-noselect">Create Event</span>
+								</div>
+							</li>	
+						</Link> 
+
+						<Link to={`/tickets`}>	
+							<li>
+								<div class="nav-btn" id="nav-create-event">
+									<span class="nav-noselect">My Account</span>
+								</div>
+							</li>	
+						</Link> 
+
+					
+						<li>
+							<div class="nav-btn" id="nav-home">
+								<span class="nav-noselect" onClick={this.logout}>Log Out</span>
+							</div>
+						</li>	
+					</ul>
 					:
-					<div id="loggedOut">
-						
-						<div></div>
-						<Link to={`/events`}>Events</Link> 
-						<Link to={`/signup`}>Sign Up</Link> 
-						<Link to={`/login`} >Login</Link> 
-						
-						
-					</div>
+					<ul id="loggedOut">
+
+						<Link to={`/events`}>	
+							<li>
+								<div class="nav-btn" id="nav-home">
+									<span class="nav-noselect">Events</span>
+								</div>
+							</li>	
+						</Link> 
+
+						<Link to={`/signup`}>	
+							<li>
+								<div class="nav-btn" id="nav-home">
+									<span class="nav-noselect">Sign Up</span>
+								</div>
+							</li>	
+						</Link> 
+
+						<Link to={`/login`}>	
+							<li>
+								<div class="nav-btn" id="nav-home">
+									<span class="nav-noselect">Log In</span>
+								</div>
+							</li>	
+						</Link> 
+
+					</ul>
 				}
       		</nav>
     )
   }
 }
+
 
 export default withRouter(Nav)

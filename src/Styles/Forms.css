@@ -102,8 +102,8 @@ form textarea {
 	  margin-top: 5%;
   }
 
-  #fileUploadText{
-	color: rgb(118, 118, 118)
+  .fileUploadText{
+	color: rgb(118, 118, 118);
 }
 
 /* <div class ="content createTicket" id={`ticket${i}`} > */
