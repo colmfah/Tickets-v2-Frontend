@@ -29,7 +29,7 @@ class Events extends React.Component {
 
   render() {
     return (
-      <>
+      <div className="grid-nav-body">
         <Nav />
 
         <div>
@@ -47,7 +47,7 @@ class Events extends React.Component {
             );
           })}
         </div>
-      </>
+      </div>
     );
   }
 }

@@ -1,195 +1,77 @@
-/* nav {
-	padding: 10px 0%; 
-
-    border-bottom: 1px solid #e2e2e2;
+nav {
+  background-color: #f7f7f7;
+  color: #293d6a;
+  font-size: clamp(10px, 3vw, 16px);
+  border-bottom: 1px solid #293d6a;
+  width: 100vw;
+  padding: 10px;
+  /* position: fixed; */
+  z-index: 2;
+  top: 0;
 }
 
-#loggedIn {
-    display: grid;
-    grid-template-columns: 8fr 1fr 1fr 1fr 1fr;
-    grid-column-gap: 10px;
-    text-align: center;
-    padding-right: 2%;
+nav ul {
+  display: flex;
+  justify-content: flex-end;
+  background-color: #f7f7f7;
 }
 
-#loggedOut {
-
-    display: grid;
-    grid-template-columns: 10fr 1fr 1fr 1fr;
-    grid-column-gap: 2%;
-    text-align: center;
-    padding-right: 2%;
+nav li {
+  background-color: #f7f7f7;
+  margin-right: 5vw;
 }
 
-
-nav a, #logOut {
-    color:#26542a;
+nav a,
+nav a:visited {
+  background-color: #f7f7f7;
+  color: #293d6a;
+  cursor: pointer;
 }
 
-#logOut:hover {
-    text-decoration: underline;
-} */
-
-
-
-
- nav {
-    padding: 10px;
-    background-color: #f7f7f7;
-    color: #293d6a;
-    font-size: clamp(10px, 3vw, 16px);
-    border-bottom: 1px solid #293d6a;
-    width: 100vw;
-    position: fixed;
-    z-index: 2;
-    top: 0;
-  }
-  
-  nav ul {
-    display: flex;
-    justify-content: flex-end;
-    background-color: #f7f7f7;
-  }
-  
-  nav li {
-    background-color: #f7f7f7;
-    margin-right: 5vw;
-  }
-  
-  nav a,
-  nav a:visited {
-    background-color: #f7f7f7;
-    color: #293d6a;
-  } 
-
-
-  .nav-btn {
-    background-color: #f7f7f7;
-    padding: clamp(0.5px, 0.75vw, 3.5px);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    z-index: 0;
-    transition: 1s;
-    border-radius: 2px;
-    border: 1px solid #293d6a;
-    z-index: 1;
+.nav-btn {
+  background-color: #f7f7f7;
+  padding: clamp(0.5px, 0.75vw, 3.5px);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 0;
+  transition: 1s;
+  border-radius: 2px;
+  border: 1px solid #293d6a;
 }
 
-
-
-.nav-btn::before, .nav-btn::after
- {
+.nav-btn::before,
+.nav-btn::after {
   position: absolute;
   background-color: #f7f7f7;
   z-index: -1;
   transition: 1s;
   content: "";
-  border: 1px solid #f7f7f7;
-  height: 100%;
-  width: 100%;
 }
 
-.nav-noselect {
-  background-color: #f7f7f7;
-  user-select: none;
+.nav-btn::before {
+  height: 115%;
+  width: 115%;
+  /* border: 1px solid red; */
 }
 
+.nav-btn::after {
+  height: 115%;
+  width: 115%;
+}
 
-
-.nav-btn:hover::before,
-#nav-home:hover::before,
-#nav-create-event:hover::before {
+.nav-btn:hover::before{
   width: 0px;
-  /* height: 95%; */
   background: #f7f7f7;
-  /* border-color: red; */
 }
 
-
-
-.nav-btn:hover::after,
-#nav-home:hover::after,
-#nav-create-event:hover::after {
+.nav-btn:hover::after {
   height: 0px;
-  /* width:97%; */
   background: #f7f7f7;
-  /* border-color: #293d6a */
-  z-index:-1
 }
 
 .nav-btn:hover {
   background: #f7f7f7;
-} 
-
-
-/* 
-#nav-home {
-  border: 1px solid #293d6a;
 }
-
-#nav-home::before {
-  height: clamp(1px, 8.5vw, 35px);
-  width: clamp(1px, 6.7vw, 35px);
-  height: 100%;
-  width: 100%
-} */
-
-/* #nav-home::after {
-  width: clamp(40px, 13vw, 70px);
-  height: clamp(1px, 3vw, 13px);
-  height: 100%;
-  width: 100%
-  top: -1rem;
-  right: -1rem;
-  width: 100%;
-  height: 100%;
-  border: 5px  solid red;
-} */
-/* 
-#nav-home::after:hover {
-    width: clamp(40px, 13vw, 70px);
-    height: clamp(1px, 3vw, 13px);
-    height: 100%;
-    width: 100%
-    top: -1rem;
-    right: -1rem;
-    width: 0%;
-    height: 0%;
-    border: 5px  solid #f7f7f7;
-  } */
-
-/* #nav-create-event {
-  border: 1px solid #293d6a;
-}
-
-#nav-create-event::before {
-  width: clamp(52px, 16vw, 85px);
-  height: clamp(20px, 6.5vw, 30px);
-}
-
-#nav-create-event::after {
-  width: clamp(67px, 20vw, 105px);
-  height: clamp(1px, 3vw, 13px);
-}
-
-#nav-create-event:hover::before {
-  width: 0px;
-}
-
-#nav-current-page {
-  cursor: default;
-  border: 1px solid #293d6a;
-}
-
-#nav-current-page::before {
-  height: 0;
-  width: 0;
-}
-
-#nav-current-page::after {
-  height: 0;
-  width: 0;
-}  */

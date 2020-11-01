@@ -38,8 +38,8 @@ logout = () => {
 						
 						<Link to={`/events`}>	
 							<li>
-								<div class="nav-btn" id="nav-home">
-									<span class="nav-noselect">Events</span>
+								<div class="nav-btn">
+									Events
 								</div>
 							</li>	
 						</Link> 
@@ -47,24 +47,24 @@ logout = () => {
 
 						<Link to={`/createevent`}>	
 							<li>
-								<div class="nav-btn" id="nav-create-event">
-									<span class="nav-noselect">Create Event</span>
+								<div class="nav-btn">
+									Create Event
 								</div>
 							</li>	
 						</Link> 
 
 						<Link to={`/tickets`}>	
 							<li>
-								<div class="nav-btn" id="nav-create-event">
-									<span class="nav-noselect">My Account</span>
+								<div class="nav-btn">
+									My Account
 								</div>
 							</li>	
 						</Link> 
 
 					
 						<li>
-							<div class="nav-btn" id="nav-home">
-								<span class="nav-noselect" onClick={this.logout}>Log Out</span>
+							<div class="nav-btn" onClick={this.logout}>
+								Log Out
 							</div>
 						</li>	
 					</ul>
@@ -73,24 +73,24 @@ logout = () => {
 
 						<Link to={`/events`}>	
 							<li>
-								<div class="nav-btn" id="nav-home">
-									<span class="nav-noselect">Events</span>
+								<div class="nav-btn">
+									Events
 								</div>
 							</li>	
 						</Link> 
 
 						<Link to={`/signup`}>	
 							<li>
-								<div class="nav-btn" id="nav-home">
-									<span class="nav-noselect">Sign Up</span>
+								<div class="nav-btn">
+									Sign Up
 								</div>
 							</li>	
 						</Link> 
 
 						<Link to={`/login`}>	
 							<li>
-								<div class="nav-btn" id="nav-home">
-									<span class="nav-noselect">Log In</span>
+								<div class="nav-btn">
+									Log In
 								</div>
 							</li>	
 						</Link> 

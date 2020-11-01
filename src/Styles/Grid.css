@@ -1,3 +1,12 @@
+/* Post MS1 code starts here */
+
+/* .grid-nav-body{
+	display: grid;
+	grid-template-columns: 500px 750px;
+} */
+
+/* Post MS1 code ends here */
+
 .pageGrid2Rows{
 	display: grid;
 	grid-template-rows: 4.3% 1fr;
