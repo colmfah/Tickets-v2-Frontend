@@ -5,7 +5,7 @@ nav {
   border-bottom: 1px solid #293d6a;
   width: 100vw;
   padding: 10px;
-  /* position: fixed; */
+  position: fixed;
   z-index: 2;
   top: 0;
 }
@@ -37,7 +37,6 @@ nav a:visited {
   justify-content: center;
   position: relative;
   z-index: 0;
-  transition: 1s;
   border-radius: 2px;
   border: 1px solid #293d6a;
 }
@@ -47,14 +46,13 @@ nav a:visited {
   position: absolute;
   background-color: #f7f7f7;
   z-index: -1;
-  transition: 1s;
+  transition: .5s;
   content: "";
 }
 
 .nav-btn::before {
   height: 115%;
   width: 115%;
-  /* border: 1px solid red; */
 }
 
 .nav-btn::after {
@@ -64,14 +62,77 @@ nav a:visited {
 
 .nav-btn:hover::before{
   width: 0px;
-  background: #f7f7f7;
 }
 
 .nav-btn:hover::after {
   height: 0px;
-  background: #f7f7f7;
 }
 
-.nav-btn:hover {
-  background: #f7f7f7;
+.nav-current-page {
+  border: 1px solid #293d6a;
+}
+
+.nav-current-page::before {
+  height: 0%;
+  width: 0%;
+}
+
+.nav-current-page::after {
+  height: 0%;
+  width: 0%;
+}
+
+nav ul li{
+  display: inline-block;
+  position: relative;
+  border: 10x
+}
+
+.nav-sub-link{
+  width: 100%;
+  margin-top: 5%;
+  margin-right: 0;
+}
+
+nav ul li ul.nav-dropdown{
+  min-width: 100%; /* Set width of the dropdown */
+  display: block;
+  opacity: 0;
+  position: absolute;
+  padding: 5%;
+  left: 0;
+  animation: slide-up .5s ease-out;
+  z-index: -1;
+}
+
+nav ul li:hover ul.nav-dropdown{
+  display: block;	/* Display the dropdown */
+  border: 1px solid #293d6a;
+  opacity: 1;
+  border-top: none;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  animation: slide-down .5s ease-out;
+  z-index: 1;
+}
+
+
+.nav-account{
+  padding: clamp(0.5px, 0.75vw, 3.5px);
+}
+
+.nav-account:hover {
+
+  border: 1px solid #293d6a;
+  border-radius: 1px;
+}
+
+@keyframes slide-down {
+  0% { opacity: 0; transform: translateY(-100%); }   
+100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  0% { opacity: 1; transform: translateY(0); }   
+100% { opacity: 0; transform: translateY(-100%);  }
 }

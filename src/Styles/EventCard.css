@@ -1,0 +1,234 @@
+@-webkit-keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  /* Home Page (Events Page) */
+  
+  .home-event-summary-container {
+    margin: 0 auto;
+    margin-bottom: 20px;
+    background-color: #ffff;
+    max-width: 90vw;
+    border-radius: 5px;
+    color: #293d6a;
+    transition: transform 0.3s;
+    border: 1px solid #8f897c;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    overflow: hidden;
+    max-height: 275px;
+  }
+
+  .home-event-location{
+    width: auto;
+  }
+
+  .home-event-date{
+    width: auto;
+  }
+  
+  .home-event-text-container{
+    width: 100%
+  }
+
+  .home-details-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffff;
+    margin: 7px;
+  }
+  
+  .home-text-container p i {
+    color: #293d6a94;
+  }
+  
+  .home-event-summary-container img {
+    width: clamp(1px, 100%, 400px);
+    height: clamp(1px, 45vw, 200px);
+    background-color: #ffff;
+    border-radius: 5px;
+    object-fit: cover;
+  }
+  
+  .home-event-summary-container a {
+    background-color: #ffff;
+  }
+  
+  .home-event-date-and-location{
+    background-color: #ffff;
+    font-size: 60%;
+    margin-top: 0px;
+    margin-bottom: 7px;
+    color: #8f897c;
+    text-align: center;
+    display: flex;
+    justify-content: space-evenly;
+  }
+  
+  .home-event-summary-container header {
+    font-size: 130%;
+    margin: 11px 0px;
+    color: #293d6a;
+    text-align: center;
+  }
+  
+  .home-event-summary-container i {
+    background-color: #ffff;
+    color: #8f897c;
+  }
+  
+  .home-event-summary-container:hover {
+    border: 1px solid #293d6a;
+    /* Box shadow code taken from https://codepen.io/sdthornton/pen/wBZdXq */
+    -webkit-box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3),
+      0 15px 12px rgba(0, 0, 0, 0.22);
+    box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
+    cursor: pointer;
+    -webkit-transform: scale(1.03);
+    -ms-transform: scale(1.03);
+    transform: scale(1.03);
+  }
+  
+  .home-text-container {
+    background-color: #ffff;
+    margin: auto;
+  }
+  
+  
+  @-webkit-keyframes home-slide-in-from-left {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes home-slide-in-from-left {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    100% {
+      -webkit-transform: translateX(0);
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  .home-slide-from-left {
+    -webkit-animation: 1s ease-in 0s 1 home-slide-in-from-left;
+    animation: 1s ease-in 0s 1 home-slide-in-from-left;
+  }
+  
+  /* End copied code */
+  
+  /* Below is similar code to the stackoverflow answer but I amended the code to make the slide happen from the opposite side. I than gave the elements a class name based on where I wanted them to slide from */
+  
+  @-webkit-keyframes home-slide-in-from-right {
+    0% {
+      -webkit-transform: translateX(100%);
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      -webkit-transform: translateX(0);
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes home-slide-in-from-right {
+    0% {
+      -webkit-transform: translateX(100%);
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      -webkit-transform: translateX(0);
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  .home-slide-from-right {
+    -webkit-animation: 1s ease-in 0s 1 home-slide-in-from-right;
+    animation: 1s ease-in 0s 1 home-slide-in-from-right;
+  }
+  
+  /* End of "similar code" */
+  
+  /* This media query makes the event take advantage of the horizontal space on larger screens by increasing its width to a maximum of 800px  */
+  
+  @media only screen and (min-width: 700px) {
+
+    .home-event-date-and-location{
+      display: inline;
+      text-align: left;
+    }
+
+
+    .home-event-summary-container {
+      display: block;
+      width: clamp(1px, 90vw, 800px);
+      margin-top: 30px;
+    }
+  
+    .home-details-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      margin: 2px;
+    max-height: 150px;
+    }
+  
+    .home-event-summary-container img {
+      margin: 0%;
+      width: 33%;
+      height: 150px;
+    }
+
+    .home-event-location {
+      margin-left: 0;
+      margin-top: 13.5px;
+    }
+
+    .home-event-text-container{
+      margin-left:3%;
+    }
+  
+    .home-event-summary-container header {
+      margin-bottom: 18px;
+      font-size: 210%;
+      text-align: left;
+    }
+    .home-event-summary-container p {
+      font-size: 70%;
+      margin-bottom: 9px;
+    }
+
+    .home-text-container {
+      margin-left: 10%;
+    }
+  
+    .tickets-remaining {
+      margin-bottom: 0;
+    }
+  }

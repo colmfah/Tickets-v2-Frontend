@@ -1,10 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import moment from "moment";
 import Nav from "./Nav";
-import Card from "./Card";
-
+import Footer from "./Footer";
+import EventCard from "./EventCard";
 
 class Events extends React.Component {
   state = {
@@ -12,42 +11,42 @@ class Events extends React.Component {
     currency: {
       USD: "$",
       EUR: "€",
-      NZD: "$"
-    }
+      NZD: "$",
+    },
   };
 
   componentDidMount() {
     axios
       .get(`${process.env.REACT_APP_API}/events`)
-      .then(res => {
+      .then((res) => {
         this.setState({
-          events: res.data
+          events: res.data,
         });
       })
-      .catch(err => {});
+      .catch((err) => {});
   }
 
   render() {
     return (
-      <div className="grid-nav-body">
+      <>
         <Nav />
-
-        <div>
-          {this.state.events.map((e, i) => {
-            return (
-              <Link to={`/events/${e._id}`}>
-                <Card
-                  name={e.title}
-                  location={e.location}
-                  startDetails={e.startDetails}
-                  price={e.price}
-                  image={e.imageURL}
-                />
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+          <div className="content-wrapper">
+            {this.state.events.map((e, i) => {
+              return (
+                <Link to={`/events/${e._id}`}>
+                  <EventCard
+                    name={e.title}
+                    location={`${e.venue}, ${e.address1}`}
+                    startDetails={e.startDetails}
+                    price={e.price}
+                    image={e.imageURL}
+                  />
+                </Link>
+              );
+            })}
+          </div>
+          <Footer />
+      </>
     );
   }
 }

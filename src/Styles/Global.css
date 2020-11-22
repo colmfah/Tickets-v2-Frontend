@@ -1,10 +1,44 @@
 /* Post MS1 Code Starts*/
 
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	font-family: Lato, sans-serif;
+}
+
+html, body  {
+	background-color: #ececec;
+}
+
+body {
+	position: relative;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+  .content-wrapper {
+	padding-top: 3.5rem;
+	padding-bottom: 2.5rem;
+  }
+
+
 ul {
 	list-style-type: none;
   }
 
+.fontawesome-icon{
+	color: #293d6a94
+}
 
+
+@media only screen and (min-width: 700px) {
+	.content{
+		margin-top: 75px;
+	}
+}
 
 
 
@@ -13,12 +47,7 @@ ul {
 
 
 
-* {
-	padding: 0;
-	margin: 0;
-	box-sizing: border-box;
-	font-family: Lato, sans-serif;
-}
+
 
 p {
 	color: #4f4f4f;
@@ -52,11 +81,7 @@ h1 {
 	text-transform: uppercase;
 }
 
-.content {
-	margin-top: 50px;
-	margin-bottom: 30px;
-	position: relative;
-}
+
 
 .currencyInput{
 	position: relative;

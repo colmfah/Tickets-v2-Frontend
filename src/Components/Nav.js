@@ -1,106 +1,125 @@
-import React from "react"
-import {Link} from 'react-router-dom'
-import { withRouter } from 'react-router-dom'
+import React from "react";
+import { Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
-import '../Styles/Nav.css'
-
+import "../Styles/Nav.css";
 
 class Nav extends React.Component {
+  tokenCheck = () => {
+    let token = localStorage.getItem("token");
+    if (token) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
+  logout = () => {
+    localStorage.removeItem("token");
+    this.props.history.push({
+      pathname: "/events",
+    });
+  };
 
-tokenCheck = () => {
-	let token = localStorage.getItem('token')
-	if (token){
-		return true
-	}else {
-		return false
-	}
-}
-
-logout = () => {
-	localStorage.removeItem('token')
-	this.props.history.push({
-		pathname: '/events'
-	})
-}
-
-
+  subLinkHovered = () => {};
 
   render() {
     return (
+      <nav>
+        {this.tokenCheck() ? (
+          <ul id="loggedIn">
+            <li>
+              <NavLink
+                exact
+                activeClassName="nav-current-page"
+                className="nav-btn"
+                to={`/events`}
+              >
+                Events
+              </NavLink>
+            </li>
 
-			<nav>
+            <li>
+              <NavLink
+                exact
+                activeClassName="nav-current-page"
+                className="nav-btn"
+                to={`/createevent`}
+              >
+                Create Event
+              </NavLink>
+            </li>
 
+            <li>
+              <div className="nav-account">
+                My Account
+                <ul class="nav-dropdown">
+                  <li className="nav-sub-link ">
+                    <a href="#" className="nav-btn">
+                      Profile
+                    </a>
+                  </li>
+                  <li className="nav-sub-link">
+                    <a href="#" className="nav-btn">
+                      Tickets
+                    </a>
+                  </li>
+                  {/* to={`/tickets`}to={`/tickets`} */}
+                  <li className="nav-sub-link">
+                    <a href="#" className="nav-btn">
+                      Events
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
 
-				{this.tokenCheck() ?
-					<ul id="loggedIn">
-				
-						
-						<Link to={`/events`}>	
-							<li>
-								<div class="nav-btn">
-									Events
-								</div>
-							</li>	
-						</Link> 
+            <li>
+              <div class="nav-btn" onClick={this.logout}>
+                Log Out
+              </div>
+            </li>
+          </ul>
+        ) : (
+          <ul id="loggedOut">
+            <li>
+              <NavLink
+                exact
+                activeClassName="nav-current-page"
+                className="nav-btn"
+                to={`/events`}
+              >
+                Events
+              </NavLink>
+            </li>
 
+            <li>
+              <NavLink
+                exact
+                activeClassName="nav-current-page"
+                className="nav-btn"
+                to={`/signup`}
+              >
+                Sign Up
+              </NavLink>
+            </li>
 
-						<Link to={`/createevent`}>	
-							<li>
-								<div class="nav-btn">
-									Create Event
-								</div>
-							</li>	
-						</Link> 
-
-						<Link to={`/tickets`}>	
-							<li>
-								<div class="nav-btn">
-									My Account
-								</div>
-							</li>	
-						</Link> 
-
-					
-						<li>
-							<div class="nav-btn" onClick={this.logout}>
-								Log Out
-							</div>
-						</li>	
-					</ul>
-					:
-					<ul id="loggedOut">
-
-						<Link to={`/events`}>	
-							<li>
-								<div class="nav-btn">
-									Events
-								</div>
-							</li>	
-						</Link> 
-
-						<Link to={`/signup`}>	
-							<li>
-								<div class="nav-btn">
-									Sign Up
-								</div>
-							</li>	
-						</Link> 
-
-						<Link to={`/login`}>	
-							<li>
-								<div class="nav-btn">
-									Log In
-								</div>
-							</li>	
-						</Link> 
-
-					</ul>
-				}
-      		</nav>
-    )
+            <li>
+              <NavLink
+                exact
+                activeClassName="nav-current-page"
+                className="nav-btn"
+                to={`/login`}
+              >
+                Log In
+              </NavLink>
+            </li>
+          </ul>
+        )}
+      </nav>
+    );
   }
 }
 
-
-export default withRouter(Nav)
+export default withRouter(Nav);
