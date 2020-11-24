@@ -1,10 +1,13 @@
 /* Post MS1 Code Starts*/
 
+@import url('https://fonts.googleapis.com/css2?family=Bitter&family=Nunito:wght@410&display=swap');
+
+
 * {
 	padding: 0;
 	margin: 0;
 	box-sizing: border-box;
-	font-family: Lato, sans-serif;
+	font-family: Nunito, sans-serif;
 }
 
 html, body  {
@@ -31,6 +34,25 @@ ul {
 
 .fontawesome-icon{
 	color: #293d6a94
+}
+
+hr {
+
+	border: 0;
+	height: 2px;
+	width: 75%;
+	background-image: linear-gradient(
+	  to right,
+	  rgba(41, 61, 106, 0.1),
+	  rgba(41, 61, 106, 0.75),
+	  rgb(41, 61, 106, 0.1)
+	);
+	margin: 20px 0px;
+  }
+
+.colorRed{
+	color: red;
+	border: 5px solid red;
 }
 
 
@@ -65,17 +87,17 @@ a {
 	text-decoration: none;
 }
 
-hr {
+/* hr {
 	border: none;
 	border-bottom: 1px solid #e2e2e2;
 	height: 1px;
 	margin: 40px 0;
-}
+} */
 
-h1 {
+/* h1 {
 	margin-top: 0;
 	margin-bottom: 10px;
-}
+} */
 
 .upper {
 	text-transform: uppercase;
@@ -134,7 +156,6 @@ h2 {
 #description {
 	white-space: pre-line;
 	line-height: 0.9;
-	border: 1px solid #e2e2e2;
 	border-radius: 6px;
 	display: inline-block;
 	padding: 1.5% 3%;

@@ -1,116 +1,168 @@
-import React from "react"
-import {Link} from 'react-router-dom'
-import { withRouter } from 'react-router-dom'
+import React, {useState, useEffect, useRef} from "react";
+import { Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
+import moment from "moment";
 
-import '../Styles/ColmsTicket.css'
-
-
-class ColmTicket extends React.Component {
+import "../Styles/ColmsTicket.css";
 
 
+const ColmTicket = (props) =>{
 
+  const [height, setHeight] = useState(0)
+  const ref = useRef(null)
 
+  useEffect(() => {
+    setHeight(ref.current.clientHeight)
+  })
 
-  render() {
-    //   let firstWord = this.props.ticketType.split(' ')[0]
-    //   let restOfWord = this.props.ticketType.split(' ').pop()
-    return (
+    let firstWord = props.ticketType.split(" ")[0];
+    let restOfWord = props.ticketType.split(" ").pop();
 
+    
+    function getTicketDetails(){
 
+      let array = []
 
-        <>
+      if(props.description !== ''){
+          array.push({
+              title: 'description',
+              value: props.description,
+              className: `ticket-detail ticket-detail-description`
+            })
+      }
+      if(props.price === 0){
 
-            <div className='colmTicket'>
+        let refundStatus
+        let refundClassName
 
-                    <div>
-                    <div id='ticketHeader'>
-                            <h1>Early <span>Bird</span></h1>
-                        </div>
-                        <div id='ticketBody'>
+        if(props.refunds.optionSelected === 'excessDemand'){
+            refundStatus = `Limited number of cancellations available`
+            refundClassName = `ticket-detail ticket-detail-refund ticket-detail-cancel-excess-Demand`
+        }else if(props.refunds.optionSelected === 'untilSpecific'){
+            refundStatus = `Until ${moment(props.refunds.refundUntil).format('Do MMM HH:mm')}`
+            refundClassName = `ticket-detail ticket-detail-refund`
+        }else if(props.refunds.optionSelected === 'noRefunds'){
+            refundStatus = 'No Cancellations'
+            refundClassName = `ticket-detail ticket-detail-refund`
+        }
 
-                            <div id='colmTicketLHS'>
-                                <div>
-                                    <span>Description</span>
-                                    <h3>Limited Tickets: Bag a bargain now!</h3>
+        if(props.chargeForNoShows > 0){
+        array.push({
+            title: 'cancellation policy',
+            value: refundStatus,
+            className: refundClassName
+        })
+        }
 
-                                    <span>Price</span>
-                                    <h3>Free</h3>
+          array.push({
+              title: 'price',
+              value: 'Free',
+              className: `ticket-detail ticket-detail-price`
+          })
 
-                                    <span>Fine if you don't attend</span>
-                                    <h3>€3</h3>
-                                </div>
-                            </div>
+      }else {
+        let refundStatus
+        let refundClassName
 
-                            <div id='colmTicketRHS'>
-                                <div id='rhsChild'>
+        if(props.refunds.optionSelected === 'excessDemand'){
+            refundStatus = `Limited number of refunds available`
+            refundClassName = `ticket-detail ticket-detail-refund ticket-detail-refund-excess-Demand`
+        }else if(props.refunds.optionSelected === 'untilSpecific'){
+            refundStatus = `Until ${moment(props.refunds.refundUntil).format('Do MMM HH:mm')}`
+            refundClassName = `ticket-detail ticket-detail-refund`
+        }else if(props.refunds.optionSelected === 'noRefunds'){
+            refundStatus = 'No Refunds'
+            refundClassName = `ticket-detail ticket-detail-refund`
+        }
 
-                                    <div>Select Quantity:</div>   
-                                    <input
-                                        type="number"
-                                        value={this.props.quantity}
-                                        onChange={event => this.props.changeQuantity(this.props.i, event.target.value)}
-                                        />
+        array.push({
+            title: 'refund policy',
+            value: refundStatus,
+            className: refundClassName
+        })
 
+          array.push({
+              title: 'price',
+              value: `€${props.price}`,
+              className: `ticket-detail ticket-detail-price`
+          })
+      }
 
-                                </div>
+      let ticketDetails = array.map((e,i) => {
+        if(e.title === 'price' && props.chargeForNoShows>0){
+          let fineClassName
+          props.hold ? fineClassName = `ticket-detail ticket-detail-fine-hold` : fineClassName = `ticket-detail ticket-detail-fine-no-hold`
+          return(
+            <div key={i} className="ticket-price-fine">
 
-                            </div>
+              <div className={e.className}>
+                <span>{e.title}</span>
+                <h2>{e.value}</h2>
+              </div>
 
-
-                        </div>
-
-                    </div>
-
-
-
-              
-
-          
+              <div className={fineClassName}>
+                <span>no show fine</span>
+                <h2>{`€${props.chargeForNoShows}`}</h2>
+              </div>
             </div>
+        )
+        }else{
 
+        
+        
+        return(
+            <div key={i} className={e.className}>
+            <span>{e.title}</span>
+            <h2>{e.value}</h2>
+            </div>
+        )
+        }
+        
+        })
 
-                {/* <div>
-                    <div>
-                        <h1>Colm's<span>Tickets</span></h1>
-                        
+        return ticketDetails
 
-                        <div>
-                            <div className="title">
-                                <span>description</span>
-                                <h2>Ticket Description</h2>
-                            </div>
-                            <div className="seat">
-                                <span>price</span>
-                                <h2>€5</h2>
-                            </div>
-                            <div className="time">
-                                <span>fine if you don't attend</span>
-                                <h2>€4</h2>
-                                <div class="barcode"></div>
-                            </div> 
-                        </div>
+    }
 
-                    </div>
+    return (
+      <>
+        <div className="event-card-wrap">
+          <div className="event-card event-card-left">
+            <h1 className="event-ticket-title" ref={ref}>
+              {firstWord} <span>{restOfWord}</span>
+            </h1>
 
-                    <div className="buyTicket cardRight">
-                        <div class="eye"></div>
-                        <div class="number">
-                        
-                        <input
-                        type="number"
-                        value={this.props.quantity}
-                        onChange={event => this.props.changeQuantity(this.props.i, event.target.value)}
-                         />
-                        <span>Select Quantity</span>
-                        </div>
-                        
-                    </div>
-                </div> */}
+            <div className="ticket-details">
+            {getTicketDetails()}
 
-        </>
+            </div>
+          </div>
 
-    )
-  }
+          <div className="event-card event-card-right">
+            <div
+              className="event-eye"
+              style={{ height: height }}
+            ></div>
+
+          {/* I will need to change this input to a request refund button on the tickets page. Use prop to determine which page component is being displayed on. Eventpage = true. Toggle display: none depending on value */}
+
+            <div className="event-number">
+              <span>quantity:</span>
+              <input
+                type="number"
+                value={props.quantity}
+                onChange={(event) =>
+                  props.changeQuantity(props.i, event.target.value)
+                }
+                min="0"
+              />
+            </div>
+          </div>
+        </div>
+
+      </>
+    );
+  // }
 }
 
-export default withRouter(ColmTicket)
+export default withRouter(ColmTicket);

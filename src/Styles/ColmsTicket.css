@@ -1,104 +1,48 @@
-.colmTicket {
-    max-width: 500px;
-    margin: 3%;
-	color: #fff;
-    font-family: sans-serif;
-    
-
-}
-
-#ticketHeader {
-    background-color: #e84c3d;
-    color: white;
-    min-height: 50px;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-}
-
-#ticketHeader h1 {
-	font-size: 1.1em;
-    padding-top: 10px;
-    margin-left: 10px;
-    
-}
-
-#ticketHeader h1 span {
-	font-size: normal;
-}
-
-#ticketBody {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    background-color: #ecedef;
-    color: #343434;
-    font-size: .9em;
-    border-bottom-right-radius: 8px;
-    border-bottom-left-radius: 8px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 10px;
-}
-
-#ticketBody span {
-    color: #a2aeae;
-    font-size: .7em;
-    text-transform: uppercase;
-	margin: 0;
-}
-
-#ticketBody h3 {
-    margin: 0;
-    margin-bottom: 15px;
-    margin-right: 15px;
-}
-
-/* #colmTicketLHS {
-    border: 5px solid purple
-} */
-
-#colmTicketRHS {
-    background-color: #ecedef;
-    border-left: .18em dashed #fff;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-    text-align: center;
-    text-transform: uppercase;
-  
+.ticket-details {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    /* width: 100%;
-  */
-   
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: space-between;
+    justify-content: space-between;
 }
 
 
-
-
-
-
-
-#colmTicketRHS input{
-	color: #e84c3d;
-    font-size: 2.5em;
-    width: 50px;
-	background-color:#ecedef;
-    margin-top: 10px;
-    text-align: center;
+.ticket-detail{
+    text-transform: uppercase;
+    font-weight: normal;
+    /* margin-top: 5px; */
+    padding: 10px 0 10px 10px
+    
 }
 
-#colmTicketRHS span {
-	display: block;
-	color: #a2aeae;
+.ticket-detail span {
+    font-size: 0.7em;
+    color: #a2aeae;
 }
 
-#colmTicketRHS #rhsChild{
-
-    align-self: center;
-justify-self: center;
-
+.ticket-detail h2 {
+    font-size: 0.9em;
+    color: #525252;
+    margin: 0;
+    text-transform: none;
 }
 
+.ticket-price-fine{
+    display: flex;
+    justify-content: space-between;
+}
+.ticket-detail-fine-hold, .ticket-detail-fine-no-hold{
+    padding-right: 5px;
+    display: flex;
+    flex-direction: column;
+}
 
+.ticket-detail-fine-hold h2, .ticket-detail-fine-no-hold h2{
+    margin: auto
+}
+
+.event-number input[type=number]::-webkit-inner-spin-button {
+    opacity: 1
+}
 
 
