@@ -74,7 +74,6 @@
   font-size: clamp(24px, 4vw, 35px);
   text-align: center;
   margin-bottom: 1vw;
-  font-weight: 550
 }
 
 .event-details i {
@@ -182,8 +181,10 @@
   cursor: pointer;
   width: 90%;
   border-color: transparent;
+  margin: auto;
   margin-top: 8%;
   margin-bottom: 10%;
+  margin-left: 5%;
   padding: 5px 0;
 
   /* Box shadow code taken from https://codepen.io/sdthornton/pen/wBZdXq */
@@ -253,7 +254,7 @@
 .event-card {
   float: left;
   position: relative;
-  width: clamp(300px, 45vw, 350px);
+  width: clamp(300px, 50vw, 350px);
 }
 
 .event-card-left {
@@ -407,83 +408,50 @@
   /* margin-top: 2.5em; */
 }
 
-/* End of copied (but amended) code */
+.event-check-box-question{
+  margin-bottom: 35px;
+}
 
-/* Below Code originates from https://designmodo.com/create-credit-card-ui/#download-the-credit-card-html. Substantially amended for my site. */
 
-/* .event-tickets h4,
-.event-card-number,
-.event-form-body,
-.event-month,
-.event-year,
-.event-cvv-input,
-.event-cvv-input input,
-.event-month select,
-.event-year select {
+.event-message{
+  color: #293d6a;
+  margin:auto;
+}
+
+form .stripe-save-card{
+  display: flex;
+  flex-direction: column;
+}
+
+.StripeElement {
+  box-sizing: border-box;
+
+  height: 40px;
+
+  padding: 10px 12px;
+
+  border: 1px solid transparent;
+  border-radius: 4px;
   background-color: white;
+
+  box-shadow: 0 1px 3px 0 #e6ebf1;
+  -webkit-transition: box-shadow 150ms ease;
+  transition: box-shadow 150ms ease;
 }
 
-.event-credit-card {
-  width: 360px;
-  max-width: 95%;
-  margin: 0 auto 0;
-  border-radius: 6px;
-  background-color: #fff;
+.StripeElement--focus {
+  box-shadow: 0 1px 3px 0 #cfd7df;
 }
 
-.event-card-number,
-.event-cvv-input input,
-.event-month select,
-.event-year select {
-  font-size: 14px;
-  font-weight: 100;
-  line-height: 30px;
+.StripeElement--invalid {
+  border-color: #fa755a;
 }
 
-.event-card-number,
-.event-month select,
-.event-year select {
-  font-size: 14px;
-  font-weight: 100;
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
 }
 
-.event-card-number,
-.event-cvv-input input,
-.event-month select,
-.event-year select {
-  color: #8e8e8e;
-}
 
-.event-card-number {
-  width: 100%;
-  margin-bottom: 20px;
-  padding-left: 20px;
-  border: 2px solid #e1e8ee;
-  border-radius: 6px;
-}
-
-.event-month select,
-.event-year select {
-  width: clamp(86px, 29vw, 130px);
-  margin-bottom: 20px;
-  padding-left: 20px;
-  border: 2px solid #e1e8ee;
-  border-radius: 6px;
-  background-position: 85% 50%;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-}
-
-.event-cvv-input input {
-  float: left;
-  width: 145px;
-  padding-left: 20px;
-  border: 2px solid #e1e8ee;
-  border-radius: 6px;
-  background: #fff;
-} */
-
-/* End of copied code */
 
 .event-form-body {
   display: -webkit-box;
@@ -506,14 +474,48 @@
   outline: none;
 }
 
-.event-use-saved-card{
-  color: #293d6a;
-}
-
-.event-use-saved-card{
+.event-confirm-saved-card{
   display: flex;
   flex-direction: column;
   align-items: center;
+  
+}
+
+.event-confirm-saved-card p {
+  margin-left: 10px;
+  margin-right: 10px;
+  color: #293d6a;
+}
+
+
+.event-details-before-payment, .event-save-card{
+  color: #293d6a;
+  max-width: 600px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+
+
+
+.event-details-before-payment{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.event-total-charge{
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+
+
+#event-total-charge-bottom-hr{
+
+  margin-top: 35px;
+
+
 }
 
 #event-secondary-button{

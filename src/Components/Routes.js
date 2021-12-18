@@ -12,7 +12,6 @@ import ShowQRCode from './QRCode'
 import YourEvents from './YourEvents'
 import confirmEmail from './confirmEmail'
 import StripeConnectSignUp from './StripeConnectSignUp'
-import StripeProvider from "react-stripe-elements";
 import ForgotPassword from './ForgotPassword'
 import ChangePassword from './ChangePassword'
 

@@ -1,8 +1,6 @@
 import React, {useState, useEffect, useRef} from "react";
-import { Link } from "react-router-dom";
 import { withRouter } from "react-router-dom";
 import moment from "moment";
-
 import "../Styles/ColmsTicket.css";
 
 
@@ -10,6 +8,8 @@ const ColmTicket = (props) =>{
 
   const [height, setHeight] = useState(0)
   const ref = useRef(null)
+
+  
 
   useEffect(() => {
     setHeight(ref.current.clientHeight)
@@ -22,6 +22,8 @@ const ColmTicket = (props) =>{
     function getTicketDetails(){
 
       let array = []
+
+      console.log('props.description', props)
 
       if(props.description !== ''){
           array.push({
@@ -63,6 +65,7 @@ const ColmTicket = (props) =>{
       }else {
         let refundStatus
         let refundClassName
+        
 
         if(props.refunds.optionSelected === 'excessDemand'){
             refundStatus = `Limited number of refunds available`
@@ -162,7 +165,7 @@ const ColmTicket = (props) =>{
 
       </>
     );
-  // }
+
 }
 
 export default withRouter(ColmTicket);

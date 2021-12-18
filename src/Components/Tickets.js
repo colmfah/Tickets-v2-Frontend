@@ -1,6 +1,6 @@
 import React from "react";
 import Nav from "./Nav";
-import UsersUpcomingEvents from './UsersUpcomingEvents'
+import UsersTickets from './UsersTickets'
 import { Link } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
@@ -108,8 +108,8 @@ updateState = (updatedUserData) => {
 
   {this.state.user.ticketsBought.length > 0 &&
 		<div>
-		<h2>Your Upcoming Events</h2>
-			<UsersUpcomingEvents
+		<h2>Your Tickets</h2>
+			<UsersTickets
 				ticketsBought={this.state.user.ticketsBought.filter(e => e.refunded === false)}
 				purchaserID={this.state.userID}
 				updateState={this.updateState}

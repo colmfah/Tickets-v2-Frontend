@@ -1,6 +1,8 @@
 import React, { Component } from "react";
-import { Stripe, CardElement, injectStripe } from "react-stripe-elements";
+import {CardElement, injectStripe } from "react-stripe-elements";
 import axios from "axios";
+
+import "../Styles/Event.css";
 
 
 class SaveCardForm extends Component {
@@ -26,10 +28,21 @@ class SaveCardForm extends Component {
 
 		e.preventDefault()
 
+		console.log('this.props', this.props)
+
 		//do if statement ....if there are no requests to purchase last minute tickets (this.props.waitListData will be blank)
 
 
+			// console.log('this.props.selectedTickets', this.props.selectedTickets)
+			// console.log('this.props.checkBoxesAreTicked', this.props.checkBoxesAreTicked)
+			// console.log('this.props.checkBoxesAreTicked()', this.props.checkBoxesAreTicked())
+			// console.log('this.props.checkBoxesAreTicked(this.props.selectedTickets)', this.props.checkBoxesAreTicked(this.props.selectedTickets))
 
+		if(this.props.checkBoxesAreTicked(this.props.selectedTickets) === false){return}else
+		
+		{
+
+	
 		
 
 		this.props.upDateMessage('This will take a moment. Please be patient...')
@@ -117,16 +130,20 @@ class SaveCardForm extends Component {
 
 	}
 
+	}
+
   render() {
 
     return (
       <div>
-			<p>{this.props.message}</p>
-			<form onSubmit={this.submit}>
+			
+			<form className="stripe-save-card" onSubmit={this.submit}>
 				<CardElement />
+				
 				<button>
-					Bid For Tickets
+					Get Tickets
 				</button>
+				<div className="event-message">{this.props.message}</div>
 			</form>
 			</div>
     );

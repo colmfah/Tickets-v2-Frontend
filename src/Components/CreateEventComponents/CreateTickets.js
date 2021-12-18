@@ -3,7 +3,7 @@ import Nav from "../Nav";
 import DatePicker from "react-datepicker";
 import moment from "moment";
 
-export class Test extends Component {
+export class CreateTickets extends Component {
 
     state = {
         errors: [],
@@ -243,7 +243,7 @@ export class Test extends Component {
                                                         style={{ color: chargeForTicketsStatusColor[i], borderColor: values.tickets[i].borderColors.chargeForTicketsStatus }}
                                                     >
                                                     <option value="" disabled>Select Ticket Type</option>
-                                                    <option value="chargeForTickets" disabled>Charge For Tickets</option>
+                                                    <option value="chargeForTickets">Charge For Tickets</option>
                                                     <option value="freeTickets">Free Tickets</option>
                                                     
                                                     </select>
@@ -509,4 +509,4 @@ export class Test extends Component {
     }
 }
 
-export default Test
+export default CreateTickets

@@ -17,7 +17,7 @@ class EventCard extends React.Component {
         <a href="party.html">
           <div class="home-details-container">
             <img
-              src={this.props.image}
+              src={this.props.image} alt={this.props.name}
             />
 
             <div className="home-event-text-container">

@@ -1,28 +1,15 @@
-// class ColmTicket extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       height: 0,
-//     };
-//     this.containerRef = React.createRef();
-//   }
-//   componentDidMount() {
-//     const { offsetHeight } = this.containerRef.current;
+import React from "react";
 
-//     this.setState({
-//       height: offsetHeight,
-//     });
-//   }
+class Test extends React.Component {
 
-//   render() {
-//     return (
-//       <div>
-//         <h1 ref={this.containerRef}>
-//           {firstWord} <span>{restOfWord}</span>
-//         </h1>
+  render() {
+    return (
+      <div>
+          <h1>Test</h1>
+      </div>
+    );
+  }
+}
 
-//         <div className="event-eye" style={{ height: this.state.height }}></div>
-//       </div>
-//     );
-//   }
-// }
+export default Test;
+

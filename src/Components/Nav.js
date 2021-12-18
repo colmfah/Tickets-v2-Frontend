@@ -54,16 +54,18 @@ class Nav extends React.Component {
             <li>
               <div className="nav-account">
                 My Account
-                <ul class="nav-dropdown">
+                <ul className="nav-dropdown">
                   <li className="nav-sub-link ">
                     <a href="#" className="nav-btn">
                       Profile
                     </a>
                   </li>
                   <li className="nav-sub-link">
-                    <a href="#" className="nav-btn">
+                    <Link
+                      to={`/tickets`}
+                    >
                       Tickets
-                    </a>
+                    </Link>
                   </li>
                   {/* to={`/tickets`}to={`/tickets`} */}
                   <li className="nav-sub-link">
@@ -76,7 +78,7 @@ class Nav extends React.Component {
             </li>
 
             <li>
-              <div class="nav-btn" onClick={this.logout}>
+              <div className="nav-btn" onClick={this.logout}>
                 Log Out
               </div>
             </li>

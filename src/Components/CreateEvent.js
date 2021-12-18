@@ -9,7 +9,7 @@ import RefundPolicy from './RefundPolicy'
 import "react-datepicker/dist/react-datepicker.css";
 import Map from './CreateEventComponents/Map'
 import Image from './CreateEventComponents/Image'
-import Tickets from './CreateEventComponents/Tickets'
+import CreateTickets from './CreateEventComponents/CreateTickets'
 import Cancellations from './CreateEventComponents/Cancellations'
 import Geocode from "react-geocode"
 import AddressDetails from "./CreateEventComponents/AddressDetails";
@@ -206,7 +206,7 @@ class CreateEvent extends React.Component {
 	
 		axios.post(`${process.env.REACT_APP_API}/image`, data)
 			.then(res => {
-				console.log('res', res)
+		
 				
 				})
 
@@ -335,9 +335,6 @@ class CreateEvent extends React.Component {
 
 		let userEvent = this.state.userEvent
 
-		if(field === 'price'){
-			userEvent.globalRefundOptions.minimumAuctionPrice = this.highestPricedTicket()
-		}
 		if(e instanceof Date){
 			userEvent.tickets[ticketNumber][field] = e
 		}else {
@@ -439,10 +436,6 @@ class CreateEvent extends React.Component {
 		}
 	
 		this.setState({ userEvent })
-	}
-
-	highestPricedTicket = () => {
-		return (this.state.userEvent.tickets.map(	(e,i) => {return e.price}	).sort((a, b) => (b-a))[0])
 	}
 
 	logout = () => {
@@ -573,7 +566,7 @@ class CreateEvent extends React.Component {
 				)
 			case 4:
 				return(
-					<Tickets
+					<CreateTickets
 						addTicket={this.addTicket}
 						changeSellingTimes = {this.changeSellingTimes }
 						changeTicketDetails = {this.changeTicketDetails}

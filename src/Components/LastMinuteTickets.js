@@ -2,33 +2,44 @@ import React from 'react'
 import DatePicker from "react-datepicker";
 import { Elements, StripeProvider } from "react-stripe-elements";
 import SaveCardForm from "./SaveCardForm";
+import ColmTicket from "./ColmTicket";
 
 
 
 class LastMinuteTickets extends React.Component {
 
-	state = {
+	state = {}
 
-}
-
-componentDidMount(){
-	console.log('wld', this.props.waitListData)
-}
+componentDidMount(){}
 
 	render() {
-
-		let excessDemandCondition
-
-		if(this.props.refundOption === 'auction'){excessDemandCondition = `the tickets will sell to the highest bidder`}else{excessDemandCondition = `the tickets will sell to the earliest bidder`}
-
 	  return (
-			<>
-			<h5>{this.props.ticketType}</h5>
+<>
+	<p>More tickets may become available shortly. You can reserve your ticket here.</p> 
+	<p>Your card will only be charged if a ticket is available for you.</p>
 
-	  <p>A small number of tickets will be sold shortly. You can bid for these tickets here. If there excess demand, {excessDemandCondition}</p>
+
+			
+        return (
+          <div >
+            <ColmTicket
+              ticketType={this.props.ticketType}
+              description={this.props.ticketDescription}
+              price={this.props.price}
+              refunds={this.props.refunds}
+              chargeForNoShows={this.props.chargeForNoShows}
+              hold={this.props.hold}
+            //   quantity={this.props.buy.numTicketsSought}
+              changeQuantity={this.changeQuantity}
+            />
+          </div>
+        );
+  
+				
+	  
 
 
-			<div>
+			{/* <div>
 			<label>How Many Tickets?</label>
 				<input
 					required
@@ -38,11 +49,11 @@ componentDidMount(){
 					value={this.props.waitListData.quantity}
 					onChange={(event) => {this.props.waitListChange(event, 'numTicketsSought', this.props.placeInOriginalArray); this.props.calculateTotals({lastMinuteTicket: true})}}
 					/>
-			</div>
+			</div> */}
 
 
 
-			{this.props.refundOption === 'auction' ? 
+			{/* {this.props.refundOption === 'auction' ? 
 
 				<div>
 					<label>{`How much are your prepared to pay?: ${this.props.currency}`}</label>
@@ -56,13 +67,13 @@ componentDidMount(){
 				</div>
 				: 
 	  			<div>Price: {this.props.minimumPrice}</div>
-			}
+			} */}
 
 
 
 
 
-			<div>
+			{/* <div>
 			<label>
 				When is the latest you are willing your receive your tickets?
 			</label>
@@ -75,9 +86,9 @@ componentDidMount(){
 				<option value="hourBeforeEnds">1 Hour Before Event Ends</option>
 				<option value="specific">Let me set a specific date and time</option>
 			</select>
-			</div>
+			</div> */}
 
-			{this.props.waitListData.expires ==='specific' && <div>
+			{/* {this.props.waitListData.expires ==='specific' && <div>
 			<DatePicker
 				required
 				timeIntervals={15}
@@ -90,9 +101,9 @@ componentDidMount(){
 				placeholderText='Enter Date'
 			/>
 
-								</div>}
+								</div>} */}
 
-{this.props.waitListData.quantity > 1 &&<div>
+{/* {this.props.waitListData.quantity > 1 &&<div>
 		<label>
 			How do you want to receive your tickets?
 		</label>
@@ -104,7 +115,7 @@ componentDidMount(){
 			<option value="false">1 by 1 as they become available (more likely to receive tickets)</option>
 			<option value="true">Only when {this.props.waitListData.quantity} tickets are available</option>
 		</select>
-		</div>}
+		</div>} */}
 
 			<hr />
 			</>

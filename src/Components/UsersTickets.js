@@ -5,7 +5,7 @@ import axios from "axios"
 import { Stripe, CardElement, injectStripe } from "react-stripe-elements";
 
 
-class UsersUpcomingEvents extends React.Component {
+class UsersTickets extends React.Component {
 
 	state = {
 		minimumPrice: [],
@@ -162,4 +162,4 @@ return (
 		}
 
 
-export default UsersUpcomingEvents
+export default UsersTickets
