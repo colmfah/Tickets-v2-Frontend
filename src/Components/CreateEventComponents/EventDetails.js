@@ -220,7 +220,8 @@ export class EventDetails extends Component {
         let selectColor
         values.region === '' ? selectColor = 'rgb(118, 118, 118)' : selectColor = 'black'
 
-
+        console.log('values.startDetails',values.startDetails)
+        console.log('type of',typeof(values.startDetails))
 
 
         return (
@@ -288,6 +289,7 @@ export class EventDetails extends Component {
 
                                             <p className='warning' id="startDetails">{this.state.errors.startDetails}</p>
                                             <div className="group datePickerDiv" style={{borderColor: this.state.borderColors.startDetails }}>
+                                                
                                                 <DatePicker
                                                     className="datePicker"
                                                     timeIntervals={15}

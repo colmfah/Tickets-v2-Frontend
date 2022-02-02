@@ -1,5 +1,5 @@
 import React from 'react'
-import { withGoogleMap, GoogleMap, withScriptjs, InfoWindow, Marker } from "react-google-maps";
+import { withGoogleMap, GoogleMap, withScriptjs, Marker } from "react-google-maps";
 import Geocode from "react-geocode"
 import '../../Styles/Grid.css'
 import '../../Styles/Cards.css'
@@ -13,9 +13,7 @@ Geocode.enableDebug();
 
 
 class Map extends React.Component{
-    constructor( props ){
-    super( props )
-    }
+
 
 
     shouldComponentUpdate(nextProps, nextState){
@@ -38,8 +36,7 @@ class Map extends React.Component{
 
 
     render(){
-        const {values} = this.props
-
+   
         const AsyncMap = withScriptjs(
             withGoogleMap(
                 props => (      

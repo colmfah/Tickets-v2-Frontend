@@ -3,32 +3,21 @@ import axios from "axios";
 import moment from "moment";
 import { Elements, StripeProvider } from "react-stripe-elements";
 import CheckoutForm from "./CheckoutForm";
-import SaveCardForm from "./SaveCardForm";
 import Nav from "./Nav";
-import BuyTicket from "./BuyTicket";
 import ColmTicket from "./ColmTicket";
-import LastMinuteTickets from "./LastMinuteTickets";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarAlt,
   faMapMarker,
-  faGlobeEurope,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import "../Styles/Event.css";
+import "../Styles/DatePickerEdits.css";
 import "../Styles/Global.css";
 
 class Event extends React.Component {
-  constructor() {
-    super();
-    this.changeNumTickets = this.changeNumTickets.bind(this);
-    this.calculateStripeFee = this.calculateStripeFee.bind(this);
-    // this.shareData = React.createRef()
-    // this.shareData = React.createRef()
-    // this.chargeForNoShows = React.createRef()
-  }
+
 
   state = {
     formFields: [{ label: "Number to Buy", type: "number", value: "price" }],
@@ -61,6 +50,7 @@ class Event extends React.Component {
           startSellingTime: "",
           stopSellingTime: "",
           ticketDescription: "",
+          quantityRequested: 0,
           refunds: {
             optionSelected: "excessDemand",
             refundUntil: "",
@@ -68,9 +58,6 @@ class Event extends React.Component {
             resellAtSpecificPrice: "",
             minimumPrice: "",
             nameOfResoldTickets: "lastMinuteTickets",
-          },
-          buy: {
-            numTicketsSought: 0,
           },
         },
       ],
@@ -80,7 +67,7 @@ class Event extends React.Component {
       EUR: "€",
       NZD: "$",
     },
-    purchaser: "",
+    purchaserEmail: '',
     stripeCustomerID: "",
     errorMsg: "",
     lastMinuteTicketCharges: {
@@ -95,19 +82,16 @@ class Event extends React.Component {
       variableCharge: 0,
       vatOnCharges: 0,
     },
-    cardDetails: {
-      last4: "",
-      card: "",
-    },
-    replaceExistingCard: false,
     message: "",
+    messageColor: "#293d6a",
     checkBoxes: {
-      shareData: false,
+      promotionalMaterial: false,
       holdOnCard: false,
       chargeForNoShows: false,
+      waitList: false
     },
     errors: [],
-    chargeSavedCard: false,
+    allTicketsSoldOut: false
   };
 
   componentDidMount() {
@@ -122,20 +106,16 @@ class Event extends React.Component {
     axios
       .post(`${process.env.REACT_APP_API}/retrieveEventByID`, objectToSend)
       .then((res) => {
-        let chargeSavedCard;
-
-        if (!res.data.cardDetails.cardSaved) {
-          chargeSavedCard = false;
-        } else {
-          chargeSavedCard = true;
-        }
-
+        console.log('res.data,', res.data)
+        let allTicketsSoldOut = res.data.userEvent.tickets.every(e=>e.soldOut)
+        if(res.data.userEvent.tickets.length === 0){allTicketsSoldOut = true}
+        console.log('allTicketsSoldOut', allTicketsSoldOut)
+      
         this.setState({
-          purchaser: res.data.purchaser,
-          cardDetails: res.data.cardDetails,
+          purchaserEmail: res.data.purchaserEmail,
           stripeCustomerID: res.data.stripeCustomerID,
           userEvent: res.data.userEvent,
-          chargeSavedCard: chargeSavedCard,
+          allTicketsSoldOut: allTicketsSoldOut
         });
       })
       .catch((err) => console.log("errr", err));
@@ -143,97 +123,89 @@ class Event extends React.Component {
 
   calculateStripeFee = () => {
     return 1.23 * (0.25 + 0.014 * this.displayTotal());
-  };
+  }
 
-  calculateTotalFees = (fixedCharge, variableCharge, vat) => {
-    return (fixedCharge + variableCharge +vat)
+  calculateTotalCharge = () => {
+    return (this.state.purchaseTicketCharges.subTotal + this.calculateTotalFees()).toFixed(2)
+   }
+
+  calculateTotalFees = () => {
+    return (this.state.purchaseTicketCharges.fixedCharge + this.state.purchaseTicketCharges.variableCharge +this.state.purchaseTicketCharges.vatOnCharges)
   }
 
   calculateTotalFines = (tickets) => {
     return tickets
-    .map(ticket => ticket.buy.numTicketsSought * ticket.chargeForNoShows)
+    .map(ticket => ticket.quantityRequete * ticket.chargeForNoShows)
     .reduce((a, b) => a + b);
   }
 
-  changeQuantity = (i, quantity) => {
+  changeEmail = (event) => {
+    let purchaserEmail = event.target.value
+    this.setState({ purchaserEmail })
+  }
+
+  changeQuantity = (index, quantity, clearMessage) => {
     let userEvent = this.state.userEvent;
-    userEvent.tickets[i].buy.numTicketsSought = quantity;
-    this.setState({ userEvent: userEvent, message: "" });
+    userEvent.tickets[index].quantityRequested = quantity;
+    this.setState({ userEvent });
+    if(clearMessage){ this.setState({ message: "" })  }
     this.regularTicketsCalculateTotals();
-  };
+    this.resetWaitListCheckBox()
+  }
 
-  changeNumTickets = (e, i) => {
-    let userEvent = this.state.userEvent;
-    userEvent.tickets[i].buy.numTicketsSought = Number(e.target.value);
-    this.setState({
-      userEvent: userEvent,
-    });
-  };
+  changeMessageColor = (color) => {
+    let messageColor
+    if(color ==='blue'){messageColor = '#293d6a'}
+    else if(color === 'red'){messageColor = '#e84c3d'}
+    else if (color === 'green'){messageColor= '#1c7816'}
+    this.setState({ messageColor })
+  }
 
-  chargeExistingCard = (e) => {
-    e.preventDefault();
+  changeWaitListExpiration = (event, placeInOriginalArray) => {
+    let userEvent = this.state.userEvent
+    userEvent.tickets[placeInOriginalArray].waitListExpires = event.target.value;
+    this.setState(userEvent)
+  }
 
-    this.setState({ message: "Saving Your Bid. Please Wait..." });
-    let objectToSend = {
-      waitListData: this.state.userEvent.tickets.filter(
-        (e) => e.lastMinuteTicket === true && e.buy.numTicketsSought > 0
-      ),
-      purchaserID: this.state.purchaser,
-      userEventID: this.state.userEvent._id,
-      replaceExistingCard: this.state.replaceExistingCard,
-      cardSaved: this.state.cardDetails.cardSaved,
-    };
-
-    console.log("objectToSend", objectToSend);
-
-    axios
-      .post(`${process.env.REACT_APP_API}/purchaseWaitList`, objectToSend)
-      .then((res) => {
-        this.setState({ message: res.data.message });
-      });
-  };
-
-  checkBoxesAreTicked = (selectedTickets) => {
+  checkBoxesAreTicked = () => {
     let checkBoxErrors = [];
-
-    if (!this.state.checkBoxes.shareData) {
-      checkBoxErrors.push("shareData");
-    }
-
-    if (
-      selectedTickets.filter(
-        (e) => e.price === 0 && e.chargeForNoShows > 0 && !e.hold
-      ).length > 0
-    ) {
-      if (!this.state.checkBoxes.chargeForNoShows) {
-        checkBoxErrors.push("chargeForNoShows");
-      }
-    } else if (
-      selectedTickets.filter(
-        (e) => e.price === 0 && e.chargeForNoShows > 0 && e.hold
-      ).length > 0
-    ) {
-      if (!this.state.checkBoxes.holdOnCard) {
-        checkBoxErrors.push("holdOnCard");
-      }
-    }
-
+    checkBoxErrors = this.waitListCheckBoxTicked(checkBoxErrors)
     if (checkBoxErrors.length > 0) {
+      this.changeMessageColor('red')
       let errors = checkBoxErrors;
       let message = "Please agree to all mandatory terms and conditions";
-
       this.setState({ errors, message });
-
       return false;
-    } else {
+    } 
       this.clearMessage();
       return true;
-    }
-  };
+  }
 
   clearMessage = () => {
     this.setState({ message: "" });
-  };
+    this.changeMessageColor('blue')
+  }
+
+  determineCheckBoxes = () => {
+
+    let checkBoxes = []
+    let selectedTickets = this.getSelectedTickets()
+    let waitListTickets = selectedTickets.filter(e=>e.lastMinuteTicket)
+
+    if(waitListTickets.length > 0){
+      checkBoxes.push({
+        text: `I agree that my card can be charged €${this.calculateTotalCharge()} before ${this.waitListExpirationTime(waitListTickets)}`,
+        checkBox: "waitList",
+      })
+    }
+
+    checkBoxes.push({
+      text: `I agree to receive promotional material from the event organiser`,
+      checkBox: "promotionalMaterial",
+    })
+
+    return checkBoxes
+  }
 
   displayAdminFee = () => {
     return (
@@ -241,76 +213,53 @@ class Event extends React.Component {
       this.state.purchaseTicketCharges.variableCharge +
       this.state.purchaseTicketCharges.vatOnCharges
     ).toFixed(2);
-  };
-
-
-  displayLastMinuteTickets = (tickets) => {
-
-//  return(     
-     
-//       tickets
-//         .filter((e) => e.lastMinuteTicket)
-//         .map((f,index) => {
-//           return (
-//             <div key={index}>
-//             <LastMinuteTickets
-//               waitListData={{
-//                 quantity: f.buy.numTicketsSought,
-//                 maximumPrice: f.price,
-//                 expires: f.waitListExpires,
-//                 specificDate: f.waitListSpecificDate,
-//                 deliverTogether: f.waitListDeliverTogether,
-//               }}
-//               waitListChange={this.waitListChange}
-//               currency={this.state.userEvent.currency}
-//               minimumPrice={f.refunds.minimumPrice}
-//               placeInOriginalArray={f.placeInOriginalArray}
-//               calculateTotals={this.calculateTotals}
-//               ticketType={f.ticketType}
-//               refundOption={f.refunds.howToResell}
-//               refunds = {f.refunds}
-//               ticket = {f}
-//             />
-//             </div>
-//           );
-//         })
-  
-//  )
-}
-  
-
-  displayNonLastMinuteTickets = (tickets) => {
-    return (tickets.map((ticket, index) => {
-        return (
-          <div key={index}>
-            <ColmTicket
-              ticket={ticket}
-              ticketType={ticket.ticketType}
-              description={ticket.ticketDescription}
-              price={ticket.price}
-              refunds={ticket.refunds}
-              chargeForNoShows={ticket.chargeForNoShows}
-              hold={ticket.hold}
-              quantity={ticket.buy.numTicketsSought}
-              changeQuantity={this.changeQuantity}
-              i={index}
-            />
-          </div>
-        );
-      }))
-
   }
 
   displaySoldOutMessage = () => {
-    console.log('Sold the fuck out')
+    return(
+      <div className={'sold-out-message'}>
+        Sorry, all tickets are sold out
+      </div>
+    )
+  }
+
+  displaySpecificDate = (event, placeInOriginalArray) => {
+    let userEvent = this.state.userEvent
+    userEvent.tickets[placeInOriginalArray].waitListSpecificDate = event;
+    if(moment(event).isAfter(userEvent.tickets[0].stopSellingTime)){
+      userEvent.tickets[placeInOriginalArray].waitListSpecificDate = Date.parse(userEvent.tickets[0].stopSellingTime)
+    }
+    this.setState(userEvent)
+  }
+
+  displayStartAndEndTimes = () => {
+    let startDay = moment(this.state.userEvent.startDetails).format("ddd D MMM YYYY")
+    let startTime = moment(this.state.userEvent.startDetails).format("HH:mm")
+    let endDay = moment(this.state.userEvent.endDetails).format("ddd D MMM YYYY")
+    let endTime = moment(this.state.userEvent.endDetails).format("HH:mm")
+    if(startDay === endDay){return `${startDay} from ${startTime} until ${endTime}`}
+    return `${startDay} at ${startTime} until ${endDay} at ${endTime}`
   }
 
   displayTickets = (tickets) => {
-    let regularTickets = tickets.filter(ticket => ticket.lastMinuteTicket !== true)
-    if(tickets.length === 0){return this.displaySoldOutMessage()}
-    if (regularTickets.length > 0){return this.displayNonLastMinuteTickets(regularTickets)}
-    return this.displayLastMinuteTickets(tickets)
-    
+    if(this.state.allTicketsSoldOut){return this.displaySoldOutMessage()}
+
+    return (tickets.map((ticket, index) => {
+      return (
+        <div key={index}>
+          <ColmTicket
+            changeDeliveryOption = {this.changeDeliveryOption}
+            changeQuantity={this.changeQuantity}
+            changeWaitListExpiration={this.changeWaitListExpiration}
+            displaySpecificDate={this.displaySpecificDate}
+            index={index}
+            ticket = {JSON.parse(JSON.stringify(ticket))}
+            waitListSpecificDate = {ticket.waitListSpecificDate}
+            ticketsAvailable = {ticket.ticketsAvailable}
+          />
+        </div>
+      );
+    }))    
   }
 
   displayTotal = () => {
@@ -322,7 +271,18 @@ class Event extends React.Component {
     ).toFixed(2);
   };
 
-  getConnectedCheckoutForm = (numTicketsSought, selectedTickets) => {
+  displayWaitListMessage = () => {
+    if(this.state.userEvent.tickets.filter(e => e.lastMinuteTicket).length === 0){return}
+    return (
+      <>
+        <div className={'wait-list-message'}>A limited number of additional tickets will become available shortly. </div>
+        <div className={'wait-list-message'}> These will be allocated on a first-come first-serve basis to customers who join the wait list.</div>
+        <div className={'wait-list-message'}>Your card will not be charged unless you secure tickets.</div>  
+      </>     
+    )
+  }
+
+  getConnectedCheckoutForm = (requestedTickets) => {
 
     if(this.state.userEvent.organiser.stripeAccountID === ""){return}
 
@@ -337,25 +297,19 @@ class Event extends React.Component {
       >
         <Elements>
           <CheckoutForm
+            changeEmail = {this.changeEmail}
+            changeMessageColor={this.changeMessageColor}
+            changeQuantity={this.changeQuantity}
+            clearMessage = {this.clearMessage}
+            message ={this.state.message}
+            messageColor={this.state.messageColor}
+            purchaserEmail={this.state.purchaserEmail}
+            purchaseErrorsExist={this.purchaseErrorsExist}
+            requestedTickets={requestedTickets}
+            tickets={this.getSelectedTickets()}
             total={this.displayTotal()}
-            ticketTypesEquivalent={this.state.userEvent.ticketTypesEquivalent}
-            moneyForColm={this.displayAdminFee() - this.calculateStripeFee()}
-            currency={this.state.userEvent.currency}
-            eventTitle={this.state.userEvent.title}
-            purchaser={this.state.purchaser}
+            updateMessage={this.updateMessage}
             userEvent={this.state.userEvent}
-            purchaserID={this.state.purchaser}
-            // replaceExistingCardStatus={this.state.replaceExistingCard}
-            // replaceExistingCard={this.replaceExistingCard}
-            upDateMessage={this.upDateMessage}
-            numTicketsSought={numTicketsSought}
-            errors={this.state.errors}
-            selectedTickets={selectedTickets}
-            checkBoxesAreTicked={this.checkBoxesAreTicked}
-            // saveCard={this.state.checkBoxes.saveCard}
-            // chargeSavedCard={this.state.chargeSavedCard}
-            // connected={true}
-            // cardDetails={this.state.cardDetails}
           />
         </Elements>
       </StripeProvider>
@@ -371,38 +325,29 @@ class Event extends React.Component {
       userEvent.address3,
       userEvent.address4,
     ]
-
-    locationArray.forEach((e, i) => {
-      if (e === "") {
-        locationArray.splice(i, 1);
-      }
-    });
-
+    locationArray = locationArray.filter(e => e!== '')
     return locationArray.join(", ");
   }
 
-  getNumberTicketsSought = (allTickets) => {
+  getRequestedTickets = (allTickets) => {
     return allTickets
-    .filter(ticket =>ticket.buy.numTicketsSought > 0)
+    .filter(ticket =>ticket.quantityRequested > 0)
     .map(ticket => {
       return {
-        chargeForTicketsStatus: ticket.chargeForTicketsStatus,
-        chargeForNoShows: ticket.chargeForNoShows,
         ticketType: ticket.ticketType,
         ticketTypeID: ticket.ticketTypeID,
-        numTicketsSought: ticket.buy.numTicketsSought,
+        quantityRequested: ticket.quantityRequested,
         finalFewTicket: ticket.finalFewTicket,
         lastMinuteTicket: ticket.lastMinuteTicket,
-        resaleOfRefund: ticket.resaleOfRefund,
       };
     });
   }
 
-  getSelectedTickets = (allTickets) => {
-    return allTickets.filter(ticket => ticket.buy.numTicketsSought > 0)
-  };
+  getSelectedTickets = () => {
+    return this.state.userEvent.tickets.filter(ticket => ticket.quantityRequested > 0)
+  }
 
-  getUnconnectedCheckoutForm = (numTicketsSought, selectedTickets) => {
+  getUnconnectedCheckoutForm = (requestedTickets) => {
     if(this.state.userEvent.organiser.stripeAccountID === ""){return}
     return (
       <StripeProvider apiKey={process.env.REACT_APP_API_STRIPE_PUBLISH}>
@@ -410,21 +355,14 @@ class Event extends React.Component {
           <CheckoutForm
             total={this.displayTotal()}
             ticketTypesEquivalent={this.state.userEvent.ticketTypesEquivalent}
-            moneyForColm={this.displayAdminFee() - this.calculateStripeFee()}
             currency={this.state.userEvent.currency}
             eventTitle={this.state.userEvent.title}
-            purchaser={this.state.purchaser}
             userEvent={this.state.userEvent}
-            purchaserID={this.state.purchaser}
-            replaceExistingCardStatus={this.state.replaceExistingCard}
-            replaceExistingCard={this.replaceExistingCard}
-            upDateMessage={this.upDateMessage}
-            numTicketsSought={numTicketsSought}
+            updateMessage={this.updateMessage}
+            requestedTickets={requestedTickets}
             errors={this.state.errors}
-            selectedTickets={selectedTickets}
-            checkBoxesAreTicked={this.checkBoxesAreTicked}
-            saveCard={this.state.checkBoxes.saveCard}
-            chargeSavedCard={this.state.chargeSavedCard}
+            selectedTickets={this.getSelectedTickets()}
+            purchaseErrorsExist={this.purchaseErrorsExist}
             connected={false}
             cardDetails={this.state.cardDetails}
           />
@@ -450,90 +388,37 @@ class Event extends React.Component {
     }
   };
 
-  payWithSavedCard = (e, numTicketsSought, selectedTickets) => {
-    e.preventDefault();
+  insufficentTickets = (selectedTickets) => {
+    let insufficentTickets = selectedTickets.find(ticket => Number(ticket.quantityRequested) > ticket.ticketsAvailable)
+    if(insufficentTickets === undefined){return false}
+    this.changeMessageColor('red')
+    let message
+    if(insufficentTickets.ticketsAvailable > 1){message = `You have selected ${insufficentTickets.quantityRequested} ${insufficentTickets.ticketType} tickets but only ${insufficentTickets.ticketsAvailable} are available`}
+    else{message = `You have selected ${insufficentTickets.quantityRequested} ${insufficentTickets.ticketType} tickets but only 1 ticket is available`}
+    let errors = "insufficientTickets"
+    this.setState({ errors, message })
+    return true
+  }
 
-    if (!this.checkBoxesAreTicked(selectedTickets)) {
-      return;
-    } else {
-      this.setState({ message: "Checking for tickets. Please Wait..." });
-
-      let objectToSend = {
-        checkForTickets: {
-          numTicketsSought: numTicketsSought,
-          purchaser: this.state.purchaser,
-          userEvent: this.state.userEvent._id,
-        },
-        stripeData: {
-          amount: this.displayTotal(),
-          currency: this.state.currency,
-          description: this.state.userEvent.title,
-          moneyForColm: this.displayAdminFee() - this.calculateStripeFee(),
-          seller: this.state.userEvent.organiser._id,
-        },
-        ticketTypesEquivalent: this.state.userEvent.ticketTypesEquivalent,
-        waitListData: this.state.userEvent.tickets.filter(
-          (e) => e.lastMinuteTicket === true && e.buy.numTicketsSought > 0
-        ),
-        cardSaved: this.state.cardDetails.cardSaved,
-        replaceExistingCard: this.state.replaceExistingCard,
-      };
-
-      axios
-        .post(`${process.env.REACT_APP_API}/paymentIntent`, objectToSend)
-        .then((res) => {
-          this.setState({ message: res.data.message });
-
-          console.log("res.data", res.data);
-
-          // if (res.data.success) {
-          //   this.props.stripe
-          //     .handleCardPayment(res.data.clientSecret, {})
-          //     .then((paymentRes) => {
-          //       if (paymentRes.error) {
-          //         this.setState({ message: paymentRes.error.message }); // run some javascript to make the text red.
-          //         axios.post(`${process.env.REACT_APP_API}/deleteTempTickets`, {
-          //           tickets: res.data.tickets,
-          //           refunds: res.data.refundRequests,
-          //           ticketsAlreadyRefunded: res.data.ticketsAlreadyRefunded,
-          //         }); //amend to include overdue refunds
-          //         //i've never tested this. also need to include it anywhere else payment might fail
-
-          //         {
-          //           /*Secuirty Issue: There is a window here for hacker to manually post the tickets to backend to make them valid using updateTicketData controller*/
-          //         }
-          //       } else if (paymentRes.paymentIntent.status === "succeeded") {
-          //         let updateTicketData = {
-          //           purchaser: this.props.purchaser,
-          //           tickets: res.data.tickets,
-          //           ticketsAlreadyRefunded: res.data.ticketsAlreadyRefunded,
-          //           refundRequests: res.data.refundRequests,
-          //           paymentIntentID: paymentRes.paymentIntent.id,
-          //           userEvent: this.props.userEvent._id,
-          //         };
-
-          //         axios
-          //           .post(
-          //             `${process.env.REACT_APP_API}/emailTickets`,
-          //             updateTicketData
-          //           )
-          //           .then((res) => {
-          //             this.setState({ message: res.data.message });
-          //           })
-          //           .catch((err) => console.log("create tickets err", err));
-          //       } else {
-          //         this.setState({
-          //           message: "Payment Failed. You have not been charged",
-          //         });
-          //         console.log("payment failed", paymentRes);
-          //       }
-          //     })
-          //     .catch((err) => console.log("handleCardPaymentErr", err));
-          // }
-          //what if its not successful? Need to code
-        });
+  noTicketsSelected = () => {
+    let numberOfTickets = this.state.userEvent.tickets.map(ticket => Number(ticket.quantityRequested)).reduce( (a,b) => a+b )
+    console.log('numberOfTickets', numberOfTickets)
+    if (numberOfTickets === 0) {
+      this.changeMessageColor('red')
+      let message = "You have not selected any tickets to purchase"
+      let errors = "quantity"
+      this.setState({ errors, message })
+      return true
     }
-  };
+  }
+
+  purchaseErrorsExist = () => {
+    let selectedTickets = this.getSelectedTickets()
+    if(this.noTicketsSelected()){return true}
+    if(this.insufficentTickets(selectedTickets)){return true}
+    if(this.checkBoxesAreTicked(selectedTickets)){return false}
+    return true
+  }
 
   regularTicketsCalculateTotals = () => {
     let subTotal = 0;
@@ -543,17 +428,17 @@ class Event extends React.Component {
     let purchaseTicketCharges = {};
 
     let tickets = this.state.userEvent.tickets.filter(
-      (e) => e.buy.numTicketsSought > 0 && e.price > 0
+      (e) => e.quantityRequested > 0 && e.price > 0
     );
 
     let highPriceTickets = tickets.filter((e) => e.price > 10);
 
     tickets.forEach((e) => {
-      subTotal += e.buy.numTicketsSought * e.price;
+      subTotal += e.quantityRequested * e.price;
     });
 
     tickets.forEach((e) => {
-      totalTickets += Number(e.buy.numTicketsSought);
+      totalTickets += Number(e.quantityRequested);
     });
 
     if (this.state.userEvent.organiser.salesPlan === "basic") {
@@ -564,7 +449,7 @@ class Event extends React.Component {
     } else {
       fixedCharge = totalTickets * 0.69;
       highPriceTickets.forEach((e) => {
-        variableCharge += Number(e.buy.numTicketsSought) * e.price * 0.055;
+        variableCharge += Number(e.quantityRequested) * e.price * 0.055;
       });
     }
     let vatOnCharges = 0.23 * (fixedCharge + variableCharge);
@@ -574,58 +459,58 @@ class Event extends React.Component {
     purchaseTicketCharges.variableCharge = variableCharge;
     purchaseTicketCharges.vatOnCharges = vatOnCharges;
     this.setState({ purchaseTicketCharges });
-  };
+  }
 
-  replaceExistingCard = (e) => {
-    e.preventDefault();
-    this.setState({
-      replaceExistingCard: true,
-      chargeSavedCard: false,
-    });
-  };
+  resetWaitListCheckBox = () => {
+    let selectedTickets = this.getSelectedTickets()
+    if(selectedTickets.filter(e=>e.lastMinuteTicket).length === 0){return}
+    let checkBoxes = this.state.checkBoxes
+    checkBoxes.waitList = false
+    this.setState({  checkBoxes })
+  }
 
-  upDateMessage = (msg) => {
+  updateMessage = (msg) => {
     this.setState({ message: msg });
-  };
+  }
 
-  waitListChange = (e, field, placeInOriginalArray) => {
-    let waitList = this.state.waitList;
-    let userEvent = this.state.userEvent;
-    console.log("lmt1", userEvent.tickets[1]);
-    if (field === "waitListSpecificDate") {
-      console.log("date triggered");
-      userEvent.tickets[placeInOriginalArray][field] = e;
-    } else if (field === "numTicketsSought") {
-      console.log("else if triggered");
-      userEvent.tickets[placeInOriginalArray].buy.numTicketsSought =
-        e.target.value;
-      //can delete this condition when you remove the buy object - it serves no function
-    } else {
-      console.log("else triggered");
-      userEvent.tickets[placeInOriginalArray][field] = e.target.value;
-      console.log("placeInOriginalArray", placeInOriginalArray);
-      console.log("field", field);
-      console.log("e.target.value", e.target.value);
+  waitListExpirationTime = (waitListTickets) => {
+    let time
+    if(waitListTickets[0].waitListExpires === 'specific'){
+      time = waitListTickets[0].waitListSpecificDate
     }
-    console.log("lmt2", userEvent.tickets[1]);
-    this.setState({ userEvent });
-  };
+    else if(waitListTickets[0].waitListExpires === 'starts'){
+      time = this.state.userEvent.startDetails
+    }
+    else if(waitListTickets[0].waitListExpires === 'hourBeforeEnds'){
+      console.log('this.state.userEvent.endDetails', this.state.userEvent.endDetails)
+      time = Date.parse(this.state.userEvent.endDetails) - 60*60*1000
+      console.log('time', time)
+      //fix this
+
+    }
+    if(moment(time).isAfter(waitListTickets[0].stopSellingTime)){
+      time = waitListTickets[0].stopSellingTime
+    }
+
+    return `${moment(time).format('D MMM YYYY')} at ${moment(time).format('HH:mm')}`
+  }
+
+  waitListCheckBoxTicked = (checkBoxErrors) => {
+    let selectedTickets = this.getSelectedTickets()
+    let waitListTickets = selectedTickets.filter(e => e.lastMinuteTicket)
+    if (waitListTickets.length> 0 && !this.state.checkBoxes.waitList){
+      checkBoxErrors.push('waitList')
+    }
+    return checkBoxErrors
+  }
+
 
 
   render() {
-
-    let selectedTickets = this.getSelectedTickets(this.state.userEvent.tickets)
-    let numTicketsSought = this.getNumberTicketsSought(this.state.userEvent.tickets)
-    let totalFines = this.calculateTotalFines(this.state.userEvent.tickets)
-    let fees = this.calculateTotalFees(this.state.purchaseTicketCharges.fixedCharge, 
-      this.state.purchaseTicketCharges.variableCharge, 
-      this.state.purchaseTicketCharges.vatOnCharges)
-    let checkBoxes = [{
-      text: `I agree to share my data with the event organiser.`,
-      checkBox: "shareData",
-    }];
-    let checkoutFormConnected = this.getConnectedCheckoutForm(numTicketsSought, selectedTickets)    
-    let checkoutFormNotConnected = this.getUnconnectedCheckoutForm(numTicketsSought, selectedTickets)
+    let requestedTickets = this.getRequestedTickets(this.state.userEvent.tickets)
+    let fees = this.calculateTotalFees()
+    let checkBoxes = this.determineCheckBoxes()
+    let checkoutFormConnected = this.getConnectedCheckoutForm(requestedTickets)    
     let location = this.getLocation(this.state.userEvent) 
 
 
@@ -633,9 +518,10 @@ class Event extends React.Component {
     return (
       <>
         <Nav />
+  
 
         <div className="event-box">
-          <img src={this.state.userEvent.imageURL} />
+          <img src={this.state.userEvent.imageURL} alt={'chosen by event organiser'}/>
 
           <section className="event-details">
             <div className="event-center">
@@ -646,35 +532,23 @@ class Event extends React.Component {
                   icon={faCalendarAlt}
                   className="fontawesome-icon"
                 />{" "}
-                {moment(this.state.userEvent.startDetails).format(
-                  "ddd, D MMM YYYY HH:mm"
-                )}{" "}
-                until{" "}
-                {moment(this.state.userEvent.endDetails).format(
-                  "ddd, D MMM YYYY HH:mm"
-                )}
+                {this.displayStartAndEndTimes()}
               </p>
 
               <p>
-                {" "}
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${this.state.userEvent.lat},${this.state.userEvent.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer">
                 <FontAwesomeIcon
                   icon={faMapMarker}
                   className="fontawesome-icon"
                 />{" "}
                 {location}
+                </a>
               </p>
 
-              <p>
-                <FontAwesomeIcon
-                  icon={faGlobeEurope}
-                  className="fontawesome-icon"
-                />
-                {` `}
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${this.state.userEvent.lat},${this.state.userEvent.lng}`}
-                  target="_blank"
-                >{`View Map`}</a>
-              </p>
+ 
 
               <p id="tickets-remaining">
                 <FontAwesomeIcon icon={faUser} className="fontawesome-icon" />{" "}
@@ -694,27 +568,23 @@ class Event extends React.Component {
           <section className="event-tickets">
             <header>Tickets</header>
             <hr />
-
-
-{/* display Tickets function 
-
-Func needs to be improved. ticket.length>1 .... what if there are no refunds allowed. 
-Sold out message needed
-
-*/}
-
-
-
-            <form>
-              {
-               this.displayTickets(this.state.userEvent.tickets)
-
-                
-                }
-
+            {this.displayWaitListMessage()}
+            {this.displayTickets(this.state.userEvent.tickets)}
               <hr />
 
+
+
+
+
+
+            <div className={this.state.allTicketsSoldOut ? 'sold-out' : 'all-ticket-details'}>
+
               <div className="event-details-before-payment">
+                <div> Subtotal: €{this.state.purchaseTicketCharges.subTotal.toFixed(2)}</div>
+                <div>Fees: €{fees.toFixed(2)}</div>
+                <div className="event-total-charge">Total: €{this.calculateTotalCharge()}</div>
+                {/* <hr /> */}
+                <hr id="event-total-charge-bottom-hr" />
                 {checkBoxes.map((e, i) => {
                   return (
                     <div
@@ -729,7 +599,7 @@ Sold out message needed
                         // ref={this[e.checkBox]}
                         checked={this.state.checkBoxes[e.checkBox]}
                         onChange={(event) =>
-                          this.handleCheckBoxChange(event, selectedTickets)
+                          this.handleCheckBoxChange(event)
                         }
                       />
                       {` ${e.text}`}
@@ -737,27 +607,13 @@ Sold out message needed
                   );
                 })}
 
-                <hr />
-
-                <div>
-                  Subtotal: €
-                  {this.state.purchaseTicketCharges.subTotal.toFixed(2)}
-                </div>
-                <div>Fees: €{fees.toFixed(2)}</div>
-                <div className="event-total-charge">
-                  Total: €
-                  {(this.state.purchaseTicketCharges.subTotal + fees).toFixed(
-                    2
-                  )}
-                </div>
-
-                <hr id="event-total-charge-bottom-hr" />
+                
               </div>
 
               {checkoutFormConnected}
 
            
-            </form>
+            </div>
           </section>
         </div>
 
@@ -778,54 +634,4 @@ export default Event;
  
 
 
-{
 
-
-// let whenToPlaceHold;
-
-// let daysUntilEventEnds = moment(this.state.userEvent.endDetails).diff(
-//   Date.now(),
-//   "days"
-// );
-
-// if (daysUntilEventEnds <= 5) {
-//   whenToPlaceHold = "now";
-// } else {
-//   whenToPlaceHold = `on ${moment(this.state.userEvent.endDetails)
-//     .subtract(5, "d")
-//     .format("Do MMM")}`;
-// }
-}
-
-
-
-{
-  //checkboxes
-
-  // if (
-  //   selectedTickets.filter(
-  //     (e) => e.price === 0 && e.chargeForNoShows > 0 && !e.hold
-  //   ).length > 0
-  // ) {
-  //   checkBoxes.push({
-  //     text: `I agree to my card being charged €${totalFines} if my ticket(s) are not checked in at the event.`,
-  //     checkBox: "chargeForNoShows",
-  //   });
-  // } else if (
-  //   selectedTickets.filter(
-  //     (e) => e.price === 0 && e.chargeForNoShows > 0 && e.hold
-  //   ).length > 0
-  // ) {
-  //   checkBoxes.push({
-  //     text: `I agree to a hold of €${totalFines} being placed on my card ${whenToPlaceHold} that will be charged to my account if my ticket(s) are not checked in at the event.`,
-  //     checkBox: "holdOnCard",
-  //   });
-  // }
-
-  // if (!this.state.cardDetails.cardSaved || this.state.replaceExistingCard) {
-  //   checkBoxes.push({
-  //     text: `Save my card for future use`,
-  //     checkBox: "saveCard",
-  //   });
-  // }
-}

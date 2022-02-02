@@ -2,12 +2,8 @@ import React from "react";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
 import moment from "moment";
-import Test from './Test'
-
 import EventDetails from "./CreateEventComponents/EventDetails";
-import RefundPolicy from './RefundPolicy'
 import "react-datepicker/dist/react-datepicker.css";
-import Map from './CreateEventComponents/Map'
 import Image from './CreateEventComponents/Image'
 import CreateTickets from './CreateEventComponents/CreateTickets'
 import Cancellations from './CreateEventComponents/Cancellations'
@@ -177,7 +173,7 @@ class CreateEvent extends React.Component {
 		
 
 		let userEvent = this.state.userEvent
-		console.log('userEvent.ticekts',	userEvent.tickets);
+		console.log('userEvent.ticekts1',	userEvent.tickets);
 		let data = userEvent.image
 		data.append('title', userEvent.title)
 		data.append('venue', userEvent.venue)
@@ -202,6 +198,8 @@ class CreateEvent extends React.Component {
 		userEvent.tickets.forEach(item => {
 			data.append(`tickets[]`, JSON.stringify(item));
 		  });
+
+		  console.log('userEvent.ticekts2',	userEvent.tickets);
 		
 	
 		axios.post(`${process.env.REACT_APP_API}/image`, data)
@@ -228,7 +226,10 @@ class CreateEvent extends React.Component {
 		}
 		
 		else if (field === "startDetails" || field === "endDetails") {
-	        userEvent[field] = e
+			userEvent[field] = e
+			console.log('startDetails', e)
+			console.log('typeof e', typeof(e))
+
 		}
 
 		else {
@@ -528,7 +529,7 @@ class CreateEvent extends React.Component {
 
   render() {
 	  const { step } = this.state
-	  const{ title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets,globalRefundOptions, globalRefundPolicy, lat, lng } = this.state.userEvent
+	  const{ title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets,globalRefundOptions, lat, lng } = this.state.userEvent
 	  const values = { title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets, globalRefundOptions, lat, lng }
 
 	  switch(step){

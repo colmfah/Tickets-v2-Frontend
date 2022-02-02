@@ -10,10 +10,11 @@
 .ticket-detail{
     text-transform: uppercase;
     font-weight: normal;
-    /* margin-top: 5px; */
     padding: 10px 0 10px 10px
     
 }
+
+
 
 .ticket-detail span {
     font-size: 0.7em;
@@ -26,6 +27,36 @@
     margin: 0;
     text-transform: none;
 }
+
+.ticket-detail select{
+    color:#525252;
+    font-size: 0.9em;
+    background-color: inherit;
+    font-weight: bold;
+    height: 30px;
+    padding: 0;
+    margin: 0;
+    border-color: #a2aeae;
+    max-width: 90%;
+}
+
+.ticket-detail input {
+    color:#525252;
+    font-size: 0.9em;
+    background-color: inherit;
+    font-weight: bold;
+    border: 1px solid #a2aeae;
+    border-radius: 5px;
+    height: 30px;
+}
+
+
+
+.ticket-detail input[type=text], .ticket-detail input::placeholder{
+    color: #525252;
+    padding-left: 1.5%;
+}
+
 
 .ticket-price-fine{
     display: flex;
@@ -41,8 +72,9 @@
     margin: auto
 }
 
+ /* makes up and down arrows in input box always visible */
 .event-number input[type=number]::-webkit-inner-spin-button {
     opacity: 1
 }
 
-
+ 

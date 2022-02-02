@@ -1,7 +1,5 @@
 import React from "react";
 import Nav from "./Nav";
-import UsersUpcomingEvents from './UsersTickets'
-import { Link } from "react-router-dom";
 import QrReader from "react-qr-reader";
 import axios from "axios";
 import moment from "moment";

@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef} from "react";
 import { withRouter } from "react-router-dom";
 import moment from "moment";
 import "../Styles/ColmsTicket.css";
+import DatePicker from "react-datepicker";
 
 
 const ColmTicket = (props) =>{
@@ -9,123 +10,144 @@ const ColmTicket = (props) =>{
   const [height, setHeight] = useState(0)
   const ref = useRef(null)
 
+  let {changeQuantity, changeWaitListExpiration, displaySpecificDate, index, ticket, ticketsAvailable, waitListSpecificDate} = props
+ 
+  let wordArray = ticket.ticketType.split(" ")
+  let firstWord = wordArray[0]
+  wordArray.shift()
+  let restOfWord = wordArray.join(' ')
   
-
   useEffect(() => {
     setHeight(ref.current.clientHeight)
   })
 
-    let firstWord = props.ticketType.split(" ")[0];
-    let restOfWord = props.ticketType.split(" ").pop();
 
-    
-    function getTicketDetails(){
-
-      let array = []
-
-      console.log('props.description', props)
-
-      if(props.description !== ''){
-          array.push({
-              title: 'description',
-              value: props.description,
-              className: `ticket-detail ticket-detail-description`
-            })
-      }
-      if(props.price === 0){
-
-        let refundStatus
-        let refundClassName
-
-        if(props.refunds.optionSelected === 'excessDemand'){
-            refundStatus = `Limited number of cancellations available`
-            refundClassName = `ticket-detail ticket-detail-refund ticket-detail-cancel-excess-Demand`
-        }else if(props.refunds.optionSelected === 'untilSpecific'){
-            refundStatus = `Until ${moment(props.refunds.refundUntil).format('Do MMM HH:mm')}`
-            refundClassName = `ticket-detail ticket-detail-refund`
-        }else if(props.refunds.optionSelected === 'noRefunds'){
-            refundStatus = 'No Cancellations'
-            refundClassName = `ticket-detail ticket-detail-refund`
-        }
-
-        if(props.chargeForNoShows > 0){
-        array.push({
-            title: 'cancellation policy',
-            value: refundStatus,
-            className: refundClassName
-        })
-        }
-
-          array.push({
-              title: 'price',
-              value: 'Free',
-              className: `ticket-detail ticket-detail-price`
-          })
-
-      }else {
-        let refundStatus
-        let refundClassName
-        
-
-        if(props.refunds.optionSelected === 'excessDemand'){
-            refundStatus = `Limited number of refunds available`
-            refundClassName = `ticket-detail ticket-detail-refund ticket-detail-refund-excess-Demand`
-        }else if(props.refunds.optionSelected === 'untilSpecific'){
-            refundStatus = `Until ${moment(props.refunds.refundUntil).format('Do MMM HH:mm')}`
-            refundClassName = `ticket-detail ticket-detail-refund`
-        }else if(props.refunds.optionSelected === 'noRefunds'){
-            refundStatus = 'No Refunds'
-            refundClassName = `ticket-detail ticket-detail-refund`
-        }
-
-        array.push({
-            title: 'refund policy',
-            value: refundStatus,
-            className: refundClassName
-        })
-
-          array.push({
-              title: 'price',
-              value: `€${props.price}`,
-              className: `ticket-detail ticket-detail-price`
-          })
-      }
-
-      let ticketDetails = array.map((e,i) => {
-        if(e.title === 'price' && props.chargeForNoShows>0){
-          let fineClassName
-          props.hold ? fineClassName = `ticket-detail ticket-detail-fine-hold` : fineClassName = `ticket-detail ticket-detail-fine-no-hold`
-          return(
-            <div key={i} className="ticket-price-fine">
-
-              <div className={e.className}>
-                <span>{e.title}</span>
-                <h2>{e.value}</h2>
-              </div>
-
-              <div className={fineClassName}>
-                <span>no show fine</span>
-                <h2>{`€${props.chargeForNoShows}`}</h2>
-              </div>
-            </div>
-        )
-        }else{
-
-        
-        
-        return(
-            <div key={i} className={e.className}>
-            <span>{e.title}</span>
-            <h2>{e.value}</h2>
-            </div>
-        )
-        }
-        
-        })
-
-        return ticketDetails
-
+    function getPriceCode(code){
+      let price
+      Number(price) === 0 ? price = 'Free' : price = `€${ticket.price}`
+      code.push(
+        <div key={code.length} className={'ticket-detail ticket-detail-price'}>
+        <span>{'price'}</span>
+        <h2>{price}</h2>
+        </div>
+      )
+      return code
     }
+
+    function getDescriptionCode(code){
+      if(ticket.ticketDescription === ''){return code}
+      code.push(
+        <div key={code.length} className={'ticket-detail ticket-detail-description'}>
+        <span>{'description'}</span>
+        <h2>{ticket.ticketDescription}</h2>
+        </div>
+      )
+      return code
+    }
+
+    function getRefundPolicyCode(code){
+
+      if(Number(ticket.price) === 0){return code}
+
+      let refundStatus
+      let refundClassName
+      
+      //this should be done at backend?
+      if(ticket.refunds.optionSelected === 'excessDemand'){
+          refundStatus = `Limited number of refunds available`
+          refundClassName = `ticket-detail ticket-detail-refund ticket-detail-refund-excess-Demand`
+      }else if(ticket.refunds.optionSelected === 'untilSpecific'){
+          refundStatus = `Until ${moment(ticket.refunds.refundUntil).format('Do MMM HH:mm')}`
+          refundClassName = `ticket-detail ticket-detail-refund`
+      }else if(ticket.refunds.optionSelected === 'noRefunds'){
+          refundStatus = 'No Refunds'
+          refundClassName = `ticket-detail ticket-detail-refund`
+      }
+
+      code.push(
+        <div key={code.length} className={refundClassName}>
+        <span>{'refund policy'}</span>
+        <h2>{refundStatus}</h2>
+        </div>
+      )
+      return code
+    }
+
+    function getWaitListExpiryCode(code){
+      code.push (
+        <div key={code.length} className={`ticket-detail`}>
+          <span>
+            Latest time to receive tickets
+          </span>
+          <select
+            required
+            value={ticket.waitListExpires}
+            onChange={event => changeWaitListExpiration(event, ticket.placeInOriginalArray)}
+          >
+            <option value="starts">When event starts</option>
+            <option value="hourBeforeEnds">1 hour before event ends</option>
+            <option value="specific">Set a specific date and time</option>
+          </select>
+        </div>
+      )
+      return code
+    }
+
+    function getDatePickerCode(code){
+      code.push(
+        <div className={`ticket-detail ticket-detail-date`}> 
+          <DatePicker
+            required
+            timeIntervals={15}
+            selected={waitListSpecificDate}
+            onChange={event =>
+              displaySpecificDate(event, ticket.placeInOriginalArray)
+            }
+            showTimeSelect
+            dateFormat="d MMM yyyy HH:mm"
+            placeholderText='Enter Date'
+          />
+        </div>
+      )
+      return code
+    }
+
+
+    function getSpecificExpiryCode(code){
+      if(ticket.waitListExpires !=='specific'){return code}
+      getDatePickerCode(code)
+      return code
+    }
+
+    function getLastMinuteTicketCode(code){
+      if(!ticket.lastMinuteTicket){return code}
+      getDescriptionCode(code)
+      getPriceCode(code)
+      getWaitListExpiryCode(code)
+      getSpecificExpiryCode(code)
+      return code
+      }   
+      
+    function getPaidTicketCode(code){
+      if(ticket.lastMinuteTicket){return code}
+      getDescriptionCode(code)
+      getPriceCode(code)
+      getRefundPolicyCode(code)
+      return code
+    }
+
+    function getTicketDetails(){
+      let code = []
+      getPaidTicketCode(code)
+      getLastMinuteTicketCode(code)
+      return code
+    }
+
+
+
+    //each func just spits out a bit of code. then another func puts together all the code it wants for each
+    //specific ticket
+
 
     return (
       <>
@@ -147,15 +169,14 @@ const ColmTicket = (props) =>{
               style={{ height: height }}
             ></div>
 
-          {/* I will need to change this input to a request refund button on the tickets page. Use prop to determine which page component is being displayed on. Eventpage = true. Toggle display: none depending on value */}
-
             <div className="event-number">
               <span>quantity:</span>
               <input
                 type="number"
-                value={props.quantity}
+                max={ticketsAvailable}
+                value={ticket.quantityRequested}
                 onChange={(event) =>
-                  props.changeQuantity(props.i, event.target.value)
+                  changeQuantity(index, event.target.value, true)
                 }
                 min="0"
               />

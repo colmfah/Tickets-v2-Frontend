@@ -1,6 +1,5 @@
 
 import React from 'react'
-import Geocode from "react-geocode"
 import Map from "./Map"
 import Nav from "../Nav"
 import '../../Styles/Grid.css'

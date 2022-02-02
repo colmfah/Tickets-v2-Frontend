@@ -1,9 +1,7 @@
 import React from "react";
 import Nav from "./Nav";
 import UsersTickets from './UsersTickets'
-import { Link } from "react-router-dom";
 import axios from "axios";
-import moment from "moment";
 
 
 class Tickets extends React.Component {
@@ -34,16 +32,15 @@ class Tickets extends React.Component {
       .catch(err => console.log(err));
   }
 
-updateState = (updatedUserData) => {
-	console.log('updatedUserData')
-	let user = this.state.user
-	user.ticketsBought = updatedUserData.ticketsBought
-	this.setState({user})
-}
+  updateState = (updatedUserData) => {
+    console.log('updatedUserData')
+    let user = this.state.user
+    user.ticketsBought = updatedUserData.ticketsBought
+    this.setState({user})
+  }
 
   turnScannerOnOff = usersEvent => {
     let stateCopy = this.state.user.usersEvents;
-    console.log("stateCopyb4map", stateCopy);
     stateCopy.map(e => {
       if (e._id === usersEvent._id) {
         e.checkIn = !e.checkIn;
@@ -119,7 +116,6 @@ updateState = (updatedUserData) => {
 
 
 
-						<h2>Events you are organising</h2>
           {/*this.state.user.usersEvents.map((e, i) => {
             return (
               <div key={i}>

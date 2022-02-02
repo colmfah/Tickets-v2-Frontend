@@ -2,7 +2,6 @@ import React from 'react'
 import moment from "moment"
 import {Link} from 'react-router-dom'
 import axios from "axios"
-import { Stripe, CardElement, injectStripe } from "react-stripe-elements";
 
 
 class UsersTickets extends React.Component {
@@ -43,7 +42,7 @@ requestRefund = (e, ticketID, i) => {
 handleChange = (event, i) => {
 	let minimumPrice= this.state.minimumPrice
 	minimumPrice[i] = event.target.value
-	if(minimumPrice == 0){
+	if(minimumPrice === 0){
 		minimumPrice = 0.01
 	}
 	this.setState({minimumPrice})

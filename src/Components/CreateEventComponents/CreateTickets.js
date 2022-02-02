@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import Nav from "../Nav";
 import DatePicker from "react-datepicker";
-import moment from "moment";
 
 export class CreateTickets extends Component {
 
@@ -337,7 +336,7 @@ export class CreateTickets extends Component {
                                                         <option value='' disabled>Start Selling Tickets</option>
                                                         <option value="now">Now</option>
                                                         <option value="specific">Specific Date and Time</option>
-                                                        {i===1 ? <option value="whenPreviousSoldOut">When {values.tickets[0].ticketType} Is Sold Out</option>:<option value="whenPreviousSoldOut" disabled={i==0}>When A Previous Ticket Is Sold Out</option>}  
+                                                        {i===1 ? <option value="whenPreviousSoldOut">When {values.tickets[0].ticketType} Is Sold Out</option>:<option value="whenPreviousSoldOut" disabled={i===0}>When A Previous Ticket Is Sold Out</option>}  
                                                     </select>
                                                 </div>
 
@@ -379,7 +378,7 @@ export class CreateTickets extends Component {
     
 
                                                 <p className="warning startSellingTime">{values.tickets[i].errors.startSellingTime}</p>
-                                                {values.tickets[i].startSelling == 'specific' && 
+                                                {values.tickets[i].startSelling === 'specific' && 
                                                 <div className="group datePickerDiv"
                                                     style={{ borderColor: values.tickets[i].borderColors.startSellingTime }}  
                                                 >                 
@@ -419,7 +418,7 @@ export class CreateTickets extends Component {
 
 
                                                 <p className="warning stopSellingTime">{values.tickets[i].errors.stopSellingTime}</p>
-                                                {values.tickets[i].stopSelling == 'specific'  &&
+                                                {values.tickets[i].stopSelling === 'specific'  &&
 
                                                     <div className="group datePickerDiv"
                                                     style={{ borderColor: values.tickets[i].borderColors.stopSellingTime }}  

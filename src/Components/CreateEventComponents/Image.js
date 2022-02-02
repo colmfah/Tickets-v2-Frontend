@@ -37,7 +37,6 @@ export class Image extends Component {
         let stateCopy = this.state
         let fileType = event.target.files[0].type
         let fileSize = event.target.files[0].size        
-        let errorMessage = ''
         let validFile = false
 
         if(fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/gif'){ 
@@ -126,4 +125,3 @@ export class Image extends Component {
 
 export default Image
 
-{/*onChange={event => this.props.changeField(event, 'image')}*/}
