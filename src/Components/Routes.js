@@ -7,12 +7,12 @@ import Events from './Events'
 import Event from './Event'
 import CheckIn from './CheckIn'
 import Tickets from './Tickets'
-import ShowQRCode from './QRCode'
 import YourEvents from './YourEvents'
 import confirmEmail from './confirmEmail'
 import StripeConnectSignUp from './StripeConnectSignUp'
 import ForgotPassword from './ForgotPassword'
 import ChangePassword from './ChangePassword'
+import ShowQRCode from './QRCode'
 
 
 
@@ -45,8 +45,8 @@ class Routes extends React.Component {
 					<Route path='/events' component={Events} />
 					<Route path='/forgotPassword' component={ForgotPassword} />
 					<Route path='/login' component={LogIn} />
-					<Route path='/tickets' render={ () => this.tokenCheck() ? <Tickets /> : <Redirect to="/login" /> }/>
 					<Route path='/qr/:id' component={ShowQRCode} />
+					<Route path='/tickets' render={ () => this.tokenCheck() ? <Tickets /> : <Redirect to="/login" /> }/>
 					<Route path='/signup' component={SignUp} />
 					<Route path='/stripeConnectSignUp' render={ () => this.tokenCheck() ? <StripeConnectSignUp /> : <Redirect to="/login" /> }/>
 					<Route path='/yourevents' render={ () => this.tokenCheck() ? <YourEvents /> : <Redirect to="/login" /> }/>

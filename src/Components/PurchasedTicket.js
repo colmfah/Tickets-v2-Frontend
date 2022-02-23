@@ -1,4 +1,5 @@
 import React, {useState, useEffect, useRef} from "react";
+import { Link } from "react-router-dom";
 import { withRouter } from "react-router-dom";
 import moment from "moment";
 import "../Styles/ColmsTicket.css";
@@ -8,25 +9,6 @@ var QRCode = require('qrcode.react')
 
 
 const ColmTicket = (props) =>{
-
-    const [message, setMessage] = useState('')
-
-
-    const [height, setHeight] = useState(0)
-    const ref = useRef(null)
-    let {ticket} = props
-
-
-    ticket.creationTime = new Date (ticket.creationTime).getTime()
-
-
-    //   
-    let wordArray = ticket.userEvent.title.split(" ")
-    let firstWord = wordArray[0]
-    wordArray.shift()
-    let restOfWord = wordArray.join(' ')
-    useEffect(() => {setHeight(ref.current.clientHeight)})
-
 
     function getPriceCode(code){
         let price
@@ -100,42 +82,84 @@ const ColmTicket = (props) =>{
     }
 
     function requestRefund(){
-        
+        setDisplaySpinner(true)
         setMessage('Please Wait...')
-     
         axios.post(`${process.env.REACT_APP_API}/refundRequest`, {ticketID: ticket, minimumPrice: ticket.minimumPrice, token: localStorage.getItem("token")})
-            .then(res => {
-                console.log('res.data', res.data)
-                setMessage(res.data.message)
-            })
+        .then(res => {
+            setMessage(res.data.message)
+            setDisplaySpinner(false)
+            if(!res.data.error){setTicket(res.data.ticket)}
+        })
+    }
+
+    function displayRefundButton(){
+        if(ticket.refundRequested){return <button onClick={event => cancelRefundRequest()}>Cancel Refund Request</button>}
+        return <button onClick={event => requestRefund()}>Request Refund</button> 
+    }
+
+    function cancelRefundRequest(){
+        setDisplaySpinner(true)
+        setMessage('Please Wait...')
+        let objectToSend = {token: localStorage.getItem("token"),ticketID: ticket._id}
+        axios.post(`${process.env.REACT_APP_API}/cancelRefundRequest`, objectToSend)
+        .then(res => {
+            setMessage(res.data.message)
+            setDisplaySpinner(false)
+            if(!res.data.error){setTicket(res.data.ticket)}  
+        }
+        
+        )
+    }
+
+    function spinnerVisibility(){
+        if(displaySpinner ){return {'display': 'block'}}
+        return {'display': 'none'}
     }
 
     //each func just spits out a bit of code. then another func puts together all the code it wants for each specific ticket
 
+    const [message, setMessage] = useState('')
+    const [height, setHeight] = useState(0)
+    const [displaySpinner, setDisplaySpinner] = useState(false)
+    props.ticket.creationTime = new Date (props.ticket.creationTime).getTime()
+    const [ticket, setTicket] = useState(props.ticket)
+    let qrCode = String([ticket._id, ticket.randomNumber, ticket.creationTime, ticket.userEvent._id])
+    const ref = useRef(null)
+    let wordArray = ticket.userEvent.title.split(" ")
+    let firstWord = wordArray[0]
+    wordArray.shift()
+    let restOfWord = wordArray.join(' ')
+    useEffect(() => {setHeight(ref.current.clientHeight)})
+    console.log('ticket', ticket)
 
     return (
-      <>
+      <div className='ticket-container'>
         <div className="ticket-card-wrap">
           <div className="event-card event-card-left">
             <h1 className="event-ticket-title" ref={ref}>{firstWord} <span>{restOfWord}</span></h1>
             <div className="ticket-details">{getTicketDetails()}</div>
           </div>
           <div className="event-card event-card-right">
-            <div className="event-eye" style={{ height: height }}></div>
+            <div className="event-eye" style={{ height: height }}>{moment(ticket.userEvent.startDetails).format('Do MMM')}</div>
             <div className="ticket-buttons">
-            <QRCode 
-                value={String([ticket._id, ticket.randomNumber, ticket.creationTime, ticket.userEvent._id])} 
-                className='QR' 
-                style={{'maxWidth': '100%', 'height': 'auto', 'marginBottom': '20px'}}/>
-                <button onClick={event => requestRefund()}>Request Refund</button>
-        
-           
-        
+            <Link to={`/qr/${qrCode}`} target="_blank" rel="noopener noreferrer">
+                <QRCode 
+                    value={qrCode} 
+                    className='QR' 
+                    style={{'maxWidth': '95%', 'height': 'auto', 'marginBottom': '5px', 'marginTop': '5px'}}/>
+            </Link>
+                {displayRefundButton()}
             </div>
           </div>
         </div>
-        <div className='ticket-message'>{message}</div>
-      </>
+        <div className='ticket-message-container'>
+            <div style={spinnerVisibility()}   className ='ticket-spinner'>
+                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+            <div className='ticket-message'>{message}</div>
+            
+        </div>
+      </div>
     );
 
 }

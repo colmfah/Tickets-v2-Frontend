@@ -1,6 +1,6 @@
 import React from "react";
 import Nav from "./Nav";
-import UsersTickets from './UsersTickets'
+import Footer from "./Footer";
 import PurchasedTicket from "./PurchasedTicket";
 import axios from "axios";
 import "../Styles/Tickets.css";
@@ -99,27 +99,26 @@ class Tickets extends React.Component {
 
   render() {
     return (
-<>
-  <Nav />
+      <>
+        <Nav />
+        <div className="tickets-wrap">
+          {this.state.user.ticketsBought.map((ticket, index)=> {
+            return( <div key={index}>
+                <PurchasedTicket
+                  ticket = {JSON.parse(JSON.stringify(ticket))}
+                />
+              </div>)}
+              )}
+        </div>
+        <Footer />
+      </>
+      
+    )    
+  }
+}
 
-  <div className="tickets-wrap">
+export default Tickets;
 
-    {this.state.user.ticketsBought.map((ticket, index) => {
-    
-       return( <div key={index}>
-          <PurchasedTicket
-            // changeDeliveryOption = {this.changeDeliveryOption}
-            // changeQuantity={this.changeQuantity}
-            // changeWaitListExpiration={this.changeWaitListExpiration}
-            // displaySpecificDate={this.displaySpecificDate}
-            index={index}
-            ticket = {JSON.parse(JSON.stringify(ticket))}
-            // waitListSpecificDate = {ticket.waitListSpecificDate}
-            // ticketsAvailable = {ticket.ticketsAvailable}
-            // specificWaitListDateError = {this.state.specificWaitListDateError}
-          />
-        </div>)}
-        )}
 
     {/* {this.state.user.ticketsBought.length > 0 &&
       <div>
@@ -132,13 +131,7 @@ class Tickets extends React.Component {
       </div>
       } */}
 
-  </div>
-
-
-
-
-
-          {/*this.state.user.usersEvents.map((e, i) => {
+                {/*this.state.user.usersEvents.map((e, i) => {
             return (
               <div key={i}>
 
@@ -171,13 +164,4 @@ class Tickets extends React.Component {
             )
           */
           
-          }
-          )
-          
-          }
-</>
-  )
-		  }
-		}
-
-export default Tickets;
+        }

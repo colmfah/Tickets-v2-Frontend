@@ -99,6 +99,7 @@
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+  padding-bottom: 2.5rem;
 }
 
 .event-description {
@@ -445,6 +446,10 @@ margin-right: 80px;
   background-color: #e84c3d;
   border-top-right-radius: 8px;
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
 }
 
 
