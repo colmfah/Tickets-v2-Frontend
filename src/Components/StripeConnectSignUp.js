@@ -53,7 +53,7 @@ class StripeConnectSignUp extends React.Component {
 						<p>In order to sell tickets you must connect your stripe account to our platform.</p>
 						<p>Please click the below button to enable this.</p>
 						<p>You will be brought to a Stripe webpage. If you already have a Stripe account, please click 'sign in' in the top right hand corner.</p>
-						<p>If you don't have a Stripe account, you can fill in the details on the page to create one, or alternatively, visit <a href='https://dashboard.stripe.com/register' target="_blank">www.stripe.com rel="noopener noreferrer"</a> to create one.</p>
+						<p>If you don't have a Stripe account, you can fill in the details on the page to create one, or alternatively, visit <a href='https://dashboard.stripe.com/register' target="_blank" rel="noopener noreferrer">www.stripe.com</a> to create one.</p>
 
 						<a href='https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_GIwo6n5S0Lvl8NZ5RmYGDCSuUvx0OAsM&scope=read_write' className="stripe-connect dark"><span>Connect with Stripe</span></a>
 					</div> 

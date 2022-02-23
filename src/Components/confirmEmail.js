@@ -1,9 +1,7 @@
 import React from 'react'
-import "../Styles/QRCode.css";
 import axios from 'axios';
 import {Link} from 'react-router-dom'
 import { withRouter } from 'react-router-dom'
-var QRCode = require('qrcode.react')
 
 
 

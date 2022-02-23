@@ -1,7 +1,9 @@
 import React from "react";
 import Nav from "./Nav";
 import UsersTickets from './UsersTickets'
+import PurchasedTicket from "./PurchasedTicket";
 import axios from "axios";
+import "../Styles/Tickets.css";
 
 
 class Tickets extends React.Component {
@@ -100,19 +102,39 @@ class Tickets extends React.Component {
 <>
   <Nav />
 
-  <p>{this.state.user.name}</p>
-	<p>{this.state.user.email}</p>
+  <div className="tickets-wrap">
 
-  {this.state.user.ticketsBought.length > 0 &&
-		<div>
-		<h2>Your Tickets</h2>
-			<UsersTickets
-				ticketsBought={this.state.user.ticketsBought.filter(e => e.refunded === false)}
-				purchaserID={this.state.userID}
-				updateState={this.updateState}
-			/>
-		</div>
-		}
+    {this.state.user.ticketsBought.map((ticket, index) => {
+    
+       return( <div key={index}>
+          <PurchasedTicket
+            // changeDeliveryOption = {this.changeDeliveryOption}
+            // changeQuantity={this.changeQuantity}
+            // changeWaitListExpiration={this.changeWaitListExpiration}
+            // displaySpecificDate={this.displaySpecificDate}
+            index={index}
+            ticket = {JSON.parse(JSON.stringify(ticket))}
+            // waitListSpecificDate = {ticket.waitListSpecificDate}
+            // ticketsAvailable = {ticket.ticketsAvailable}
+            // specificWaitListDateError = {this.state.specificWaitListDateError}
+          />
+        </div>)}
+        )}
+
+    {/* {this.state.user.ticketsBought.length > 0 &&
+      <div>
+      <h2>Your Tickets Cff</h2>
+        <UsersTickets
+          ticketsBought={this.state.user.ticketsBought.filter(e => e.refunded === false)}
+          purchaserID={this.state.userID}
+          updateState={this.updateState}
+        />
+      </div>
+      } */}
+
+  </div>
+
+
 
 
 
@@ -147,9 +169,14 @@ class Tickets extends React.Component {
                     )}
                   </div>
             )
-          */})}
+          */
+          
+          }
+          )
+          
+          }
 </>
-		    )
+  )
 		  }
 		}
 

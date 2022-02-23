@@ -1,0 +1,50 @@
+.tickets-wrap{
+    margin-top: 50px;
+    border: 1px solid red;
+    background-color: #FFFF;
+}
+
+.ticket-buttons {
+    text-align: center;
+    margin: auto;
+    width: 90%;
+}
+
+.ticket-buttons :hover{
+    transform: scale(1.1);
+    box-shadow: 0 19px 38px rgba(249, 171, 85, 0.3),
+      0 15px 12px rgba(249, 171, 85, 0.22);
+    border: 1px solid #f9ab55;
+    transition: all 0.2s ease-in-out;
+}
+
+.ticket-buttons button{
+    margin-bottom: 20px;
+    color: #e84c3d;
+    background-color: #FFFF;
+    font-weight: bold;
+}
+
+.ticket-card-wrap {
+    color: #fff;
+    font-family: sans-serif;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -ms-flex-line-pack: center;
+    align-content: center;
+    background-color: #fff;
+    margin-top: 3%;
+    padding-left: clamp(0px, 3%, 30px);
+    padding-right: clamp(0px, 3%, 30px);
+  }
+
+  .ticket-message{
+    text-align: center;
+    margin: auto;
+    width: 95%;
+    color: #293d6a
+  }
