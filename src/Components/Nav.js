@@ -29,94 +29,116 @@ class Nav extends React.Component {
       <nav>
         {this.tokenCheck() ? (
           <ul id="loggedIn">
-            <li>
-              <NavLink
-                exact
-                activeClassName="nav-current-page"
-                className="nav-btn"
-                to={`/events`}
-              >
-                Events
-              </NavLink>
-            </li>
+          <div className="nav-spacing">
+            <li className="nav-link-wrapper">
+                <NavLink
+                  exact
+                  activeClassName="nav-current-page"
+                  className="nav-btn"
+                  to={`/events`}
+                >
+                  Events
+                </NavLink>
+              </li>
+            </div>
+       
+        
+            <div className="nav-spacing">
+              <li className="nav-link-wrapper">
+                <NavLink
+                  exact
+                  activeClassName="nav-current-page"
+                  className="nav-btn"
+                  to={`/createevent`}
+                >
+                  Create Event
+                </NavLink>
+              </li>
+            </div>
 
-            <li>
-              <NavLink
-                exact
-                activeClassName="nav-current-page"
-                className="nav-btn"
-                to={`/createevent`}
-              >
-                Create Event
-              </NavLink>
-            </li>
-
-            <li>
-              <div className="nav-account">
-                My Account
-                <ul className="nav-dropdown">
-                  <li className="nav-sub-link ">
-                    <a href="#" className="nav-btn">
-                      Profile
-                    </a>
-                  </li>
-                  <li className="nav-sub-link">
-                    <Link
-                      to={`/tickets`}
-                    >
-                      Tickets
-                    </Link>
-                  </li>
-                  {/* to={`/tickets`}to={`/tickets`} */}
-                  <li className="nav-sub-link">
-                    <a href="#" className="nav-btn">
-                      Events
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-
-            <li>
-              <div className="nav-btn" onClick={this.logout}>
-                Log Out
-              </div>
-            </li>
+            <div className="nav-spacing">
+              <li>
+                <div className="nav-account">
+                  My Account
+                  <ul className="nav-dropdown">
+                    <li className="nav-sub-link nav-link-wrapper">
+                      <NavLink
+                        className="nav-btn"
+                        to={`/tickets`}
+                      >
+                        My Tickets
+                      </NavLink>
+                    </li>
+                    <li className="nav-sub-link nav-link-wrapper">
+                      <NavLink
+                        to={`/waitLists`}
+                        className="nav-btn"
+                      >
+                        My WaitLists
+                      </NavLink>
+                    </li>
+                  
+                    <li className="nav-sub-link nav-link-wrapper">
+                      <NavLink
+                        to={`/myevents`}
+                        className="nav-btn"
+                      >
+                        My Events
+                      </NavLink>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </div>
+            
+            <div className="nav-spacing">
+              <li className="nav-link-wrapper">
+                <div className="nav-btn" onClick={this.logout}>
+                  Log Out
+                </div>
+              </li>
+            </div>
           </ul>
         ) : (
           <ul id="loggedOut">
-            <li>
-              <NavLink
-                exact
-                activeClassName="nav-current-page"
-                className="nav-btn"
-                to={`/events`}
-              >
-                Events
-              </NavLink>
-            </li>
+            <div className="nav-spacing">
+              <li className="nav-link-wrapper">
+                <NavLink
+                  exact
+                  activeClassName="nav-current-page"
+                  className="nav-btn"
+                  to={`/events`}
+                >
+                  Events
+                </NavLink>
+              </li>
+            </div>
 
-            <li>
-              <NavLink
-                exact
-                activeClassName="nav-current-page"
-                className="nav-btn"
-                to={`/signup`}
-              >
-                Sign Up
-              </NavLink>
-            </li>
+            <div className="nav-spacing">
+              <li className="nav-link-wrapper">
+                <NavLink
+                  exact
+                  activeClassName="nav-current-page"
+                  className="nav-btn"
+                  to={`/signup`}
+                >
+                  Sign Up
+                </NavLink>
+              </li>
+            </div>
 
-            <li>
-              <NavLink
-                exact
-                activeClassName="nav-current-page"
-                className="nav-btn"
-                to={`/login`}
-              >
-                Log In
-              </NavLink>
-            </li>
+            <div className="nav-spacing">
+              <li className="nav-link-wrapper">
+                <NavLink
+                  exact
+                  activeClassName="nav-current-page"
+                  className="nav-btn"
+                  to={`/login`}
+                >
+                  Log In
+                </NavLink>
+              </li>
+            </div>
           </ul>
         )}
       </nav>

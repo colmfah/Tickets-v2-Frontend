@@ -1,23 +1,4 @@
-.card {
-	border: 1px solid #e2e2e2;
-	border-radius: 6px;
-	
-}
 
-.card > .content {
-	padding: 20px;
-	margin: 0;
-}
-
-.card small + form {
-	margin-top: 40px;
-}
-
-
-.card p.footer {
-	margin-bottom: 0;
-	font-size: 15px;
-}
 
 .warning {
 	margin-bottom: 0;
@@ -75,9 +56,6 @@
 	font: 20px Arial, sans-serif;
 }
 
-.navBar{
-	overflow:hidden
-}
 
 @media only screen and (max-width: 1045px) {
 	.wrapper > .content {

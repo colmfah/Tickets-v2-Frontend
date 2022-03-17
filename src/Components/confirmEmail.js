@@ -1,7 +1,11 @@
 import React from 'react'
 import axios from 'axios';
-import {Link} from 'react-router-dom'
+import Nav from "./Nav";
+import { Link } from "react-router-dom";
+import Footer from "./Footer";
 import { withRouter } from 'react-router-dom'
+
+import '../Styles/ConfirmEmail.css'
 
 
 
@@ -25,10 +29,12 @@ class confirmEmail extends React.Component {
         })
     }
     
-    changeField = (e, field) => {
-        let stateCopy = this.state
-        stateCopy[field] = e.target.value
-        this.setState(stateCopy)
+    toggleSell = (value) =>{
+        console.log('value', value)
+        console.log('value', typeof(value))
+
+        let sell = value
+        this.setState({sell})
     }
 
     submit = () => {
@@ -36,30 +42,49 @@ class confirmEmail extends React.Component {
     }
 
 
+
 	render() {
 
 	  return (
-			<>
-				<div>{this.state.message}</div>
-
+        <div className="check-in-container">
+            <Nav />
+            <div className="check-in-form confirm-email-box">
+				<div className="log-in-links">{this.state.message}</div>
                 {this.state.success ? 
                     <form onSubmit={this.submit}>
 
-                        <div>Do you want to connect your Stripe account to sell tickets?</div> 
-                        <select required value={this.state.sell} onChange={event => this.changeField(event, 'sell')}>
-                            <option value="false">No</option>
-                            <option value="true">Yes</option>
-                        </select>
-                        <div>You do not need to connect your Stripe account if you are selling free tickets</div>
+                        <div>Do you want to enable your account to sell tickets?</div> 
+                        <div>
+                            <label>
+                                <input
+                                    type="radio"
+                                    checked={this.state.sell}
+                                    onClick={() => this.toggleSell(true)}
+                                />
+                                {` Yes`}
+                            </label>  
+
+                            <label>
+                                <input
+                                    type="radio"
+                                    checked={!this.state.sell}
+                                    onClick={() => this.toggleSell(false)}
+                                />
+                                {` No`}
+                            </label>   
+                        </div>                  
+                        
                             
 
-                        <button>Submit</button>
+                        <button id="log-in-button">Submit</button>
 
                     </form>
                     :
-                    <Link to={`/signup`}>Sign Up</Link>
+                    <Link to={`/signup`}><button id="log-in-button">Sign Up</button></Link>
                 }
-			</>
+            </div>
+            <Footer />
+		</div>
 		    )
     }
 }

@@ -1,0 +1,168 @@
+.my-event-ticket-details {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: space-between;
+    justify-content: space-around;
+}
+
+.my-event-ticket-detail{
+    text-transform: uppercase;
+    font-weight: normal;
+    padding: 10px 10px 10px 10px
+}
+
+
+
+.my-event-ticket-detail span {
+    font-size: 0.7em;
+    color: #a2aeae;
+}
+
+.my-event-ticket-detail h2 {
+    font-size: 0.9em;
+    color: #525252;
+    margin: 0;
+    text-transform: none;
+    text-align: center;
+}
+
+.my-event-ticket-detail select{
+    color:#525252;
+    font-size: 0.9em;
+    background-color: inherit;
+    font-weight: bold;
+    height: 30px;
+    padding: 0;
+    margin: 0;
+    border-color: #a2aeae;
+    max-width: 90%;
+}
+
+.my-event-ticket-detail input {
+    color:#525252;
+    font-size: 0.9em;
+    background-color: inherit;
+    font-weight: bold;
+    border: 1px solid #a2aeae;
+    border-radius: 5px;
+    height: 30px;
+}
+
+
+
+.my-event-ticket-detail input[type=text], .my-event-ticket-detail input::placeholder{
+    color: #525252;
+    padding-left: 1.5%;
+}
+
+
+.my-event-ticket-price-fine{
+    display: flex;
+    justify-content: space-between;
+}
+.my-event-ticket-detail-fine-hold, .my-event-ticket-detail-fine-no-hold{
+    padding-right: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.my-event-ticket-detail-fine-hold h2, .my-event-ticket-detail-fine-no-hold h2{
+    margin: auto
+}
+
+.my-event-ticket-buttons :hover{
+    transform: scale(1.1);
+    box-shadow: 0 19px 38px rgba(249, 171, 85, 0.3),
+      0 15px 12px rgba(249, 171, 85, 0.22);
+    /* border: 1px solid #f9ab55; */
+    transition: all 0.2s ease-in-out;
+}
+
+.my-event-ticket-buttons button{
+    margin-bottom: 7px;
+    color: #e84c3d;
+    background-color: #FFFF;
+    font-weight: bold;
+    border-radius: 5px;
+    width:min-content;
+    max-width: 95%;
+    padding: 4px 12px;
+}
+
+.my-event-ticket-buttons {
+  text-align: center;
+  margin: auto;
+}
+
+.my-event-tickets {
+    border: 1px solid #8f897c;
+    background-color: #fff;
+    border-radius: 5px;
+    width: fit-content;
+    max-width: min(900px, 95vw); 
+    margin: auto;
+    margin-bottom: 50px;
+    text-align: center;
+}
+
+
+.my-event-title{
+    text-align: center;
+    border: 1px solid #8f897c;
+    border-radius: 5px;
+    width: fit-content;
+    background-color: #fff;
+    margin: auto;
+    margin-top: 100px;
+    margin-bottom: 50px;
+    padding: clamp(1px, 5%, 30px);
+}
+
+.my-event-title h2{
+    color: #293d6a;
+    font-size: clamp(24px, 4vw, 35px);
+    text-align: center;
+    
+}
+
+.my-event-title hr, .my-event-heading hr{
+    color: #293d6a;
+    font-size: clamp(24px, 4vw, 35px);
+    text-align: center;
+    margin: auto;
+    margin-top: 10px;
+}
+
+.my-event-heading{
+
+    text-align: center;
+    width: fit-content;
+    background-color: #fff;
+    margin: auto;
+    margin-top: 20px;
+    max-width: 100%
+
+}
+
+.my-event-heading h2{
+    color: #293d6a;
+    font-size: clamp(24px, 4vw, 35px);
+    text-align: center;
+
+}
+
+.my-event-emails{
+    margin: clamp(1px, 5%, 25px)
+}
+
+.my-event-checkbox-container{
+    padding: 30px
+}
+
+.my-event-container{
+    padding-bottom: 2.5em
+}
+
+
+
+

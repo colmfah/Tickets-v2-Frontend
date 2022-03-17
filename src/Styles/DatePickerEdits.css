@@ -1,6 +1,8 @@
 
 
-.datePicker {
+#datePicker {
+	border: none;
+	background-color: transparent;
 	border-width: 0
 }
 

@@ -14,6 +14,7 @@ class Tickets extends React.Component {
       name: "",
       _id: "",
       ticketsBought: [],
+      waitLists: [],
       usersEvents: []
     }
   };
@@ -25,77 +26,11 @@ class Tickets extends React.Component {
     };
     axios
       .post(`${process.env.REACT_APP_API}/profile`, objectToSend)
-      .then(res => {
-				console.log('comp mount', res.data)
-        this.setState({
-          user: res.data
-        });
-      })
+      .then(res => {this.setState({ user: res.data})})
       .catch(err => console.log(err));
   }
 
-  updateState = (updatedUserData) => {
-    console.log('updatedUserData')
-    let user = this.state.user
-    user.ticketsBought = updatedUserData.ticketsBought
-    this.setState({user})
-  }
 
-  turnScannerOnOff = usersEvent => {
-    let stateCopy = this.state.user.usersEvents;
-    stateCopy.map(e => {
-      if (e._id === usersEvent._id) {
-        e.checkIn = !e.checkIn;
-        return e;
-      }
-    });
-
-    this.setState({
-      usersEvents: stateCopy
-    });
-  };
-
-  handleScan = (data, usersEvent) => {
-    if (data) {
-      this.turnScannerOnOff(usersEvent);
-
-      let stateCopy = this.state.user.usersEvents;
-      stateCopy.map(e => {
-        if (e._id === usersEvent._id) {
-          e.message = "QR code scanned. Checking database for match...";
-          return e;
-        }
-        this.setState({
-          usersEvents: stateCopy
-        });
-      });
-
-      axios
-        .post(`${process.env.REACT_APP_API}/checkIn`, {
-          qrcode: data,
-          eventid: usersEvent._id
-        })
-        .then(res => {
-          let stateCopy = this.state.user.usersEvents;
-          stateCopy = stateCopy.map(e => {
-            if (e._id === usersEvent._id) {
-              e.message = res.data;
-              return e;
-            }
-          });
-          this.setState({
-            usersEvents: stateCopy
-          });
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    }
-  };
-
-  handleError = err => {
-    console.error(err);
-  };
 
   render() {
     return (

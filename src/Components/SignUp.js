@@ -3,7 +3,7 @@ import axios from "axios"
 import { Link } from "react-router-dom"
 import Nav from "./Nav"
 import React from "react"
-import '../Styles/Grid.css'
+import Footer from "./Footer";
 import '../Styles/Cards.css'
 import '../Styles/Forms.css'
 import '../Styles/Buttons.css'
@@ -17,7 +17,8 @@ class SignUp extends React.Component {
       email: "",
       name: "",
       password: "",
-    }
+    },
+    displaySpinner: false
   }
 
   changeField = (e, field) => {
@@ -28,78 +29,61 @@ class SignUp extends React.Component {
 
   signup = e => {
     e.preventDefault()
-    axios.post(`${process.env.REACT_APP_API}/users`, this.state.user).then(res => {       
-      this.setState({ message: res.data.message})}).catch(err => {console.log(err)})
+    let displaySpinner = true
+    this.setState({displaySpinner})
+    axios.post(`${process.env.REACT_APP_API}/users`, this.state.user)
+    .then(res => {       
+      this.setState({ message: res.data.message, displaySpinner: false})})
+    .catch(err => {this.setState({ message: String(err), displaySpinner: false})})
+  }
+
+  spinnerVisibility(){
+    if(this.state.displaySpinner ){return {'display': 'block'}}
+    return {'display': 'none'}
   }
 
   render() {
     return (
-      <>
-        <div className="pageGrid2Rows">
-          
-          <div className="navBar" > <Nav /></div>  
-               
-
-          <div className="formColumnGrid">
-            <div></div>
-
-            <div className ="formRowGrid">
-              <div></div>
-              <div className="theForm card">
-                <div class ="content">
-
-
-                  <form onSubmit={this.signup}>
-                    <div className="group">
-                      <input
-                        className = "toggleBorder"
-                        required
-                        value={this.state.user.name}
-                        onChange={event => this.changeField(event, 'name')}
-                        type={'text'}
-                        placeholder={'Your Name'}
-                      />
-                    </div>
-            
-                    <div className="group">
-                      <input
-                        className = "toggleBorder"
-                        required
-                        value={this.state.user.email}
-                        onChange={event => this.changeField(event, 'email')}
-                        type={'email'}
-                        placeholder={'Email Address'}
-                      />
-                    </div>
-                
-                    <div className="group">
-                      <input
-                        className = "toggleBorder"
-                        required
-                        value={this.state.user.password}
-                        minLength={"8"}
-                        onChange={event => this.changeField(event, 'password')}
-                        type={'password'}
-                        placeholder={'Password'}
-                      />
-                    </div>
-                
-                
-                      <button className="primary">Sign Up</button>
-                
-                  </form>
-                  <p className="warning">{this.state.message}</p>
-                  <p className="footer">Already have an account? <Link to="/login">Login</Link> </p>
-
-                  
-                </div>
-              </div>
-              <div></div>
+      <div className="check-in-container">   
+        <Nav/>           
+          <form className="check-in-form" onSubmit={this.signup}>
+            <div className="check-in-heading">
+                <h2>Sign Up</h2>
+                <hr />
             </div>
-            <div></div>
-          </div>
-        </div>
-      </>
+            <input
+              required
+              value={this.state.user.name}
+              onChange={event => this.changeField(event, 'name')}
+              type={'text'}
+              placeholder={'Your Name'}
+            />
+            <input
+              required
+              value={this.state.user.email}
+              onChange={event => this.changeField(event, 'email')}
+              type={'email'}
+              placeholder={'Email Address'}
+            />
+            <input
+              required
+              value={this.state.user.password}
+              minLength={"8"}
+              onChange={event => this.changeField(event, 'password')}
+              type={'password'}
+              placeholder={'Password'}
+            />
+            <div className="check-in-spinner-message" id="log-in-spinner-message">
+              <div style={this.spinnerVisibility()} className ='ticket-spinner'>
+                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div> 
+              </div>
+              <div className="log-in-message">{this.state.message}</div>
+            </div>
+            <button id="log-in-button">Sign Up</button>
+            <p className="log-in-links">Already have an account? <Link to="/login">Login</Link> </p>
+          </form>
+          <Footer />
+      </div>
     )
   }
 }

@@ -11,168 +11,189 @@ class Cancellations extends React.Component {
       ticketTypesEquivalent: "none",
       optionSelected: "none",
       untilSpecific: "none",
+      minimumPrice:"none",
     },
     errors: {
       ticketTypesEquivalent: "",
       optionSelected: "",
-      refundUntil: "",
+      untilSpecific: "",
+      minimumPrice:''
     },
   };
 
-  checkForErrors = (field, data, values) => {
+  checkForErrors(values){
+    this.checkForOptionSelectedError(values)
+    this.checkForReSalePriceErrors(values)
+  };
+
+  checkForOptionSelectedError(values){
     let borderColors = this.state.borderColors;
     let errors = this.state.errors;
     let warning = "";
+    console.log('values.globalRefundOptions.optionSelected', values.globalRefundOptions.optionSelected)
+    if(values.globalRefundOptions.optionSelected === ''){warning = "Please Select Refund Option"} 
+    borderColors.optionSelected = "#00988f"
+    if(warning !== ""){borderColors.optionSelected = "red"}
+    errors.optionSelected = warning
+    console.log('errors', errors)
+    this.setState({ borderColors, errors })
+  }
 
-    if (data === "") {
-      if (field === "ticketTypesEquivalent") {
-        warning = "Are All Ticket Types Equivalent Once Customer Enters Event?";
-      } else if (field === "optionSelected") {
-        warning = "Please Select Cancellation Option";
-      } else if (field === "refundUntil") {
-        warning = "When Do You Want To Allow Cancellations Until?";
-      }
-      borderColors[field] = "tomato";
-    } else {
-      borderColors[field] = "#00988f";
-    }
+  checkForSpecificTimeError(field, values){
+    if (field !== "untilSpecific"){return}
+    let borderColors = this.state.borderColors;
+    let errors = this.state.errors;
+    let warning = "";
+    if(values.globalRefundOptions.untilSpecific = ''){warning = "When Do You Want To Allow Refunds Until?"} 
+    if (moment(values.globalRefundOptions.untilSpecific).isAfter(moment(values.endDetails))){warning = `You Cannot Allow Cancellations After the Event Has Ended`}
+    borderColors[field] = "#00988f"
+    if(warning !== ''){borderColors[field] = "red"}
+    errors[field] = warning
+    this.setState({ borderColors, errors })
+  }
 
-    if (field === "refundUntil") {
-      if (moment(data).isAfter(moment(values.endDetails))) {
-        warning = `You Cannot Allow Cancellations After the Event Has Ended`;
-      }
-      borderColors[field] = "tomato";
-    }
-
-    errors[field] = warning;
-    this.setState({ borderColors, errors });
-  };
-
-  continue = (e, values, submit, fines) => {
+  continue(e, values){
     e.preventDefault();
-
-    if (fines.length > 0) {
-      this.checkForErrors(
-        "optionSelected",
-        values.globalRefundOptions.optionSelected,
-        values
-      );
-    }
-
-    if (values.globalRefundOptions.optionSelected === "untilSpecific") {
-      console.log("refundUntil triggered");
-
-      this.checkForErrors(
-        "refundUntil",
-        values.globalRefundOptions.refundUntil,
-        values
-      );
-    }
-
-    if (values.tickets.length > 1) {
-      this.checkForErrors(
-        "ticketTypesEquivalent",
-        values.ticketTypesEquivalent,
-        values
-      );
-    }
-
-    if (
-      this.state.errors.ticketTypesEquivalent === "" &&
-      this.state.errors.optionSelected === "" &&
-      this.state.errors.refundUntil === ""
-    ) {
-      submit(e);
-    }
+    this.checkForErrors(values)
+    let errors = Object.values(this.state.errors).filter(e=> e!== '')
+    console.log('errors', errors)
+    if(errors.length > 0){return}
+    this.props.submit(e);
   };
 
   handleChange = (e, field, values) => {
-    field === "ticketTypesEquivalent"
-      ? this.props.changeField(e, field)
-      : this.props.handleRefundChange(e, field);
-    field === "refundUntil"
-      ? this.checkForErrors(field, e, values)
-      : this.checkForErrors(field, e.target.value);
+    this.props.handleRefundChange(e, field);
+    if(field === 'optionSelected'){this.checkForOptionSelectedError(values)}
   };
 
-  turnBorderOrange(field) {
+
+  displayDatePicker(values){
+    if(values.globalRefundOptions.optionSelected !== "untilSpecific" ){return}
+      return (
+        <div>
+          <p className="create-event-warning">{this.state.errors.untilSpecific}</p>
+          <div
+            className="datePickerDiv"
+            style={{ borderColor: this.state.borderColors.untilSpecific,}}
+          >
+            <DatePicker
+              className="datePicker"
+              timeIntervals={15}
+              selected={values.globalRefundOptions.untilSpecific}
+              placeholderText="Select Date"
+              onChange={(event) => this.handleChange(event, "untilSpecific", values)}
+              showTimeSelect
+              dateFormat="Pp"
+              required
+            />
+          </div>
+        </div>
+      )
+  }
+
+  displaySpecificPriceOption(values){
+    if(values.globalRefundOptions.optionSelected !== "excessDemand" ){return}
+    return(
+    <div>
+      <p className="create-event-warning price">{this.state.errors.minimumPrice}</p>
+      <input
+          required
+          type="number"
+          value={values.globalRefundOptions.minimumPrice}
+          onChange={(event) => this.handleChange(event, "minimumPrice", values)}
+          onBlur={() => this.checkForReSalePriceErrors()}
+          placeholder="Resale Price (€)"
+          min={this.getHighestPrice()}
+          style={{borderColor: this.state.borderColors.minimumPrice}}
+      />
+    </div>)
+  }
+
+  checkForReSalePriceErrors(){
+    const { values } = this.props
+    if(values.globalRefundOptions.optionSelected !== "excessDemand" ){return}
     let borderColors = this.state.borderColors;
     let errors = this.state.errors;
-    errors[field] = "";
-    borderColors[field] = "#ff8c00";
-    this.setState({ borderColors });
+    let warning = ""
+    console.log('values.globalRefundOptions.minimumPrice ', values.globalRefundOptions.minimumPrice )
+    if(values.globalRefundOptions.minimumPrice === ''){warning = "Resale Price Required"} 
+    if(values.globalRefundOptions.minimumPrice < this.getHighestPrice()){warning = `You Can't Sell Refunded Tickets For Less Than Original Price (${this.getHighestPrice()})`} 
+    borderColors.minimumPrice = "#00988f"
+    if(warning !== ''){borderColors.minimumPrice = "red"}
+    errors.minimumPrice = warning
+    this.setState({ borderColors, errors })
   }
+
+
+  getHighestPrice(){
+    return this.props.values.tickets.map(e=>e.price).sort((a,b) => b- a)[0]
+  }
+
+  spinnerVisibility(){
+    if(this.props.displaySpinner ){return {'display': 'block'}}
+    return {'display': 'none'}
+}
+
+
+
 
   render() {
     const { values } = this.props;
-    let fines = values.tickets
-      .filter((e) => Number(e.chargeForNoShows) > 0)
-      .map((e) => e.ticketType);
-    let ticketTypesEquivalentColor;
-    let optionSelectedColor;
 
-    values.ticketTypesEquivalent === ""
-      ? (ticketTypesEquivalentColor = "rgb(118, 118, 118)")
-      : (ticketTypesEquivalentColor = "black");
-    values.globalRefundOptions.optionSelected === ""
-      ? (optionSelectedColor = "rgb(118, 118, 118)")
-      : (optionSelectedColor = "black");
 
     return (
-      <>
-        <div className="pageGrid2Rows">
-          <div className="navBar">
-            <Nav />
-          </div>
-
-          <div className="formRowGrid">
-            <div></div>
-
-            <div className="wrapper">
-              <div></div>
-
-              <div className="content threeRowGridToCenterContent">
-                <div></div>
+      <div className="create-event-container">
+        <Nav />
+        <form className="create-event-form" >                           
+          <div className="create-event-heading">
+              <header>Create Event</header>
+              <hr />
+          </div>    
+          <p className="create-event-warning">{this.state.errors.optionSelected}</p>
+          <div className="create-event-radio-container" style={{borderColor: this.state.borderColors.optionSelected  }} >
+            <div>Select Refund Option</div> 
+            <div className='create-event-radio-wrapper' >
                 <div>
-                  <form>
-                    {values.tickets.length > 1 && (
-                      <div>
-                        <p className="warning">
-                          {this.state.errors.ticketTypesEquivalent}
-                        </p>
-                        <div className="group">
-                          <select
-                            required
-                            value={values.ticketTypesEquivalent}
-                            onBlur={() =>
-                              this.checkForErrors(
-                                "ticketTypesEquivalent",
-                                values.ticketTypesEquivalent
-                              )
-                            }
-                            onChange={(event) =>
-                              this.handleChange(event, "ticketTypesEquivalent")
-                            }
-                            onFocus={() =>
-                              this.turnBorderOrange("ticketTypesEquivalent")
-                            }
-                            style={{
-                              color: ticketTypesEquivalentColor,
-                              borderColor: this.state.borderColors
-                                .ticketTypesEquivalent,
-                            }}
-                          >
-                            <option value="" disabled>
-                              Are all ticket types equivalent?
-                            </option>
-                            <option value={true}>Yes</option>
-                            <option value={false}>No</option>
-                          </select>
-                        </div>
-                      </div>
-                    )}
+                    <input
+                        type="radio"
+                        checked={values.globalRefundOptions.optionSelected ==='excessDemand'}
+                        value="excessDemand"
+                        onChange={(event) => this.handleChange(event, "optionSelected", values)}
+                    />
+                    {` Only If New Customers Are Waiting To Buy`}
+                </div>
+                <div>
+                <input
+                        type="radio"
+                        checked={values.globalRefundOptions.optionSelected ==='noRefunds'}
+                        value="noRefunds"
+                        onChange={(event) => this.handleChange(event, "optionSelected", values)}
+                    />
+                    {` No Refunds Allowed`}
+                </div>
+            </div>
+          </div>
+    
+        {this.displaySpecificPriceOption(values)}
+        <p className="create-event-warning">{this.props.errorMessage}</p>
+        <div style={this.spinnerVisibility()}   className ='ticket-spinner'>
+                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+          <div className="create-event-button-container">
+          <button className="create-event-button" onClick={(event) => this.props.prevStep(event)}>
+              Go Back
+            </button>
+            <button className="create-event-button green-button" onClick={(event) => this.continue(event, values)}>
+              Submit Event
+            </button>
+          </div>
+        </form>
 
-                    {fines.length > 0 && (
+      </div>
+
+
+
+                  /* {fines.length > 0 && (
                       <div>
                         <p className="warning">
                           {this.state.errors.optionSelected}
@@ -189,9 +210,6 @@ class Cancellations extends React.Component {
                             }
                             onChange={(event) =>
                               this.handleChange(event, "optionSelected", values)
-                            }
-                            onFocus={() =>
-                              this.turnBorderOrange("optionSelected")
                             }
                             style={{
                               color: optionSelectedColor,
@@ -214,148 +232,8 @@ class Cancellations extends React.Component {
                           </select>
                         </div>
                       </div>
-                    )}
+                    )} */
 
-                    <div>
-                      <p className="warning">
-                        {this.state.errors.optionSelected}
-                      </p>
-                      <div className="group">
-                        <select
-                          required
-                          value={values.globalRefundOptions.optionSelected}
-                          onBlur={() =>
-                            this.checkForErrors(
-                              "optionSelected",
-                              values.globalRefundOptions.optionSelected
-                            )
-                          }
-                          onChange={(event) =>
-                            this.handleChange(event, "optionSelected", values)
-                          }
-                          onFocus={() =>
-                            this.turnBorderOrange("optionSelected")
-                          }
-                          style={{
-                            color: optionSelectedColor,
-                            borderColor: this.state.borderColors.optionSelected,
-                          }}
-                        >
-                          <option value="" disabled>
-                            Allow Customers To Cancel Tickets?
-                          </option>
-                          <option value="excessDemand">
-                            Only If New Customers Are Waiting To Buy
-                          </option>
-                          <option value="untilSpecific">
-                            Until Specific Date And Time
-                          </option>
-                          <option value="noRefunds">
-                            No Cancellations Allowed{" "}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-
-                    {values.globalRefundOptions.optionSelected ===
-                      "untilSpecific" && (
-                      <div>
-                        <p className="warning">
-                          {this.state.errors.refundUntil}
-                        </p>
-                        <div
-                          className="group datePickerDiv"
-                          style={{
-                            borderColor: this.state.borderColors.refundUntil,
-                          }}
-                        >
-                          <DatePicker
-                            className="datePicker"
-                            timeIntervals={15}
-                            selected={values.globalRefundOptions.refundUntil}
-                            placeholderText="Select Date"
-                            onBlur={() =>
-                              this.checkForErrors(
-                                "refundUntil",
-                                values.globalRefundOptions.refundUntil,
-                                values
-                              )
-                            }
-                            onChange={(event) =>
-                              this.handleChange(event, "refundUntil", values)
-                            }
-                            onFocus={() => this.turnBorderOrange("refundUntil")}
-                            showTimeSelect
-                            dateFormat="Pp"
-                            required
-                          />
-                        </div>
-                      </div>
-                    )}
-
-
-                    {values.globalRefundOptions.optionSelected !== "noRefunds" && 
-                      <div>
-
-                        <select
-                          required
-                          value={values.globalRefundOptions.howToResell}
-                          onChange={(event) =>
-                            this.handleChange(event, "howToResell", values)
-                          }
-                        >
-                        <option value="" disabled>
-                            Price to resell refunded tickets
-                          </option>
-                          {/* <option value="originalPrice">
-                            Charge Original Price 
-                            only available for TTNE
-                          </option> */}
-                          <option value="specificPrice">
-                            Charge Specific Price
-                          </option>
-                          <option value="auction">
-                            Auction To the Highest Bidder
-                          </option>
-
-                        </select>
-
-                        {/* run test to ensure that it is not cheaper than original price (or than lowest price for TTE) */}
-
-                      </div>
-                    
-                    
-                    
-                    
-                    }
-
-                    <div className="group buttonContainer">
-                      <button
-                        className="primary lhsbutton"
-                        onClick={(event) =>
-                          this.continue(event, values, this.props.submit, fines)
-                        }
-                      >
-                        Submit Event
-                      </button>
-                      <button
-                        className="secondary rhsbutton"
-                        onClick={(event) => this.props.prevStep(event)}
-                      >
-                        Go Back
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-
-              <div></div>
-            </div>
-
-            <div></div>
-          </div>
-        </div>
-      </>
 
       // <>
       //     {/* <h1>Cancellation Policy For Free Tickets</h1> */}
@@ -405,10 +283,10 @@ class Cancellations extends React.Component {
       //                 <div>
       //                     <DatePicker
       //                         timeIntervals={15}
-      //                         selected={values.globalRefundOptions.refundUntil}
+      //                         selected={values.globalRefundOptions.untilSpecific}
       //                         placeholderText="Select Date"
       //                         onChange={event =>
-      //                             this.props.handleRefundChange(event, "refundUntil", 'not relevant')
+      //                             this.props.handleRefundChange(event, "untilSpecific", 'not relevant')
       //                         }
       //                         showTimeSelect
       //                         dateFormat="Pp"
@@ -451,6 +329,8 @@ class Cancellations extends React.Component {
       //     } */}
 
       // </>
+
+      
     );
   }
 }

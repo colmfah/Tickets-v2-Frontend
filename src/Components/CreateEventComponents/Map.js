@@ -1,7 +1,7 @@
 import React from 'react'
 import { withGoogleMap, GoogleMap, withScriptjs, Marker } from "react-google-maps";
 import Geocode from "react-geocode"
-import '../../Styles/Grid.css'
+// import '../../Styles/Grid.css'
 import '../../Styles/Cards.css'
 import '../../Styles/Forms.css'
 import '../../Styles/Buttons.css'
@@ -88,9 +88,9 @@ class Map extends React.Component{
    
 
         return(
-            <> 
+            <div className='create-event-map'> 
                 {map}       
-            </>
+            </div>
         )
     }
 }

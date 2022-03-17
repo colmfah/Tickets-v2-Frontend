@@ -1,0 +1,12 @@
+.confirm-email-box{
+    max-width: 95vw;
+}
+
+.confirm-email-box div, .confirm-email-box p, .confirm-email-box a{
+    margin-top: 20px;
+    margin-bottom: 20px
+}
+
+.confirm-email-box input:nth-child(1){
+    margin-left: 10px
+}

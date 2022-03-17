@@ -1,7 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-
-import "../Styles/Footer.css";
+import '../Styles/Footer.css'
 
 class Footer extends React.Component {
 

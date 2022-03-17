@@ -1,13 +1,10 @@
 import React, { Component } from 'react'
 import Nav from "../Nav";
+import Footer from "../Footer";
 import moment from "moment";
 import DatePicker from "react-datepicker";
-import '../../Styles/Grid.css'
-import '../../Styles/Cards.css'
-import '../../Styles/Forms.css'
-import '../../Styles/Buttons.css'
-import '../../Styles/Global.css'
-import '../../Styles/Nav.css'
+import '../../Styles/CreateEvent.css'
+
 
 export class EventDetails extends Component {
 
@@ -16,7 +13,8 @@ export class EventDetails extends Component {
             title: '',
             region: '',
             startDetails: '',
-            endDetails: ''
+            endDetails: '',
+            description: ''
         },
         borderColors:{
             title: 'none',
@@ -25,7 +23,8 @@ export class EventDetails extends Component {
             startDetails: 'none',
             endDetails: 'none',
             eventPassword: 'none',  
-        }
+        },
+        textAreaHeight: '100px'
     }
 
     componentDidMount(){
@@ -51,8 +50,16 @@ export class EventDetails extends Component {
 
     checkDescriptionError(){
         let borderColors = this.state.borderColors
-        borderColors.description = '#00988f'  
-        this.setState({ borderColors})
+        let errors = this.state.errors
+        if(this.props.values.description === ''){
+            errors.description = 'Please Provide A Description'
+            borderColors.description = 'red'
+        }
+        else{
+            errors.description = ''
+            borderColors.description = '#00988f'       
+        }
+        this.setState({ borderColors, errors})
     }
 
     changeEndDetails(e){
@@ -69,14 +76,6 @@ export class EventDetails extends Component {
         this.setState({eventPassword, errors})
     }
 
-    changeRegion(e){
-        this.props.changeField(e, 'region')
-        let region = e.target.value
-        let errors = this.state.errors
-        errors.region = ''   
-        this.setState({errors}) 
-        this.checkRegionError(region)       
-    }
 
     changeTitle(e){
         let title = e.target.value
@@ -96,13 +95,20 @@ export class EventDetails extends Component {
     checkEndDetailsError(values){        
         let borderColors = this.state.borderColors
         let errors = this.state.errors
-        if(values.endDetails === ''){
+        if(moment(values.startDetails).isValid() && values.endDetails === ''){
             errors.endDetails = 'Please Provide An End Time'
-            borderColors.endDetails = 'tomato'
-        }else if(!moment(values.endDetails).isAfter(moment(values.startDetails))){
+            borderColors.endDetails = 'red'
+        }
+        else if(moment(values.startDetails).isValid() && !moment(values.endDetails).isAfter(moment(values.startDetails))){
+         
             errors.endDetails ='Your Event Must End After It Starts'
-            borderColors.endDetails = 'tomato'
-        }else{
+            borderColors.endDetails = 'red'
+        }
+        else if(!moment(values.endDetails).isAfter(moment())){
+            errors.endDetails = 'Your Event Must End In The Future'
+            borderColors.endDetails = 'red'
+        }
+        else{
             errors.endDetails = ''
             borderColors.endDetails = '#00988f'       
         }
@@ -116,7 +122,7 @@ export class EventDetails extends Component {
         let errors = this.state.errors
         if(values.eventPassword.length < 6){
             errors.eventPassword = 'Your Password Must Be At Least 6 Characters'
-            borderColors.eventPassword = 'tomato'
+            borderColors.eventPassword = 'red'
         }
         else{
             errors.eventPassword = ''
@@ -132,7 +138,7 @@ export class EventDetails extends Component {
         
         if(region === ''){
             errors.region = 'Please Select Your Region'
-            borderColors.region = 'tomato'
+            borderColors.region = 'red'
         }else{
             errors.region = ''
             borderColors.region = '#00988f' 
@@ -141,16 +147,19 @@ export class EventDetails extends Component {
     }
 
     checkStartDetailsError(values){    
+        console.log('checkStartDetailsError')
         let borderColors = this.state.borderColors
         let startDetails = values.startDetails
         let errors = this.state.errors
         if(startDetails === ''){
             errors.startDetails = 'Please Provide A Start Time'
-            borderColors.startDetails = 'tomato'
+            borderColors.startDetails = 'red'
         }
         else if(!moment(startDetails).isAfter(moment())){
+            console.log('moment(startDetails)', moment(startDetails).format('DD MM YY'))
+            console.log('moment()', moment().format('DD MM YY'))
             errors.startDetails = 'Your Event Must Start In The Future'
-            borderColors.startDetails = 'tomato'
+            borderColors.startDetails = 'red'
         }else{
             errors.startDetails = ''
             borderColors.startDetails = '#00988f'       
@@ -163,7 +172,7 @@ export class EventDetails extends Component {
         let errors = this.state.errors
         if(title === ''){
             errors.title = 'Please Name Your Event'
-            borderColors.title = 'tomato'
+            borderColors.title = 'red'
         }
         else{
             errors.title = ''
@@ -172,13 +181,13 @@ export class EventDetails extends Component {
         this.setState({ borderColors, errors})
     }
 
-    continue(values){ 
-        
+    continue(event, values){ 
+        event.preventDefault()
         this.checkTitleError(values.title)
-        this.checkRegionError(values.region)
         this.checkStartDetailsError(values)
         this.checkEndDetailsError(values)
         this.checkPasswordError(values)
+        this.checkDescriptionError(values.title)
 
 
         let errors = Object.entries(this.state.errors)
@@ -191,166 +200,121 @@ export class EventDetails extends Component {
         })
 
         if(elementsWithErrors.length > 0 ){
-            document.getElementById(elementsWithErrors[0]).scrollIntoView({behavior: "smooth"})
+            document.getElementsByClassName('create-event-container')[0].scrollIntoView({behavior: "smooth"})
         }else{
  
             this.props.nextStep() 
         }
     }
 
-    turnBorderOrange(e, field){
-        e.preventDefault()
-        console.log('border orange');
-        
-
-        let borderColors = this.state.borderColors
-        borderColors[field] = '#ff8c00'
-        console.log(borderColors);
-        
-        this.setState({borderColors})
-    }
 
 
-   
+      handleTextAreaChange(e){
+        e.target.style.height = 'inherit';
+        e.target.style.height = `${e.target.scrollHeight}px`; 
+        this.handleFieldChange(e, 'description')
+      }
+
+      checkForDateErrors(event, startDetails=false){
+        event.preventDefault()
+        this.checkStartDetailsError(this.props.values)
+        if(startDetails){return}
+        this.checkEndDetailsError(this.props.values)
+      }
+
+      resetError(field){
+          let errors = this.state.errors
+          let borderColors = this.state.borderColors
+          errors[field]=''
+          borderColors[field] = 'none' 
+          this.setState({ borderColors, errors})
+      }
+
+      handleFieldChange(event, field){
+        this.resetError(field)
+        this.props.changeField(event, field)
+      }
+    
+
 
 
     
     render() {
         const {values} = this.props
-        let selectColor
-        values.region === '' ? selectColor = 'rgb(118, 118, 118)' : selectColor = 'black'
-
-        console.log('values.startDetails',values.startDetails)
-        console.log('type of',typeof(values.startDetails))
-
 
         return (
-            <>
-                <div className="pageGrid2Rows">
-                
-                    <div className="navBar"><Nav /></div>
-                        
-                    <div className="formColumnGrid">
-                        
-                        <div></div>
-                            <div className ="formRowGrid">
-                                <div></div>
-                                <div className="theForm card">
-                                    <div class ="content">
-
-                                        <form>
-                                            <p className='warning' id="title">{this.state.errors.title}</p>
-                                            <div className="group">
-                                                <input
-                                                    required
-                                                    value={values.title}
-                                                    onChange={event => this.props.changeField(event, 'title')}
-                                                    onFocus={event => this.turnBorderOrange(event, 'title')}
-                                                    onBlur={event => this.checkTitleError(values.title)}
-                                                    type='text'
-                                                    placeholder='Event Name'
-                                                    style={{borderColor: this.state.borderColors.title}}
-                                                />
-                                                
-                                                
-                                            </div>
-                                    
-                                            <div className="group">
-                                                <textarea
-                                                    value={values.description}
-                                                    required
-                                                    onChange={event => this.props.changeField(event, 'description')}
-                                                    onFocus={event => this.turnBorderOrange(event, 'description')}
-                                                    onBlur={event => this.checkDescriptionError(event)}
-                                                    type='text'
-                                                    placeholder='Describe The Event'
-                                                    style={{borderColor: this.state.borderColors.description}}
-                                                />
-                                            </div>
-                                            
-                                            <p className='warning' id="region">{this.state.errors.region}</p>
-                                            <div className="group">
-                                                <select
-                                                    required		
-                                                    value={values.region}
-                                                    onChange={event => this.changeRegion(event)}
-                                                    onFocus={event => this.turnBorderOrange(event, 'region')}
-                                                    onBlur={event => this.checkRegionError(values.region)}                           
-                                                    style={{ color: selectColor, borderColor: this.state.borderColors.region }}
-                                                >
-                                                    <option value="" disabled>Select your Region</option>
-                                                    <option value="dublin">Dublin</option>
-                                                    <option value="cork">Cork</option>
-                                                    <option value="other">Other</option>
-                                                </select>
-                                                
-                                            </div>
-                                    
-
-                                            <p className='warning' id="startDetails">{this.state.errors.startDetails}</p>
-                                            <div className="group datePickerDiv" style={{borderColor: this.state.borderColors.startDetails }}>
-                                                
-                                                <DatePicker
-                                                    className="datePicker"
-                                                    timeIntervals={15}
-                                                    selected={values.startDetails}
-                                                    onChange={event => this.props.changeField(event, 'startDetails')}
-                                                    onFocus={event => this.turnBorderOrange(event, 'startDetails')}
-                                                    onBlur={() =>this.checkStartDetailsError(values)}
-                                                    showTimeSelect
-                                                    dateFormat="d MMM yyyy HH:mm"
-                                                    required
-                                                    placeholderText={'Date & Time Event Starts'}
-                                                    style={{borderColor: this.state.borderColors.startDetails}}
-                                                />
-                                            </div>
-                                            
-                                    
-                                        
-                                            <p className='warning' id="endDetails">{this.state.errors.endDetails}</p>
-                                            <div className="group datePickerDiv" style={{borderColor: this.state.borderColors.endDetails }}>
-                                                <DatePicker
-                                                    className="datePicker"
-                                                    timeIntervals={15}
-                                                    selected={values.endDetails}
-                                                    onChange={event => this.props.changeField(event, 'endDetails')}
-                                                    onBlur={() =>this.checkEndDetailsError(values)}
-                                                    onFocus={event => this.turnBorderOrange(event, 'endDetails')}
-                                                    showTimeSelect
-                                                    dateFormat="d MMM yyyy HH:mm"
-                                                    required
-                                                    placeholderText={'Date & Time Event Ends'}
-                                                />
-                                            </div>
-
-                                            <p className='warning' id="eventPassword">{this.state.errors.eventPassword}</p>
-                                            <div className="group">
-                                                <input
-                                                    value={values.eventPassword}
-                                                    required
-                                                    onChange={event => this.props.changeField(event, 'eventPassword')}
-                                                    onBlur={() =>this.checkPasswordError(values)}
-                                                    onFocus={event => this.turnBorderOrange(event, 'eventPassword')}
-                                                    type='password'
-                                                    placeholder='Password To Check Customers In'
-                                                    style={{borderColor: this.state.borderColors.eventPassword}}
-                                                />
-                                            </div>
-
-                                            <button className="primary" onClick={() => this.continue(values)}>Continue</button>
-
-                                        </form>
-                                        
-                                    </div>
-                                </div>
-                                <div></div>
-                            </div>
-                        <div></div>
-                        
+            <div className="create-event-container">
+                <Nav />
+                <form className="create-event-form">
+                <div className="create-event-heading">
+                    <header>Create Event</header>
+                    <hr />
+                </div>    
+                <p className='create-event-warning' id="title">{this.state.errors.title}</p>
+                    <input
+                        required
+                        value={values.title}
+                        onChange={event => this.handleFieldChange(event, 'title')}
+                        onBlur={event => this.checkTitleError(values.title)}
+                        type='text'
+                        placeholder='Event Name'
+                        style={{borderColor: this.state.borderColors.title}}
+                    />
+                    <p className='create-event-warning' id="startDetails">{this.state.errors.startDetails}</p>
+                    <div className="datePickerDiv" style={{borderColor: this.state.borderColors.startDetails }}>
+                        <DatePicker
+                            id="datePicker"
+                            timeIntervals={15}
+                            selected={values.startDetails}
+                            onChange={event => this.handleFieldChange(event, 'startDetails')}
+                            onBlur={(event) => this.checkForDateErrors(event, true)}
+                            showTimeSelect
+                            dateFormat="d MMM yyyy HH:mm"
+                            required
+                            placeholderText={'Date & Time Event Starts'}
+                            style={{borderColor: this.state.borderColors.startDetails}}
+                        />
                     </div>
-                
-                </div>
-            </>
+                    <p className='create-event-warning' id="endDetails">{this.state.errors.endDetails}</p>
+                    <div className="datePickerDiv" style={{borderColor: this.state.borderColors.endDetails }}>
+                        <DatePicker
+                            id="datePicker"
+                            timeIntervals={15}
+                            selected={values.endDetails}
+                            onChange={event => this.handleFieldChange(event, 'endDetails')}
+                            onBlur={event => this.checkForDateErrors(event)}
+                            showTimeSelect
+                            dateFormat="d MMM yyyy HH:mm"
+                            required
+                            placeholderText={'Date & Time Event Ends'}
+                            style={{borderColor: 'purple'}}
+                        />
+                    </div>
+                    <p className='create-event-warning' id="eventPassword">{this.state.errors.eventPassword}</p>
+                    <input
+                        value={values.eventPassword}
+                        required
+                        onChange={event => this.handleFieldChange(event, 'eventPassword')}
+                        onBlur={() =>this.checkPasswordError(values)}
+                        type='password'
+                        placeholder='Password To Check Customers In'
+                        style={{borderColor: this.state.borderColors.eventPassword}}
+                    />          
+                    <p className='create-event-warning' id="description">{this.state.errors.description}</p>
+                    <textarea
+                        value={values.description}
+                        required
+                        minlength="6"
+                        onChange={event => this.handleTextAreaChange(event)}
+                        onBlur={event => this.checkDescriptionError(event)}
+                        type='text'
+                        placeholder='Describe The Event'
+                        style={{borderColor: this.state.borderColors.description, height: this.state.textAreaHeight}}
+                    />
+                    <button className="create-event-button" onClick={(event) => this.continue(event, values)}>Continue</button>
+                </form>
+                <Footer />
+            </div>
   
         )
     }

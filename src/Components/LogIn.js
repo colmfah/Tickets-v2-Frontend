@@ -2,12 +2,9 @@ import React from "react";
 import axios from "axios";
 import Nav from "./Nav";
 import { Link } from "react-router-dom";
-import '../Styles/Grid.css'
-import '../Styles/Cards.css'
-import '../Styles/Forms.css'
-import '../Styles/Buttons.css'
-import '../Styles/Global.css'
-import '../Styles/Nav.css'
+import Footer from "./Footer";
+
+import '../Styles/LogIn.css'
 
 class LogIn extends React.Component {
   state = {
@@ -16,10 +13,7 @@ class LogIn extends React.Component {
       password: ""
     },
     message: "",
-    borderColors:{
-      email: 'none',
-      password: 'none'
-  }
+    displaySpinner: false
   }
 
   changeField = (e, field) => {
@@ -28,77 +22,68 @@ class LogIn extends React.Component {
     this.setState({ user });
   }
 
-  login = e => {  
-    e.preventDefault();
+  login(event){  
+    event.preventDefault()
+    let displaySpinner = true
+    let message = `Logging In. Please Wait...`
+    this.setState({displaySpinner, message})
     axios.post(`${process.env.REACT_APP_API}/login`, this.state.user).then(res => {
+
         let token = res.data.token
         if (token) {
           localStorage.setItem("token", token);
           res.data.tempPassword? this.props.history.push({pathname: "/changePassword"}) : this.props.history.push({pathname: "/events"})
-        } else{          
+        } else{ 
+          displaySpinner = false
+          this.setState({displaySpinner})         
           this.setState({message: res.data.message})
         }
     })
   }
 
+  spinnerVisibility(){
+    if(this.state.displaySpinner ){return {'display': 'block'}}
+    return {'display': 'none'}
+  }
+
 
   render() {
     return (
-      <>
-       <div className="pageGrid2Rows">
-         <div className="navBar" ><Nav /></div>
-
-          
-          <div className="formColumnGrid">
-            <div></div>
-
-
-
-            <div className ="formRowGrid">
-              <div></div>
-
-              <div className="theForm card">
-                <div class ="content">
-
-                  <form onSubmit={this.login}>
-                    <div className="group">
-                      <input
-                        className = "toggleBorder"
-                        required
-                        value={this.state.user.email}
-                        onChange={event => this.changeField(event, 'email')}
-                        type={'email'}
-                        placeholder={'Email Address'}
-                      />
-                    </div>
-
-                    <div className="group">
-                      <input
-                        className = "toggleBorder"
-                        required
-                        value={this.state.user.password}
-                        onChange={event => this.changeField(event, 'password')}
-                        type={'password'}
-                        placeholder={'Password'}
-                      />
-                    </div>
-                  
-                    <button className="primary" onClick={event => {this.login(event)}}>Log In</button>
-
-                    <p className="warning">{this.state.message}</p>
-                    <p className="footer">Don't have an account? <Link to="/signup">Sign Up</Link>  </p>
-                    <p className="footer"><Link to="/forgotPassword">Forgot Your Password?</Link></p>
-                  </form>
-                </div>
-              </div>
-
-              <div></div>
+      <div className="check-in-container">
+        <Nav />
+          <form className="check-in-form" onSubmit={event => this.login(event)}>
+            <div className="check-in-heading">
+              <h2>Log In</h2>
+              <hr />
             </div>
+            <input      
+              required
+              value={this.state.user.email}
+              onChange={event => this.changeField(event, 'email')}
+              type={'email'}
+              placeholder={'Email Address'}
+            />
+            <input
+              required
+              value={this.state.user.password}
+              onChange={event => this.changeField(event, 'password')}
+              type={'password'}
+              placeholder={'Password'}
+            />
+            <div className="check-in-spinner-message" id="log-in-spinner-message">
+              <div style={this.spinnerVisibility()} className ='ticket-spinner'>
+                <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div> 
+              </div>
+              <div className="log-in-message">{this.state.message}</div>
+            </div>
+            <button id="log-in-button">Log In</button>
+            
+            <p className="log-in-links">Don't have an account? <Link to="/signup">Sign Up</Link>  </p>
+            <p className="log-in-links"><Link to="/forgotPassword">Forgot Your Password?</Link></p>
+          </form>
+        <Footer />
+      </div>
 
-
-          </div>
-        </div>
-        </>
     )
   }
 }

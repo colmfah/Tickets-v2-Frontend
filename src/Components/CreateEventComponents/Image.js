@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Nav from "../Nav";
-import '../../Styles/Grid.css'
+import Footer from "../Footer";
 import '../../Styles/Cards.css'
 import '../../Styles/Forms.css'
 import '../../Styles/Buttons.css'
@@ -11,7 +11,7 @@ export class Image extends Component {
 
     state = {
         errorMessage: '',
-        borderColor: 'none',
+        fileName: ''
     }
 
     continue = (e, values) => {
@@ -22,7 +22,7 @@ export class Image extends Component {
         }   
         else if(values.image === '' && stateCopy.errorMessage === ''){
             stateCopy.errorMessage = `You must upload an image`
-            stateCopy.borderColor = 'tomato'
+            stateCopy.borderColor = 'red'
             this.setState(stateCopy)
         }
     }
@@ -38,17 +38,17 @@ export class Image extends Component {
         let fileType = event.target.files[0].type
         let fileSize = event.target.files[0].size        
         let validFile = false
-
+  
         if(fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/gif'){ 
             validFile = true      
         }
 
         if(!validFile){
             stateCopy.errorMessage = 'Please upload a jpeg, gif or png file'
-            stateCopy.borderColor = 'tomato'
+            stateCopy.borderColor = 'red'
         }else if(fileSize > 30000000){
             stateCopy.errorMessage = 'Please upload a file that is under 30 MB' 
-            stateCopy.borderColor = 'tomato'   
+            stateCopy.borderColor = 'red'   
         }else{
             stateCopy.errorMessage = ''
         }
@@ -56,69 +56,42 @@ export class Image extends Component {
         if(stateCopy.errorMessage === '') {
             stateCopy.borderColor = '#00988f'  
             this.props.changeField(event, 'image')
+            stateCopy.fileName = event.target.files[0].name
         }
 
         this.setState(stateCopy)
     }  
 
-    turnBorderOrange(e){
-        e.preventDefault()
-        let stateCopy = this.state
-        stateCopy.borderColor = '#ff8c00'
-        stateCopy.errorMessage = ''       
-        this.setState(stateCopy)
-    }
 
     render() {
         const {values} = this.props
         return (
-            
-            <> 
-                <div className="pageGrid2Rows">
-                
-                    <div className="navBar"><Nav /></div>
-               
-                    <div className ="formRowGrid">  
-                        <div></div>
-                        <div className="formColumnGrid">
-                            <div></div>
-
-
-                            <div className="theForm card">
-                                <div class ="content">
-                                
-                                <div id="fileUploadText">   {values.image === '' ? 'Upload Image' : 'Image Successfully Uploaded' }</div>
-                                    <form>  
-                                        <div id="fileUpload">
-                                            <p className='warning' id="error">{this.state.errorMessage}</p>
-                                            <input
-                                                required
-                                                type="file"
-                                                onChange={this.fileUploaded}
-                                                title="Upload Image"
-                                                placeholder="Upload Image"
-                                                onFocus={event => this.turnBorderOrange(event)}
-                                                style={values.image === '' ?  {borderColor: this.state.borderColor} : {borderColor: this.state.borderColor, color: 'transparent'}}
-                                                
-                                            />
-                                        </div>
-                                        <div className="buttonContainer">
-                                            <button className="primary" onClick={event => this.continue(event, values)}>Continue</button>   
-                                            <button className="secondary rhsbutton" onClick={event => this.goBack(event)}>Go Back</button>
-                                        </div>
-                                        
-                                    </form> 
-                                </div>
-                            </div>
-
-                            <div></div>
-                        </div> 
-                        <div></div> 
-
-                    </div>
-
-                </div>
-            </>
+            <div className="create-event-container">
+                <Nav />
+                <form className="create-event-form">
+                <div className="create-event-heading">
+                    <header>Create Event</header>
+                    <hr />
+                </div>   
+                <label className="custom-file-input">
+                    <input
+                        required
+                        type="file"
+                        onChange={this.fileUploaded}
+                        title="Upload Image"
+                        placeholder="Upload Image"
+                        style={values.image === '' ?  {borderColor: this.state.borderColor} : {borderColor: this.state.borderColor, color: 'transparent'}}
+                    />
+                </label>
+                <p className='create-event-warning' id="error">{this.state.errorMessage}</p>
+                <div id="fileUploadText">   {values.image === '' ? '' : `${this.state.fileName} successfully uploaded` }</div>
+                <div className="create-event-button-container">
+                    <button className="create-event-button" onClick={event => this.goBack(event)}>Go Back</button>
+                    <button className="create-event-button" onClick={event => this.continue(event, values)}>Continue</button>   
+                </div>   
+                </form> 
+                <Footer />
+            </div>
         )
     }
 }

@@ -35,7 +35,7 @@ class CreateEvent extends React.Component {
 	},
 	userEvent: {
 		image: '',
-		region: '',
+		region: 'dublin',
 		lat: 53.34723555464459,
 		lng: -6.258907671241786,
 		title: "",
@@ -50,7 +50,7 @@ class CreateEvent extends React.Component {
 		organiser: "",
 		currency: "EUR",
 		totalTicketsCreated: 1,
-		ticketTypesEquivalent: '',
+		ticketTypesEquivalent: true,
 		eventPassword: '',
 		tickets: [{
 			ticketType: '',
@@ -58,7 +58,7 @@ class CreateEvent extends React.Component {
 			price: '',
 			numberOfTickets: '',
 			startSelling: '',
-			chargeForTicketsStatus: '',
+			chargeForTicketsStatus: 'chargeForTickets',
 			chargeForNoShows: '',
 			stopSelling: '',
 			startSellingTime: '',
@@ -66,8 +66,8 @@ class CreateEvent extends React.Component {
 			ticketDescription: '',
 			hold: '',
 			refunds: {optionSelected: '',
-							refundUntil: '',
-							howToResell: '',
+							untilSpecific: '',
+							howToResell: 'specificPrice',
 							resellAtSpecificPrice: '',
 							minimumPrice: '',
 						},
@@ -100,10 +100,13 @@ class CreateEvent extends React.Component {
 		}],
 		globalRefundPolicy: true,
 		globalRefundOptions: {optionSelected: '',
-						refundUntil: '',
+						untilSpecific: '',
 						howToResell: '',
 						resellAtSpecificPrice: '',
-						minimumPrice: ''}
+						minimumPrice: ''},
+		errorMessage: '',
+		displaySpinner: false,
+		message: ''
 	}
 	}
 
@@ -129,8 +132,8 @@ class CreateEvent extends React.Component {
 			ticketDescription: '',
 			hold: '',
 			refunds: {optionSelected: '',
-							refundUntil: '',
-							howToResell: '',
+							untilSpecific: '',
+							howToResell: 'specificPrice',
 							resellAtSpecificPrice: '',
 							minimumPrice: ''
 							},
@@ -168,12 +171,7 @@ class CreateEvent extends React.Component {
 
 	createEvent = e => {
 		e.preventDefault()
-
-		
-		
-
 		let userEvent = this.state.userEvent
-		console.log('userEvent.ticekts1',	userEvent.tickets);
 		let data = userEvent.image
 		data.append('title', userEvent.title)
 		data.append('venue', userEvent.venue)
@@ -199,23 +197,29 @@ class CreateEvent extends React.Component {
 			data.append(`tickets[]`, JSON.stringify(item));
 		  });
 
-		  console.log('userEvent.ticekts2',	userEvent.tickets);
+		let displaySpinner = true
+		this.setState({displaySpinner})
 		
 	
 		axios.post(`${process.env.REACT_APP_API}/image`, data)
 			.then(res => {
-		
+				console.log('res.data', res.data)
+				displaySpinner = false
+				this.setState({displaySpinner})
+				this.props.history.push(`/events/${res.data._id}`)
 				
 				})
 
 				.catch(err => {
-				console.log("imgerr", err)
+				displaySpinner = false
+				let errorMessage = String(err)
+				this.setState({errorMessage, displaySpinner})
 			})
 	}
 
 	changeField = (e, field) => {	
 		
-		console.log('field', field);
+		
 		
 		let userEvent = this.state.userEvent
 				
@@ -227,15 +231,12 @@ class CreateEvent extends React.Component {
 		
 		else if (field === "startDetails" || field === "endDetails") {
 			userEvent[field] = e
-			console.log('startDetails', e)
-			console.log('typeof e', typeof(e))
-
 		}
 
 		else {
 	      userEvent[field] = e.target.value;
 		}
-		console.log('userEvent', userEvent);
+	
 		
 	    this.setState({ userEvent })
 	}
@@ -247,6 +248,8 @@ class CreateEvent extends React.Component {
         let warning = ''
 
         if(userEvent.tickets[i][field] === ''){
+
+			console.log('userEvent.tickets[i].numberOfTickets.split', userEvent.tickets[i].numberOfTickets.split(''))
 
             
             if(field ==='ticketType'){
@@ -266,14 +269,17 @@ class CreateEvent extends React.Component {
             }else if(field ==='numberOfTickets'){
                 warning = 'Please Select Number Of Tickets'
             }else if(field ==='price'){
-				warning = 'Please Select A Price. If tickets are free select €0'
+				warning = 'Please Select A Price. If Tickets Are Free Select €0'
 			}
    
-        }else if((field === 'chargeForNoShows' && userEvent.tickets[i].chargeForNoShows < 0) || (field === 'price' && userEvent.tickets[i].price < 0)){
+        }else if((field === 'chargeForNoShows' && userEvent.tickets[i].chargeForNoShows < 0) || (field === 'price' && userEvent.tickets[i].price < 0) || field === 'numberOfTickets' && userEvent.tickets[i].numberOfTickets <= 0 ){
             warning = 'Value Must Be Positive'
 
         }else if (field === 'price' && userEvent.tickets[i].price > 0 && userEvent.tickets[i].price < 1){
             warning = 'If Tickets Are Not Free, The Minimum Price Allowed Is €1'
+		}
+		else if(field === 'numberOfTickets' && userEvent.tickets[i].numberOfTickets.split('').includes('.')){
+			warning = 'Number Of Tickets Must Be A Whole Number'
 		}
 		
 		// else if (field === 'sellWhenTicketNumberSoldOut'){
@@ -423,7 +429,6 @@ class CreateEvent extends React.Component {
     }
 
 	handleRefundChange = (e, field, i)=>{
-
 		
 		let userEvent = this.state.userEvent
 		
@@ -527,11 +532,11 @@ class CreateEvent extends React.Component {
 
 
 
+
   render() {
 	  const { step } = this.state
 	  const{ title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets,globalRefundOptions, lat, lng } = this.state.userEvent
 	  const values = { title, description, region, venue, address1, address2, address3, address4, startDetails, endDetails, currency, eventPassword, image, ticketTypesEquivalent, tickets, globalRefundOptions, lat, lng }
-
 	  switch(step){
 
 		  case 1:
@@ -579,11 +584,9 @@ class CreateEvent extends React.Component {
 						// handleBooleanChange={this.handleBooleanChange}
 						nextStep={this.nextStep}
 						prevStep={this.prevStep}
-						saveDataToParent={this.saveDataToParent}
 						setSpecificTime={this.setSpecificTime}
 						startSellingSpecificTimeErrors={this.startSellingSpecificTimeErrors}
 						stopSellingSpecificTimeErrors={this.stopSellingSpecificTimeErrors}
-						turnBorderOrange={this.turnBorderOrange}
 						values={values}
 					/>
 				)
@@ -597,6 +600,9 @@ class CreateEvent extends React.Component {
 					prevStep={this.prevStep}
 					submit={this.createEvent}
 					values={values}
+					errorMessage={this.state.errorMessage}
+					message = {this.state.message}
+					displaySpinner = {this.state.displaySpinner}
 				/>
 			)
 	  }

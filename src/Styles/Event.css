@@ -174,8 +174,7 @@
 }
 
 
-.event-tickets button,
-.create-event-form button {
+.event-tickets button{
   background-color: #293d6a;
   color: #fff;
   border-radius: 5px;
@@ -290,14 +289,8 @@ margin-right: 80px;
 
 
 
-.create-event-form button {
-  margin-top: 5%;
-  width: 75%;
-}
-
-
-#purchase-button:hover,
-.create-event-form button:hover {
+#purchase-button:hover
+{
   -webkit-transform: scale(1.1);
   -ms-transform: scale(1.1);
   transform: scale(1.1);

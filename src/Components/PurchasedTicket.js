@@ -8,7 +8,33 @@ var QRCode = require('qrcode.react')
 
 
 
-const ColmTicket = (props) =>{
+const PurchasedTicket = (props) =>{
+
+    function cancelRefundRequest(){
+        setDisplaySpinner(true)
+        setMessage('Please Wait...')
+        let objectToSend = {token: localStorage.getItem("token"),ticketID: ticket._id}
+        axios.post(`${process.env.REACT_APP_API}/cancelRefundRequest`, objectToSend)
+        .then(res => {
+            setMessage(res.data.message)
+            setDisplaySpinner(false)
+            if(!res.data.error){setTicket(res.data.ticket)}  
+        }
+        
+        )
+    }
+
+    function displayRefundButton(){
+        if(ticket.refundRequested){return <button onClick={event => cancelRefundRequest()}>Cancel Refund Request</button>}
+        return <button onClick={event => requestRefund()}>Request Refund</button> 
+    }
+
+    function getPaidTicketCode(code){
+        getTicketTypeCode(code)
+        getPriceCode(code)
+        getRefundPolicyCode(code)
+        return code
+    }
 
     function getPriceCode(code){
         let price
@@ -17,16 +43,6 @@ const ColmTicket = (props) =>{
         <div key={code.length} className={'ticket-detail ticket-detail-price'}>
             <span>{'price'}</span>
             <h2>{price}</h2>
-        </div>
-        )
-        return code
-    }
-
-    function getTicketTypeCode(code){
-        code.push(
-        <div key={code.length} className={'ticket-detail ticket-detail-description'}>
-            <span>{'ticket type'}</span>
-            <h2>{ticket.ticketType}</h2>
         </div>
         )
         return code
@@ -59,25 +75,19 @@ const ColmTicket = (props) =>{
         return code
     }
 
-    function getLastMinuteTicketCode(code){
-        if(!ticket.lastMinuteTicket){return code}
-        getTicketTypeCode(code)
-        getPriceCode(code)
-        return code
-        }   
-        
-    function getPaidTicketCode(code){
-        if(ticket.lastMinuteTicket){return code}
-        getTicketTypeCode(code)
-        getPriceCode(code)
-        getRefundPolicyCode(code)
-        return code
-    }
-
     function getTicketDetails(){
         let code = []
         getPaidTicketCode(code)
-        getLastMinuteTicketCode(code)
+        return code
+    }
+
+    function getTicketTypeCode(code){
+        code.push(
+        <div key={code.length} className={'ticket-detail ticket-detail-description'}>
+            <span>{'ticket type'}</span>
+            <h2>{ticket.ticketType}</h2>
+        </div>
+        )
         return code
     }
 
@@ -90,25 +100,6 @@ const ColmTicket = (props) =>{
             setDisplaySpinner(false)
             if(!res.data.error){setTicket(res.data.ticket)}
         })
-    }
-
-    function displayRefundButton(){
-        if(ticket.refundRequested){return <button onClick={event => cancelRefundRequest()}>Cancel Refund Request</button>}
-        return <button onClick={event => requestRefund()}>Request Refund</button> 
-    }
-
-    function cancelRefundRequest(){
-        setDisplaySpinner(true)
-        setMessage('Please Wait...')
-        let objectToSend = {token: localStorage.getItem("token"),ticketID: ticket._id}
-        axios.post(`${process.env.REACT_APP_API}/cancelRefundRequest`, objectToSend)
-        .then(res => {
-            setMessage(res.data.message)
-            setDisplaySpinner(false)
-            if(!res.data.error){setTicket(res.data.ticket)}  
-        }
-        
-        )
     }
 
     function spinnerVisibility(){
@@ -130,7 +121,6 @@ const ColmTicket = (props) =>{
     wordArray.shift()
     let restOfWord = wordArray.join(' ')
     useEffect(() => {setHeight(ref.current.clientHeight)})
-    console.log('ticket', ticket)
 
     return (
       <div className='ticket-container'>
@@ -142,12 +132,12 @@ const ColmTicket = (props) =>{
           <div className="event-card event-card-right">
             <div className="event-eye" style={{ height: height }}>{moment(ticket.userEvent.startDetails).format('Do MMM')}</div>
             <div className="ticket-buttons">
-            <Link to={`/qr/${qrCode}`} target="_blank" rel="noopener noreferrer">
-                <QRCode 
-                    value={qrCode} 
-                    className='QR' 
-                    style={{'maxWidth': '95%', 'height': 'auto', 'marginBottom': '5px', 'marginTop': '5px'}}/>
-            </Link>
+                <Link to={`/qr/${qrCode}`} target="_blank" rel="noopener noreferrer">
+                    <QRCode 
+                        value={qrCode} 
+                        className='QR' 
+                        style={{'maxWidth': '95%', 'height': 'auto', 'marginBottom': '12px', 'marginTop': '5px'}}/>
+                </Link>
                 {displayRefundButton()}
             </div>
           </div>
@@ -157,11 +147,9 @@ const ColmTicket = (props) =>{
                 <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
             </div>
             <div className='ticket-message'>{message}</div>
-            
         </div>
       </div>
     );
-
 }
 
-export default withRouter(ColmTicket);
+export default withRouter(PurchasedTicket);

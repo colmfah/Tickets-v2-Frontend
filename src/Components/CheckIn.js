@@ -3,6 +3,8 @@ import Nav from "./Nav";
 import QrReader from "react-qr-reader";
 import axios from "axios";
 import moment from "moment";
+import Footer from "./Footer";
+import "../Styles/CheckIn.css";
 
 
 class CheckIn extends React.Component {
@@ -13,7 +15,8 @@ class CheckIn extends React.Component {
     message: '',
     userEvent: {},
     showCheckIn: false,
-    checkIn: false
+    checkIn: false,
+    displaySpinner: false
   }
 
   componentDidMount() {
@@ -21,10 +24,13 @@ class CheckIn extends React.Component {
 
   checkInLogIn = (e) => {
       e.preventDefault()
+      let message = `Checking Details. Please Wait...`
+      let displaySpinner = true
+      this.setState({message, displaySpinner})
 
       axios.post(`${process.env.REACT_APP_API}/checkInLogIn`, {userEvent: this.state.eventRequested, password: this.state.password}).then(res => {
-              
-        this.setState({message: res.data.message, userEvent: res.data.userEvent, showCheckIn: res.data.success})
+        displaySpinner = false   
+        this.setState({message: res.data.message, userEvent: res.data.userEvent, showCheckIn: res.data.success, displaySpinner: false})
     
     }).catch(err => console.log(err));
 
@@ -67,84 +73,89 @@ class CheckIn extends React.Component {
     this.setState({checkIn: stateCopy.checkIn})
   }
 
+  spinnerVisibility(){
+    if(this.state.displaySpinner ){return {'display': 'block'}}
+    return {'display': 'none'}
+  }
+
+  displayLogInForm(){
+    return(
+      <div>
+        <div>
+            <input
+                value={this.state.eventRequested}
+                required
+                onChange={event => this.eventDetails(event, 'eventRequested')}
+                type='text'
+                placeholder='Event ID'
+            />
+        </div>
+        <div>
+            <input
+                value={this.state.password}
+                required
+                onChange={event => this.eventDetails(event, 'password')}
+                type='password'
+                placeholder='Password'
+            />
+        </div>
+       <div className="check-in-spinner-message">
+        <div style={this.spinnerVisibility()} className ='ticket-spinner'>
+          <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div> 
+        </div>
+        <div className="check-in-message">{this.state.message}</div>
+      </div>
+      <div className="check-in-button-container">
+        <button onClick={this.checkInLogIn}>Submit</button>
+      </div>
+    </div>
+    )
+  }
+
+  displayCheckInForm(){
+    return(
+      <div>
+          
+        <h3>{this.state.userEvent.title}</h3>
+        <div>{moment(this.state.userEvent.startDetails).format("Do MMM YYYY [at] HH:mm ")}</div>
+        <div className="check-in-button-container">
+
+          {this.state.checkIn ? <button onClick={this.turnScannerOnOff}> Turn Scanner Off</button> : <button onClick={this.turnScannerOnOff}> Check In Ticket</button>} 
+          <button onClick={this.logOut}>Log Out of Event</button>
+
+        </div>
+        {this.state.checkIn ? <QrReader
+                delay={300}
+                onError={this.handleError}
+                onScan={event => this.handleScan(event, this.state.userEvent._id)}
+                style={{ maxWidth: '500px', marginTop: '50px' }}
+        />: <> </>} 
+
+
+    
+  
+    </div>
+      
+    )
+  }
+
 
 
   render() {
     return (
 <>
-  <Nav />
-
-
-
-
-	<h2>Check In</h2>
-
-
-
-    {!this.state.showCheckIn ? 
-
-      <form onSubmit={this.checkInLogIn}>
-
-      <div>
-          <input
-              value={this.state.eventRequested}
-              required
-              onChange={event => this.eventDetails(event, 'eventRequested')}
-              type='text'
-              placeholder='Event ID'
-          />
+  <div className="check-in-container">
+    <Nav />
+    <div className="check-in-form">
+      <div className="check-in-heading">
+        <h2>Check In</h2>
+        <hr />
+        {this.state.showCheckIn ? this.displayCheckInForm()  :  this.displayLogInForm()}
       </div>
-
-      <div>
-          <input
-              value={this.state.password}
-              required
-              onChange={event => this.eventDetails(event, 'password')}
-              type='password'
-              placeholder='Password'
-          />
-      </div>
-
-      <button>Submit</button>
-
-      </form>
-    :
-      <div>
-          
-          <h3>{this.state.userEvent.title}</h3>
-          <div>From: {moment(this.state.userEvent.startDetails).format("ddd, Do MMM YYYY, HH:mm ")} Until: {moment(this.state.userEvent.endDetails).format("ddd, Do MMM YYYY, HH:mm ")}</div>
-          <div>Venue: {this.state.venue}</div>
-
-          {this.state.checkIn ? 
-            <div>
-              <button onClick={this.turnScannerOnOff}>
-                Turn Off Check In
-              </button>
-              <QrReader
-                delay={300}
-                onError={this.handleError}
-                onScan={event => this.handleScan(event, this.state.userEvent._id)}
-              />
-            </div>
-          : 
-            <button onClick={this.turnScannerOnOff}>
-              Check In Ticket
-            </button>
-          } 
-
-          <button onClick={this.logOut}>Log Out of Event</button>
-      
-      
-      </div>}
-        
-        
-
-        
-  <div>{this.state.message}</div>
-
+    </div>
     
-
-
+    <Footer />
+  </div>
 </>
 		    )
 		  }

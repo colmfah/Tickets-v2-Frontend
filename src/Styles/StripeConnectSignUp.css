@@ -1,0 +1,13 @@
+
+.stripe-connect-sign-up-box{
+    max-width: 95vw;
+}
+
+.stripe-connect-sign-up-box div, .stripe-connect-sign-up-box p, .stripe-connect-sign-up-box a{
+    margin-top: 20px;
+    margin-bottom: 20px
+}
+
+.stripe-connect-sign-up-box input:nth-child(1){
+    margin-left: 10px
+}
