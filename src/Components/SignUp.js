@@ -4,11 +4,6 @@ import { Link } from "react-router-dom"
 import Nav from "./Nav"
 import React from "react"
 import Footer from "./Footer";
-import '../Styles/Cards.css'
-import '../Styles/Forms.css'
-import '../Styles/Buttons.css'
-import '../Styles/Global.css'
-import '../Styles/Nav.css'
 
 class SignUp extends React.Component {
   state = {
@@ -30,7 +25,8 @@ class SignUp extends React.Component {
   signup = e => {
     e.preventDefault()
     let displaySpinner = true
-    this.setState({displaySpinner})
+    let message = 'Please Wait'
+    this.setState({displaySpinner, message})
     axios.post(`${process.env.REACT_APP_API}/users`, this.state.user)
     .then(res => {       
       this.setState({ message: res.data.message, displaySpinner: false})})
@@ -44,8 +40,10 @@ class SignUp extends React.Component {
 
   render() {
     return (
-      <div className="check-in-container">   
-        <Nav/>           
+      <>
+      
+        <Nav/> 
+        <div className="check-in-container">             
           <form className="check-in-form" onSubmit={this.signup}>
             <div className="check-in-heading">
                 <h2>Sign Up</h2>
@@ -82,8 +80,9 @@ class SignUp extends React.Component {
             <button id="log-in-button">Sign Up</button>
             <p className="log-in-links">Already have an account? <Link to="/login">Login</Link> </p>
           </form>
-          <Footer />
-      </div>
+        </div>
+        <Footer />
+      </>
     )
   }
 }

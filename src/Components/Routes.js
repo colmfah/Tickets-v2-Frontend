@@ -28,14 +28,15 @@ class Routes extends React.Component {
 
 	tokenCheck = () => {
 	let token = localStorage.getItem('token')
-	if (token){
-		return true
-	}else {
-		return false
+	if (token){return true}
+	return false
 	}
-}
+
+
 
 	render() {
+
+	
 
 	  return (
 
@@ -44,7 +45,7 @@ class Routes extends React.Component {
 					<Route path='/checkin' component={CheckIn} />
 					<Route path='/changepassword' component={() => this.tokenCheck() ? <ChangePassword /> : <Redirect to="/login" /> } />
 					<Route path='/confirmEmail/:id' component={confirmEmail} />
-					<Route path='/createevent' render={ () => this.tokenCheck() ? <CreateEvent /> : <Redirect to="/login" /> }/>
+					<Route path='/createevent' render={ () => this.tokenCheck() ? <CreateEvent /> : <Redirect to="/stripeConnectSignUp" /> }/>
 					<Route path='/events/:id' component={Event} />
 					<Route path='/events' component={Events} />
 					<Route path='/forgotPassword' component={ForgotPassword} />
@@ -52,7 +53,9 @@ class Routes extends React.Component {
 					<Route path='/qr/:id' component={ShowQRCode} />
 					<Route path='/tickets' render={ () => this.tokenCheck() ? <Tickets /> : <Redirect to="/login" /> }/>
 					<Route path='/signup' component={SignUp} />
-					<Route path='/stripeConnectSignUp' render={ () => this.tokenCheck() ? <StripeConnectSignUp /> : <Redirect to="/login" /> }/>
+					{/* <Route path='/stripeConnectSignUp' render={ () => this.tokenCheck() ? <StripeConnectSignUp /> : <Redirect to="/login" /> }/> */}
+					{/* reinstate token check when finished amending page */}
+					<Route path='/stripeConnectSignUp' render={ () =>  <StripeConnectSignUp />}/>
 					<Route path='/waitLists' render={ () => this.tokenCheck() ? <WaitLists /> : <Redirect to="/login" /> }/>
 					<Route path='/myevents' render={ () => this.tokenCheck() ? <MyEvents /> : <Redirect to="/login" /> }/>
 					<Route path='/myevent/:id' component={MyEvent}/>

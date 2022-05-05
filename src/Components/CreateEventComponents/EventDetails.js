@@ -273,6 +273,7 @@ export class EventDetails extends Component {
                             required
                             placeholderText={'Date & Time Event Starts'}
                             style={{borderColor: this.state.borderColors.startDetails}}
+                            autoComplete="off"
                         />
                     </div>
                     <p className='create-event-warning' id="endDetails">{this.state.errors.endDetails}</p>
@@ -288,6 +289,7 @@ export class EventDetails extends Component {
                             required
                             placeholderText={'Date & Time Event Ends'}
                             style={{borderColor: 'purple'}}
+                            autoComplete="off"
                         />
                     </div>
                     <p className='create-event-warning' id="eventPassword">{this.state.errors.eventPassword}</p>

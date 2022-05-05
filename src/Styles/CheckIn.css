@@ -12,14 +12,14 @@
     border: 1px solid #8f897c;
     border-radius: 5px;
     width: fit-content;
-    min-width: 335px;
-    max-width: min(100vw, 335px);
+    max-width: 95vw;
+    min-width: 300px;
     background-color: #fff;
     margin: auto;
-    padding-left: clamp(1px, 5%, 45px);
-    padding-right: clamp(1px, 5%, 45px);
-    padding-top: 25px;
-    padding-bottom: 25px;
+    /* padding-left: clamp(1px, 5%, 45px);
+    padding-right: clamp(1px, 5%, 45px); */
+    padding-top: 60px;
+    padding-bottom: 60px;
     color: #293d6a;
     display: flex;
     flex-direction: column;
@@ -67,9 +67,9 @@
     transition: all 0.2s ease-in-out;
 }
 
-.check-in-form button:not(:first-child) {
+/* .check-in-form button:not(:first-child) {
     margin-left: 25px;
-}
+} */
 
 .check-in-form button:hover{
     transform: scale(1.1);
@@ -120,4 +120,9 @@
 
 .check-in-form h3{
     margin-top: 50px
+}
+
+.check-in-event-details{
+    margin-bottom: 30px;
+
 }

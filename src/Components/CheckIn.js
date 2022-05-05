@@ -16,7 +16,8 @@ class CheckIn extends React.Component {
     userEvent: {},
     showCheckIn: false,
     checkIn: false,
-    displaySpinner: false
+    displaySpinner: false,
+    messageColor: 'black'
   }
 
   componentDidMount() {
@@ -49,8 +50,9 @@ class CheckIn extends React.Component {
       this.setState({message: "QR code scanned. Checking database for match..."})
 
       axios.post(`${process.env.REACT_APP_API}/checkIn`, {qrcode: data, userEvent: userEvent, password: this.state.password}).then(res => {
-
-        this.setState({message: res.data.message})
+        let messageColor = this.state.color
+        res.data.checkedIn === true ? messageColor = 'green' : messageColor = 'red'
+        this.setState({message: res.data.message, messageColor})
         }).catch(err => {console.log(err)})
     }
   }
@@ -115,26 +117,21 @@ class CheckIn extends React.Component {
   displayCheckInForm(){
     return(
       <div>
-          
         <h3>{this.state.userEvent.title}</h3>
-        <div>{moment(this.state.userEvent.startDetails).format("Do MMM YYYY [at] HH:mm ")}</div>
-        <div className="check-in-button-container">
-
-          {this.state.checkIn ? <button onClick={this.turnScannerOnOff}> Turn Scanner Off</button> : <button onClick={this.turnScannerOnOff}> Check In Ticket</button>} 
-          <button onClick={this.logOut}>Log Out of Event</button>
-
-        </div>
-        {this.state.checkIn ? <QrReader
-                delay={300}
-                onError={this.handleError}
-                onScan={event => this.handleScan(event, this.state.userEvent._id)}
-                style={{ maxWidth: '500px', marginTop: '50px' }}
-        />: <> </>} 
-
-
-    
-  
-    </div>
+        <div className="check-in-event-details">{moment(this.state.userEvent.startDetails).format("Do MMM YYYY [at] HH:mm ")}</div>
+        {this.state.checkIn ? <button onClick={this.turnScannerOnOff}> Turn Scanner Off</button> : <button onClick={this.turnScannerOnOff}> Check In Ticket</button>} 
+        <button onClick={this.logOut}>Log Out of Event</button>
+        <div>{this.state.message}</div>
+        {this.state.checkIn ? 
+          <QrReader
+            delay={300}
+            onError={this.handleError}
+            onScan={event => this.handleScan(event, this.state.userEvent._id)}
+            style={{ maxWidth: '500px', marginTop: '50px' }}
+          />
+        : 
+        <> </>} 
+      </div>
       
     )
   }

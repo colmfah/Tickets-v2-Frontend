@@ -49,8 +49,10 @@ class LogIn extends React.Component {
 
   render() {
     return (
-      <div className="check-in-container">
+      <>
+      
         <Nav />
+        <div className="check-in-container">
           <form className="check-in-form" onSubmit={event => this.login(event)}>
             <div className="check-in-heading">
               <h2>Log In</h2>
@@ -81,8 +83,9 @@ class LogIn extends React.Component {
             <p className="log-in-links">Don't have an account? <Link to="/signup">Sign Up</Link>  </p>
             <p className="log-in-links"><Link to="/forgotPassword">Forgot Your Password?</Link></p>
           </form>
-        <Footer />
-      </div>
+          </div>
+          <Footer />
+        </>
 
     )
   }

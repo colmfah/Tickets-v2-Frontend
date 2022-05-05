@@ -111,7 +111,8 @@ class CheckoutForm extends Component {
   handlePaymentError = (err, frontEndError = false, clientSecret=null) => {
     this.hideRefundStatus() 
     this.props.changeMessageColor('red')
-    this.props.updateMessage(String(err))
+    console.log('typeof(err)', typeof(err))
+    typeof(err) === 'object' ? this.props.updateMessage(err.message) : this.props.updateMessage(String(err))
     this.toggleDisablePurchaseButton()
     if(!frontEndError){return}
     this.updateTicketsWithError(err, clientSecret)
@@ -180,12 +181,13 @@ class CheckoutForm extends Component {
     let {changeEmail, message, messageColor, purchaserEmail} = this.props
     return (
       <form onSubmit={e => this.decideTransactionType(e)}>
-        <input type="email" placeholder="Email Address" 
+        <input type="email" placeholder="Your Email Address" name="email"
           required
           value={purchaserEmail}
           disabled = {this.isUserLoggedIn()}
           onChange={event => changeEmail(event)}
           className={'match-stripe'}
+          autoComplete={'on'}
         />
         <CardElement onChange={event => this.checkCreditCardNumber(event)}/>
         <div id='message-and-purchase-button'>
@@ -200,6 +202,7 @@ class CheckoutForm extends Component {
           </button>
         </div>
       </form>
+      
     )
   }
 }

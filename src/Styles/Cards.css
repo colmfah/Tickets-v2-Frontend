@@ -8,10 +8,6 @@
 	text-align: left
 }
 
-/* .wrapper {
-	text-align: center;
-
-} */
 
 .wrapper {
 	display: flex;
@@ -27,18 +23,9 @@
 	padding: 3.5%;
 	border: 1px solid #e2e2e2;
 	border-radius: 6px;
-	/* display: inline-block; */
 	width: 400px;
 	margin: 2%;
 }
-
-/* .wrapper > .content + .content {
-	margin-top: 0%;
-} */
-
-
-
-
 
 
 .ticketNumber {

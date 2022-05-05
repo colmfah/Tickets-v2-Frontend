@@ -53,11 +53,12 @@ class StripeConnectSignUp extends React.Component {
 						<p>In order to sell tickets you must connect your stripe account to our platform</p>
 						<p>Please click the below button to enable this</p>
 						<p>You will be brought to Stripe's website</p>
-						<p>You can log into your stripe account or create a new stripe account if you don't already have one</p>
 						<p>Please follow the instructions on Stripe's websites</p>
 						<p>When you have completed all steps, you will be redirected back to this website</p>
+					
 
-						<a href='https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_GIwo6n5S0Lvl8NZ5RmYGDCSuUvx0OAsM&scope=read_write' className="stripe-connect dark"><span>Connect with Stripe</span></a>
+						<a href='https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_LPsNwzXaRz6XqLKvYpdXJB4C6kjQPjxa&scope=read_write' className="stripe-connect dark"><span>Connect with Stripe</span></a>
+				
 						</>
 				: <div>{this.state.message}</div>}
 			</div> 

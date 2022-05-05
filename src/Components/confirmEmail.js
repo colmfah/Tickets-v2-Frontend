@@ -30,9 +30,6 @@ class confirmEmail extends React.Component {
     }
     
     toggleSell = (value) =>{
-        console.log('value', value)
-        console.log('value', typeof(value))
-
         let sell = value
         this.setState({sell})
     }

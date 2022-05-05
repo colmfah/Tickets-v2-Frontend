@@ -1,6 +1,22 @@
 
 .stripe-connect-sign-up-box{
+    text-align: center;
+    border: 1px solid #8f897c;
+    border-radius: 5px;
+    width: fit-content;
+    min-width: 400px;
     max-width: 95vw;
+    background-color: #fff;
+    margin: auto;
+    padding-left: clamp(1px, 5%, 45px);
+    padding-right: clamp(1px, 5%, 45px);
+    padding-top: 60px;
+    padding-bottom: 60px;
+    color: #293d6a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .stripe-connect-sign-up-box div, .stripe-connect-sign-up-box p, .stripe-connect-sign-up-box a{

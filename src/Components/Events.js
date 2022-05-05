@@ -30,6 +30,7 @@ class Events extends React.Component {
     return (
       <>
         <Nav />
+        
           <div className="content-wrapper">
             {this.state.events.map((e, i) => {
               return (

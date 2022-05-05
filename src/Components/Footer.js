@@ -1,6 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
 import '../Styles/Footer.css'
+import moment from "moment";
 
 class Footer extends React.Component {
 
@@ -12,7 +13,7 @@ class Footer extends React.Component {
         <ul>
           <li>
 
-          © TicketDock 2020
+          © Ticketglen {moment().format('YYYY')}
     
           </li>
         </ul>

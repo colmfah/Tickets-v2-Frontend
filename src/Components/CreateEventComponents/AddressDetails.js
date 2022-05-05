@@ -141,7 +141,7 @@ class AddressDetails extends React.Component {
                     required
                     value={values.address1}
                     onChange={event => this.updateData(event, 'address1')}
-                    onBlur={event => this.checkForError(values.address1, 'address1')}
+                    onBlur={event => {this.checkForError(values.address1, 'address1'); this.props.getLatLng(event)}}
                     type='text'
                     placeholder='Street Address'
                     style={{borderColor: this.state.borderColors.address1}}

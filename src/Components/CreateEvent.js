@@ -110,8 +110,9 @@ class CreateEvent extends React.Component {
 	}
 	}
 
-	componentDidMount = () => {
-		
+	componentDidMount = async () => {
+		let stripeAccountConnected = await this.connectedStripeAccountCheck()
+		if(!stripeAccountConnected){this.props.history.push({pathname: "/stripeConnectSignUp"})}
 	}
 
 
@@ -523,12 +524,12 @@ class CreateEvent extends React.Component {
         this.setState({userEvent})
     }
 
-	turnBorderOrange = (field, i) => { 
-		let userEvent = this.state.userEvent      
-		userEvent.tickets[i].borderColors[field] = '#ff8c00' 
-		userEvent.tickets[i].errors[field]=''  			
-		this.setState({userEvent})
+	connectedStripeAccountCheck = async () => {
+		let token = localStorage.getItem('token')
+		let tokenDetails = await axios.post(`${process.env.REACT_APP_API}/tokenDetails`, {token: token})
+		return tokenDetails.data.stripeAccountConnected
 	}
+
 
 
 
