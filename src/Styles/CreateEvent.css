@@ -1,5 +1,5 @@
 .create-event-container{
-    padding-top: 1px;
+    padding-top: 125px;
     padding-bottom: 2.5rem;
     background-color: #ececec;
     max-width: 100vw;
@@ -12,7 +12,8 @@
     /* align-items: flex-start; */
     justify-content: space-evenly;
     gap: 50px;
-    margin: 4vw 20px;
+    margin: 75px auto;
+    width: fit-content
 }
 
 
@@ -24,7 +25,6 @@
     padding: 20px 60px;
     background-color: #fff;
     margin: auto;
-    margin-top: 100px;
     max-width: 100%;
 }
 
@@ -49,7 +49,7 @@
     color: #293d6a;
     display: flex;
     flex-direction: column;
-    /* align-items: stretch; */
+    align-items: center;
     justify-content: center;
 }
 
@@ -62,7 +62,7 @@
     max-width: 95vw;
     background-color: #fff;
     margin: auto;
-    margin-top: 125px;
+    /* margin-top: 125px; */
     margin-bottom: 75px;
     padding-left: clamp(1px, 5%, 45px);
     padding-right: clamp(1px, 5%, 45px);
@@ -92,10 +92,20 @@
     text-align: center;
 }
 
-.create-event-form textarea, .create-ticket-form textarea {
+.create-event-form textarea{
     width: min(95%, 95vw);
     min-height: 300px;
     overflow: hidden;
+}
+
+
+
+.contact-us-form input, .contact-us-form textarea {
+    margin: 10px 0;
+}
+
+.contact-us-form button {
+    margin-top: 20px
 }
 
 #create-event-ticket-description {
@@ -122,9 +132,6 @@
     transition: all 0.2s ease-in-out;
 }
 
-.create-event-button:not(:first-child) {
-    margin-left: 25px;
-}
 
 .create-event-button:hover{
     transform: scale(1.1);
@@ -135,7 +142,7 @@
 .create-event-warning {
     margin-top: 25px;
     color: red;
-    scroll-margin-top: 50px;
+    scroll-margin-top: 100px;
 }
 
 .create-event-heading{
@@ -152,15 +159,17 @@
     text-align: center;
 } */
 
-.create-event-heading hr, .create-ticket-heading hr, .create-ticket-number-heading hr{
+.create-event-heading hr, .create-ticket-heading hr, .create-ticket-number-heading hr, .check-in-heading hr{
     color: #293d6a;
     font-size: clamp(24px, 4vw, 35px);
     text-align: center;
     margin: auto;
     margin-bottom: 20px;
+    color: red;
+  
 }
 
-.create-event-heading header, .create-ticket-heading header{
+.create-event-heading header, .create-ticket-heading header, .check-in-heading header, .my-event-title header, .my-event-heading header{
     color: #293d6a;
     font-size: clamp(24px, 4vw, 35px);
     text-align: center;
@@ -180,7 +189,7 @@
   margin-bottom: 20px;  
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
     padding: 0px 20px;
 }
 
@@ -254,11 +263,10 @@
     width: 475px;
     max-width: 95vw;
     margin: auto;
-    margin-bottom: 50px;
+    margin-bottom: 75px;
     border: 1px solid #8f897c;
     border-radius: 5px;
-    padding: 20px 0px;
-    padding-top: 40px;
+    padding: 30px 0px;
     background-color: #fff;
 }
 
@@ -295,6 +303,23 @@
     border: 1px solid red;
 }
 
+.create-tickets-update-and-pause-button-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 10px;
+    
+}
 
+.create-tickets-update-and-pause-button-container button{
+    margin-top: 30px;
+    margin-left: 0px !important;
+}
+
+.create-event-image-preview{
+    height: 200px;
+    max-width: 100%
+}
 
 

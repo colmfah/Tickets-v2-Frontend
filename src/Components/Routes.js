@@ -16,6 +16,7 @@ import ChangePassword from './ChangePassword'
 import ShowQRCode from './QRCode'
 import WaitLists from './WaitLists'
 import Test from './Test'
+import ContactUs from './ContactUs'
 
 
 
@@ -42,7 +43,7 @@ class Routes extends React.Component {
 
 			<BrowserRouter>
 				<Switch>
-					<Route path='/checkin' component={CheckIn} />
+					<Route path='/checkin/:id' component={CheckIn} />
 					<Route path='/changepassword' component={() => this.tokenCheck() ? <ChangePassword /> : <Redirect to="/login" /> } />
 					<Route path='/confirmEmail/:id' component={confirmEmail} />
 					<Route path='/createevent' render={ () => this.tokenCheck() ? <CreateEvent /> : <Redirect to="/stripeConnectSignUp" /> }/>
@@ -60,6 +61,7 @@ class Routes extends React.Component {
 					<Route path='/myevents' render={ () => this.tokenCheck() ? <MyEvents /> : <Redirect to="/login" /> }/>
 					<Route path='/myevent/:id' component={MyEvent}/>
 					<Route path='/test' component={Test} />
+					<Route path='/contactUs' component={ContactUs} />
 					<Route path='/' component={Events} />
 				</Switch>
 			</BrowserRouter>

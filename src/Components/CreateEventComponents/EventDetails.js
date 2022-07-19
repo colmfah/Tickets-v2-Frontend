@@ -24,7 +24,8 @@ export class EventDetails extends Component {
             endDetails: 'none',
             eventPassword: 'none',  
         },
-        textAreaHeight: '100px'
+        textAreaHeight: '100px',
+        message: ''
     }
 
     componentDidMount(){
@@ -120,14 +121,14 @@ export class EventDetails extends Component {
     checkPasswordError(values){
         let borderColors = this.state.borderColors
         let errors = this.state.errors
+        errors.eventPassword = ''
+        borderColors.eventPassword = '#00988f'  
+        if(this.props.amendingEvent && (values.eventPassword === undefined || values.eventPassword.length === 0)){this.setState({ borderColors, errors}); return}
         if(values.eventPassword.length < 6){
             errors.eventPassword = 'Your Password Must Be At Least 6 Characters'
             borderColors.eventPassword = 'red'
         }
-        else{
-            errors.eventPassword = ''
-            borderColors.eventPassword = '#00988f'       
-        }
+     
         this.setState({ borderColors, errors})
     }
 
@@ -147,7 +148,6 @@ export class EventDetails extends Component {
     }
 
     checkStartDetailsError(values){    
-        console.log('checkStartDetailsError')
         let borderColors = this.state.borderColors
         let startDetails = values.startDetails
         let errors = this.state.errors
@@ -203,7 +203,7 @@ export class EventDetails extends Component {
             document.getElementsByClassName('create-event-container')[0].scrollIntoView({behavior: "smooth"})
         }else{
  
-            this.props.nextStep() 
+            this.props.nextStep('eventDetails') 
         }
     }
 
@@ -215,10 +215,9 @@ export class EventDetails extends Component {
         this.handleFieldChange(e, 'description')
       }
 
-      checkForDateErrors(event, startDetails=false){
-        event.preventDefault()
+      checkForDateErrors(){
         this.checkStartDetailsError(this.props.values)
-        if(startDetails){return}
+        if(this.props.values.endDetails === ''){return}
         this.checkEndDetailsError(this.props.values)
       }
 
@@ -234,7 +233,18 @@ export class EventDetails extends Component {
         this.resetError(field)
         this.props.changeField(event, field)
       }
+
+      spinnerVisibility(){
+          if(this.props.spin){return {'display': 'block'}} 
+          return {'display': 'none'}       
+    }
     
+    disableOrEnableButton(){
+        if(this.props.updating){
+            return 'create-event-button disable-button'
+        }
+        return 'create-event-button'
+    }
 
 
 
@@ -243,13 +253,13 @@ export class EventDetails extends Component {
         const {values} = this.props
 
         return (
-            <div className="create-event-container">
-                <Nav />
+            <>
                 <form className="create-event-form">
                 <div className="create-event-heading">
-                    <header>Create Event</header>
+                    <header>Event Details</header>
                     <hr />
                 </div>    
+
                 <p className='create-event-warning' id="title">{this.state.errors.title}</p>
                     <input
                         required
@@ -259,17 +269,18 @@ export class EventDetails extends Component {
                         type='text'
                         placeholder='Event Name'
                         style={{borderColor: this.state.borderColors.title}}
+                        
                     />
                     <p className='create-event-warning' id="startDetails">{this.state.errors.startDetails}</p>
                     <div className="datePickerDiv" style={{borderColor: this.state.borderColors.startDetails }}>
                         <DatePicker
                             id="datePicker"
                             timeIntervals={15}
-                            selected={values.startDetails}
-                            onChange={event => this.handleFieldChange(event, 'startDetails')}
-                            onBlur={(event) => this.checkForDateErrors(event, true)}
+                            selected={Date.parse(values.startDetails)}
+                            onChange={event => this.handleFieldChange(event, 'startDetails')}    
+                            onCalendarClose={(event) => this.checkForDateErrors()}
                             showTimeSelect
-                            dateFormat="d MMM yyyy HH:mm"
+                            dateFormat="d MMM yyyy, HH:mm"
                             required
                             placeholderText={'Date & Time Event Starts'}
                             style={{borderColor: this.state.borderColors.startDetails}}
@@ -281,11 +292,11 @@ export class EventDetails extends Component {
                         <DatePicker
                             id="datePicker"
                             timeIntervals={15}
-                            selected={values.endDetails}
+                            selected={Date.parse(values.endDetails)}
                             onChange={event => this.handleFieldChange(event, 'endDetails')}
-                            onBlur={event => this.checkForDateErrors(event)}
+                            onCalendarClose={event => this.checkForDateErrors()}
                             showTimeSelect
-                            dateFormat="d MMM yyyy HH:mm"
+                            dateFormat="d MMM yyyy, HH:mm"
                             required
                             placeholderText={'Date & Time Event Ends'}
                             style={{borderColor: 'purple'}}
@@ -294,8 +305,7 @@ export class EventDetails extends Component {
                     </div>
                     <p className='create-event-warning' id="eventPassword">{this.state.errors.eventPassword}</p>
                     <input
-                        value={values.eventPassword}
-                        required
+                        value={values.eventPassword}                  
                         onChange={event => this.handleFieldChange(event, 'eventPassword')}
                         onBlur={() =>this.checkPasswordError(values)}
                         type='password'
@@ -306,18 +316,23 @@ export class EventDetails extends Component {
                     <textarea
                         value={values.description}
                         required
-                        minlength="6"
+                        minLength="6"
                         onChange={event => this.handleTextAreaChange(event)}
+                        onFocus={event => this.handleTextAreaChange(event)}
                         onBlur={event => this.checkDescriptionError(event)}
                         type='text'
                         placeholder='Describe The Event'
                         style={{borderColor: this.state.borderColors.description, height: this.state.textAreaHeight}}
                     />
-                    <button className="create-event-button" onClick={(event) => this.continue(event, values)}>Continue</button>
+                    <br />
+                <div style={this.spinnerVisibility()}   className ='ticket-spinner'>
+                    
+                    <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                </div>
+                <div>{this.props.message}</div>
+                    <button className={this.disableOrEnableButton()} onClick={(event) => this.continue(event, values)}>{this.props.buttonText}</button>
                 </form>
-                <Footer />
-            </div>
-  
+            </>
         )
     }
 }

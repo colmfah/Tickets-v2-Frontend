@@ -17,10 +17,15 @@ class CheckIn extends React.Component {
     showCheckIn: false,
     checkIn: false,
     displaySpinner: false,
-    messageColor: 'black'
+    messageColor: 'black',
+    image: '',
+    displayImage: false
   }
 
-  componentDidMount() {
+  componentDidMount() {    
+    let eventRequested = this.props.match.params.id 
+    this.setState({eventRequested})
+
   }
 
   checkInLogIn = (e) => {
@@ -46,33 +51,50 @@ class CheckIn extends React.Component {
   handleScan = (data, userEvent) => {
     if (data) {
 
-      this.turnScannerOnOff()
-      this.setState({message: "QR code scanned. Checking database for match..."})
+      this.turnScannerOnOff(data, true)
+      this.setState({message: "QR code scanned. Checking database for match...", displayImage: false})
 
       axios.post(`${process.env.REACT_APP_API}/checkIn`, {qrcode: data, userEvent: userEvent, password: this.state.password}).then(res => {
+        let message = res.data.message
         let messageColor = this.state.color
-        res.data.checkedIn === true ? messageColor = 'green' : messageColor = 'red'
-        this.setState({message: res.data.message, messageColor})
+        let image = this.state.image
+        let displayImage = true
+        if(res.data.checkedIn === true){
+          messageColor = 'green'
+          image = `${process.env.REACT_APP_API}/greenTick.png`
+        }else{
+          messageColor = 'red'
+          image = `${process.env.REACT_APP_API}/redx.png`
+        }
+        if(res.data.tryAgain){
+          messageColor = '#d8420b'
+          image = `${process.env.REACT_APP_API}/caution.png`
+        }
+        this.setState({message, messageColor, image, displayImage})
         }).catch(err => {console.log(err)})
     }
   }
 
-  logOut = () => {
+  logOut = (event) => {
+    event.preventDefault()
     this.setState({
       message: '',
       showCheckIn: false,
       checkIn: false,
-      eventRequested: '',
       password: '',
-      userEvent: {}
+      userEvent: {},
+      image: ''
     })
 
   }
 
-  turnScannerOnOff = () => {
+  turnScannerOnOff = (event, scanInProgress = false) => {
+    if(!scanInProgress){event.preventDefault()}
     let stateCopy = this.state
     stateCopy.checkIn = !stateCopy.checkIn
-    this.setState({checkIn: stateCopy.checkIn})
+    stateCopy.displayImage = false
+    stateCopy.message = ''
+    this.setState(stateCopy)
   }
 
   spinnerVisibility(){
@@ -80,79 +102,102 @@ class CheckIn extends React.Component {
     return {'display': 'none'}
   }
 
+  displayImage(){
+    if(this.state.displayImage ){return {'display': 'block'}}
+    return {'display': 'none'}
+  }
+
   displayLogInForm(){
     return(
-      <div>
-        <div>
-            <input
-                value={this.state.eventRequested}
-                required
-                onChange={event => this.eventDetails(event, 'eventRequested')}
-                type='text'
-                placeholder='Event ID'
-            />
+      <div className="check-in-container">
+        <form className="check-in-form">
+          <div className="check-in-heading">
+            <header>Check In</header>
+            <hr />
+          </div>
+          <div>
+              <input
+                  value={this.state.eventRequested}
+                  required
+                  onChange={event => this.eventDetails(event, 'eventRequested')}
+                  type='text'
+                  placeholder='Event ID'
+              />
+          </div>
+          <div>
+              <input
+                  value={this.state.password}
+                  required
+                  onChange={event => this.eventDetails(event, 'password')}
+                  type='password'
+                  placeholder='Password'
+              />
+          </div>
+        <div className="check-in-spinner-message">
+          <div style={this.spinnerVisibility()} className ='ticket-spinner'>
+            <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div> 
+          </div>
+          <div className="check-in-message">{this.state.message}</div>
+          <div>{this.state.image}</div>
         </div>
-        <div>
-            <input
-                value={this.state.password}
-                required
-                onChange={event => this.eventDetails(event, 'password')}
-                type='password'
-                placeholder='Password'
-            />
+        <div className="check-in-button-container">
+          <button onClick={this.checkInLogIn}>Submit</button>
         </div>
-       <div className="check-in-spinner-message">
-        <div style={this.spinnerVisibility()} className ='ticket-spinner'>
-          <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div> 
-        </div>
-        <div className="check-in-message">{this.state.message}</div>
-      </div>
-      <div className="check-in-button-container">
-        <button onClick={this.checkInLogIn}>Submit</button>
-      </div>
+      </form>
     </div>
     )
   }
 
+  displayQRReader(){
+    if(!this.state.checkIn){return}
+    return (
+            <QrReader
+              delay={300}
+              onError={this.handleError}
+              onScan={event => this.handleScan(event, this.state.userEvent._id)}
+              style={{ width: '100vw', maxWidth: '600px', margin: '10px auto'}}
+              
+            />)
+  }
+
+
   displayCheckInForm(){
     return(
-      <div>
-        <h3>{this.state.userEvent.title}</h3>
-        <div className="check-in-event-details">{moment(this.state.userEvent.startDetails).format("Do MMM YYYY [at] HH:mm ")}</div>
-        {this.state.checkIn ? <button onClick={this.turnScannerOnOff}> Turn Scanner Off</button> : <button onClick={this.turnScannerOnOff}> Check In Ticket</button>} 
-        <button onClick={this.logOut}>Log Out of Event</button>
-        <div>{this.state.message}</div>
-        {this.state.checkIn ? 
-          <QrReader
-            delay={300}
-            onError={this.handleError}
-            onScan={event => this.handleScan(event, this.state.userEvent._id)}
-            style={{ maxWidth: '500px', marginTop: '50px' }}
-          />
-        : 
-        <> </>} 
+      <div className='check-in-container'>
+      <div className='check-in-scan'>
+        
+        <div className="check-in-event-details">
+          <header>{this.state.userEvent.title}</header>
+          <div className="check-in-date">{moment(this.state.userEvent.startDetails).format("Do MMM YYYY [at] HH:mm ")}</div>
+          <img src={this.state.image} alt={'log in response'} style={this.displayImage()}  className='check-in-image'/>
+          <p style={{color: this.state.messageColor}}>{this.state.message}</p>
+        </div>
+        <div>{this.displayQRReader()}</div>
+
+        <div className="check-in-button-wrapper">
+          <button onClick={(event) => this.turnScannerOnOff(event)}> {this.getButtonText()}</button>
+          <button onClick={event => this.logOut(event)}>Log Out of Event</button>
+        </div>
+      </div>
       </div>
       
     )
   }
 
+  getButtonText(){
+    if(this.state.checkIn){return 'Turn Scanner Off'}
+    return 'Check In Ticket'
+  }
 
 
   render() {
     return (
 <>
-  <div className="check-in-container">
+  
     <Nav />
-    <div className="check-in-form">
-      <div className="check-in-heading">
-        <h2>Check In</h2>
-        <hr />
-        {this.state.showCheckIn ? this.displayCheckInForm()  :  this.displayLogInForm()}
-      </div>
-    </div>
-    
+    {this.state.showCheckIn ? this.displayCheckInForm()  :  this.displayLogInForm()}
     <Footer />
-  </div>
+ 
 </>
 		    )
 		  }

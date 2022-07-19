@@ -4,18 +4,14 @@ nav {
   font-size: clamp(10px, 3vw, 16px);
   border-bottom: 1px solid #293d6a;
   width: 100vw;
-  padding: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   position: fixed;
   z-index: 2;
   top: 0;
-  display: flex;
-  justify-content: flex-end;
 }
 
-#loggedIn, #loggedOut{
-  width: 100%;
-  max-width: 700px;
-}
+
 
 nav ul {
   display: flex;
@@ -48,9 +44,9 @@ nav a:visited {
 
 .nav-spacing{
   width: clamp(80px, 21vw, 108px);
-  margin: auto;
   display: flex;
   justify-content: center;
+  align-items: center;
 
 }
 
@@ -76,7 +72,7 @@ nav a:visited {
   margin-left: 0;
 }
 
-.nav-link-wrapper .nav-btn{
+.nav-link-wrapper .nav-btn {
   background-color: #f7f7f7;
   cursor: pointer;
   display: flex;
@@ -146,11 +142,13 @@ nav a:visited {
 
 .nav-current-page {
   border: 1px solid #293d6a;
+  padding: clamp(0.5px, 0.75vw, 3.5px);
+  border-radius: 2px
 }
 
 
 
-.nav-current-page::before {
+/* .nav-current-page::before {
   height: 0%;
   width: 0%;
 }
@@ -158,7 +156,7 @@ nav a:visited {
 .nav-current-page::after {
   height: 0%;
   width: 0%;
-}
+} */
 
 nav ul li{
   display: inline-block;

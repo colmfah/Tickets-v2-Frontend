@@ -16,85 +16,93 @@
     }
   }
   
-  /* Home Page (Events Page) */
+
   
-  .home-event-summary-container {
+
+
+  
+  .home-event-text-container{
+    width: clamp(300px, 60vw, 400px);
+    max-height: 200px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
     margin: 0 auto;
-    margin-bottom: 20px;
+   
+  }
+
+  .home-details-container {
     background-color: #ffff;
-    max-width: 90vw;
+    width: fit-content;
+    max-width: 95vw;
     border-radius: 5px;
     color: #293d6a;
     transition: transform 0.3s;
     border: 1px solid #8f897c;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
     overflow: hidden;
-    max-height: 275px;
-  }
-
-  .home-event-location{
-    width: auto;
-  }
-
-  .home-event-date{
-    width: auto;
-  }
-  
-  .home-event-text-container{
-    width: 100%
-  }
-
-  .home-details-container {
+    max-height: 500px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
+    align-items: space-between;
     background-color: #ffff;
-    margin: 7px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+
   }
+
+
   
-  .home-text-container p i {
+  .home-text-container p {
     color: #293d6a94;
   }
   
-  .home-event-summary-container img {
-    width: clamp(1px, 100%, 400px);
-    height: clamp(1px, 45vw, 200px);
+  .home-details-container img {
+    width: 100%;
+    max-height: 100%;
     background-color: #ffff;
     border-radius: 5px;
     object-fit: cover;
   }
+
+  .event-card-image-wrapper{
+    width: clamp(300px, 60vw, 700px);
+    height: clamp(150px, 30vw, 200px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   
-  .home-event-summary-container a {
+  .home-details-container a {
     background-color: #ffff;
   }
   
   .home-event-date-and-location{
     background-color: #ffff;
-    font-size: 60%;
-    margin-top: 0px;
-    margin-bottom: 7px;
-    color: #8f897c;
     text-align: center;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
+    margin-top: 7px;
+    font-size: clamp(12px, 1.5vw, 15px);
+    font-weight: 600;
+    color: #d8420b;
   }
   
-  .home-event-summary-container header {
-    font-size: 130%;
+   .home-details-container header {
+    /* font-size: 130%; */
+    font-size: clamp(15px, 3vw, 25px);
     margin: 11px 0px;
     color: #293d6a;
     text-align: center;
+    margin: auto;
+    overflow: hidden;
+    max-height: 70px;
   }
   
-  .home-event-summary-container i {
-    background-color: #ffff;
-    color: #8f897c;
-  }
   
-  .home-event-summary-container:hover {
+  .home-details-container:hover {
     border: 1px solid #293d6a;
-    /* Box shadow code taken from https://codepen.io/sdthornton/pen/wBZdXq */
     -webkit-box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3),
       0 15px 12px rgba(0, 0, 0, 0.22);
     box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
@@ -103,11 +111,15 @@
     -ms-transform: scale(1.03);
     transform: scale(1.03);
   }
-  
-  .home-text-container {
-    background-color: #ffff;
-    margin: auto;
+
+
+
+  .events-content-wrapper{
+    margin-top: 50px;
+    padding-top: 3.5rem;
+    padding-bottom: 2.5rem;
   }
+  
   
   
   @-webkit-keyframes home-slide-in-from-left {
@@ -173,62 +185,44 @@
     animation: 1s ease-in 0s 1 home-slide-in-from-right;
   }
   
-  /* End of "similar code" */
+
   
-  /* This media query makes the event take advantage of the horizontal space on larger screens by increasing its width to a maximum of 800px  */
-  
-  @media only screen and (min-width: 700px) {
-
-    .home-event-date-and-location{
-      display: inline;
-      text-align: left;
-    }
-
-
-    .home-event-summary-container {
-      display: block;
-      width: clamp(1px, 90vw, 800px);
-      margin-top: 30px;
-    }
+  @media only screen and (min-width: 850px) {
   
     .home-details-container {
       display: flex;
       flex-direction: row;
       justify-content: flex-start;
-      margin: 2px;
-    max-height: 150px;
+      padding: 2px;
+      margin: auto;
+      height: 100%;
+      width: clamp(1px, 90vw, 1000px);
+      margin-bottom: 50px;
     }
-  
-    .home-event-summary-container img {
-      margin: 0%;
-      width: 33%;
-      height: 150px;
+    
+    .home-details-container header {
+
+      font-size: clamp(20px, 3vw, 30px);
+      text-align: center;
+      margin: auto;
+      overflow: hidden;
+      max-height: none;
     }
 
-    .home-event-location {
-      margin-left: 0;
-      margin-top: 13.5px;
-    }
 
-    .home-event-text-container{
+    .home-event-text-container {
       margin-left:3%;
+      max-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px;
     }
   
-    .home-event-summary-container header {
-      margin-bottom: 18px;
-      font-size: 210%;
-      text-align: left;
-    }
-    .home-event-summary-container p {
-      font-size: 70%;
-      margin-bottom: 9px;
-    }
-
-    .home-text-container {
-      margin-left: 10%;
+  
+    .home-event-date-and-location{
+      margin-left: 0;
     }
   
-    .tickets-remaining {
-      margin-bottom: 0;
-    }
   }

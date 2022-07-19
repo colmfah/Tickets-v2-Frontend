@@ -65,13 +65,46 @@ class CheckoutForm extends Component {
 
   compilePaymentDetails = (paymentMethodID='') => {
     return {
-      userEvent: this.props.userEvent,
+      userEvent: this.props.userEvent._id,
       requestedTickets: this.props.requestedTickets,
       purchaserEmail: this.props.purchaserEmail,
       amount: this.props.total,
       paymentMethodID: paymentMethodID,
-      promotionalMaterial: this.props.promotionalMaterial
+      promotionalMaterial: this.props.promotionalMaterial,
+      cardCountry: this.props.cardCountry
     };
+  }
+
+  displayCardCountryOptions = () => {
+    return
+    if(this.props.userEvent.tickets.filter(e => e.lastMinuteTicket).length > 0){return}
+    return(        
+    <div className="create-event-radio-container event-country-card-radio-container">
+      <div>Country of debit/credit card</div> 
+      <div className='create-event-radio-wrapper'>
+          <div>
+              <input
+                  type="radio"
+                  checked={this.props.cardCountry==='EU'}
+                  value="EU"
+                  onChange={event => this.props.changeCardCountry(event)}
+              />
+              {` EU or UK`}
+          </div>
+
+          <div>
+              <input
+                  type="radio"
+                  checked={this.props.cardCountry==='restOfWorld'}
+                  value="restOfWorld"
+                  onChange={event => this.props.changeCardCountry(event)}
+              />
+              {` Rest of world`} 
+          </div> 
+      </div>                              
+  </div> 
+  )
+
   }
 
   creditCardErrorsExist  = () => {
@@ -130,7 +163,9 @@ class CheckoutForm extends Component {
     return false; 
   }
 
+
   payNow = async (tickets) => {
+    // is handlePaymentError still working?
     if(tickets.filter(ticket => ticket.lastMinuteTicket).length > 0){return}
     let error = false
     this.props.clearMessage()
@@ -142,28 +177,30 @@ class CheckoutForm extends Component {
     if(error){return}
     this.props.updateMessage("Processing Card Details. This will take a minute. Please be patient")
     const cardElement = this.props.elements.getElement("card");
-    let confirmedCardData = await this.props.stripe.confirmCardSetup(clientSecret.data.clientSecret, {payment_method: {card: cardElement, billing_details: {email: this.props.purchaserEmail}}}).catch(err =>{ error = true; this.handlePaymentError(err, true, clientSecret)})
+    let paymentIntent = await this.props.stripe.confirmCardPayment(clientSecret.data.clientSecret, {
+      payment_method: {card: cardElement, billing_details: {email: this.props.purchaserEmail}}}).catch(err =>{ error = true; this.handlePaymentError(err, true, clientSecret)})
     if(error){return}
-    if (confirmedCardData.error) {  error = true; this.handlePaymentError(confirmedCardData.error.message, true, clientSecret)} 
+    if (paymentIntent.error) {  error = true; this.handlePaymentError(paymentIntent.error.message, true, clientSecret.data.clientSecret)} 
     if(error){return}
     this.props.updateMessage("Confirmed Card Details. Charging Card. Please Wait")
     this.props.toggleRefundStatusDisplay()
-    let chargedCard = await axios.post(`${process.env.REACT_APP_API}/payNow`, this.compilePaymentDetails(confirmedCardData.setupIntent.payment_method)).catch(err =>{error = true; this.handlePaymentError(err) })
-    if(error){return}
-    if(!chargedCard.data.success){error = true; this.handlePaymentError(chargedCard.data.message)}
-    if(error){return}
-    axios.post(`${process.env.REACT_APP_API}/emailTickets`,{paymentIntent: chargedCard.data.paymentIntent, userEvent: this.props.userEvent}).then(res=>{})
+    axios.post(`${process.env.REACT_APP_API}/emailTickets`,{paymentIntent: paymentIntent.paymentIntent.id, userEvent: this.props.userEvent}).then(res=>{})
     this.props.changeMessageColor('green')
     this.props.updateMessage(`Your card has been charged. Your tickets will be emailed to ${this.props.purchaserEmail} shortly`)
     this.props.resetTicketQuantities()
     this.toggleDisablePurchaseButton()
   }
 
-  refundStatusClass = () => {
-    if(this.props.displayRefundStatus && this.props.tickets.length === 0){return `refund-status-message`}
-    if(this.props.displayRefundStatus && this.props.tickets[0].lastMinuteTicket){return `refund-status-message`}
-    if(this.props.displayRefundStatus){return `refund-status-message reveal`}
-    return `display-none`
+
+  dispalyRefundReminder = () => {
+    if(this.props.tickets[0] === undefined){return}
+    if(this.props.tickets[0].refunds.optionSelected !== 'excessDemand'){return}
+    return (
+      <div className='refund-status-message'>
+        A limited number of refunds are available for this event <br /> 
+        Visit the <Link to={`/tickets`} target="_blank" rel="noopener noreferrer">tickets section</Link> of <em>My Account</em> to request a refund
+    </div>
+    )
   }
 
   toggleDisablePurchaseButton = () => {
@@ -189,14 +226,14 @@ class CheckoutForm extends Component {
           className={'match-stripe'}
           autoComplete={'on'}
         />
+
+        {this.displayCardCountryOptions()}
+
         <CardElement onChange={event => this.checkCreditCardNumber(event)}/>
         <div id='message-and-purchase-button'>
           <div className ={this.state.disablePurchaseButton ? 'lds-default': 'display-none'}><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
           <div className='purchase-message' style={{color: messageColor}}>{message}</div>
-          <div className={this.refundStatusClass() }>
-            A limited number of refunds are available for this event <br /> 
-            Visit the <Link to={`/tickets`} target="_blank" rel="noopener noreferrer">tickets section</Link> of <em>My Account</em> to request a refund
-          </div>
+          {this.dispalyRefundReminder()}
           <button id={this.state.disablePurchaseButton ?  'disable-purchase-button': 'purchase-button'} disabled={this.state.disablePurchaseButton}>
             {this.buttonText()}
           </button>

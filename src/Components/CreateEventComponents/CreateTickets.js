@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import Nav from "../Nav";
 import DatePicker from "react-datepicker";
-import Footer from "../Footer";
+
 
 export class CreateTickets extends Component {
 
@@ -94,19 +93,16 @@ export class CreateTickets extends Component {
 
                 
             }else if(e.startSelling === 'specific'){
-                ticketErrors.push(  this.props.startSellingSpecificTimeErrors (i, 'startSellingTime', values) )
+                ticketErrors.push(  this.props.startSellingSpecificTimeErrors (i, 'startSellingTime', values, true) )
             }else if(e.startSelling ==='whenPreviousSoldOut'){
                 
                 this.checkTicketExists(e)
             }
 
             if(e.stopSelling === 'specific'){
-                ticketErrors.push(  this.props.stopSellingSpecificTimeErrors (i, 'stopSellingTime', values) )
+                ticketErrors.push(  this.props.stopSellingSpecificTimeErrors (i, 'stopSellingTime', values, true) )
             }
 
-        
-
-            
 
             errors.push(ticketErrors)
             
@@ -125,6 +121,58 @@ export class CreateTickets extends Component {
 
 
         
+    }
+
+    updateTicket = (event, values, i) => {
+        event.preventDefault()
+        let errors = []
+        let ticketErrors = []
+        
+
+        ticketErrors.push( this.props.checkForErrors( 'ticketType', i, true)  )
+        ticketErrors.push(  this.props.checkForErrors( 'startSelling', i, true)  )
+        ticketErrors.push(  this.props.checkForErrors( 'stopSelling', i, true)  )   
+        ticketErrors.push(  this.props.checkForErrors( 'numberOfTickets', i, true)  )
+        ticketErrors.push(  this.props.checkForErrors( 'stopSellingTime', i, true)  )
+        ticketErrors.push(  this.props.checkForErrors( 'startSellingTime', i, true)  )
+
+                
+        if(values.tickets[i].chargeForTicketsStatus === 'freeTickets'){
+            ticketErrors.push(  this.props.checkForErrors( 'chargeForNoShows', i, true)  )
+        }else{
+            ticketErrors.push(  this.props.checkForErrors( 'price', i, true)  )
+        }
+
+        if(values.tickets[i].chargeForNoShows > 0){
+            ticketErrors.push(  this.props.checkForErrors( 'hold', i, true)  )
+        }
+
+        // if(values.tickets[i].startSelling ==='whenPreviousSoldOut'){
+        //     ticketErrors.push(  this.props.checkForErrors( 'sellWhenTicketNumberSoldOut', i, true)  )            
+        
+
+            
+        // }
+        
+        if(values.tickets[i].startSelling ==='whenPreviousSoldOut'){
+            
+            this.checkTicketExists(values.tickets[i])
+            //need to change this as I'm not checking across all tickets for update
+            //can't delete tickets anymore so they always exist
+        }
+
+        errors.push(ticketErrors)
+        errors = errors.map(e => e.filter(f => f!== undefined))
+
+        if(errors[0][0] === undefined){
+
+            this.props.nextStep('tickets', i) 
+
+        }else{ 
+            this.props.displayUpdateMessages('tickets', 'Cannot update: Please fix errors', false, i) 
+            document.getElementById(`ticket${i}`).getElementsByClassName(errors[0][0])[0].scrollIntoView({behavior: "smooth"})
+        } 
+
     }
 
     
@@ -185,16 +233,18 @@ export class CreateTickets extends Component {
     displaySpecificStartSellingOption(index, values){
         if(values.tickets[index].startSelling !== 'specific'){return}
         return(
-            // 
+            
+            
+
         <div className="create-ticket-date-picker" style={{ borderColor: values.tickets[index].borderColors.startSellingTime }} >
                 <DatePicker
                     timeIntervals={15}
-                    onBlur={() => this.props.startSellingSpecificTimeErrors (index, 'startSellingTime', values)}
-                    onChange={event => this.props.setSpecificTime(event, index, 'startSellingTime', values)}
-                    selected={values.tickets[index].startSellingTime}
+                    onChange={event => this.props.setSpecificTime(event, index, 'startSellingTime')}
+                    onCalendarClose={event => this.props.checkForErrors('startSellingTime', index, false)}
+                    selected={Date.parse(values.tickets[index].startSellingTime)}
                     placeholderText='Select Date And Time'
                     showTimeSelect
-                    dateFormat="Pp"
+                    dateFormat="d MMM yyyy, HH:mm"
                     required
                     
                     />
@@ -203,25 +253,26 @@ export class CreateTickets extends Component {
 
     displaySpecificStopSellingOption(index, values){
         if(values.tickets[index].stopSelling !== 'specific'){return}
-        return (<div>
-            <p className="create-event-warning stopSellingTime">{values.tickets[index].errors.stopSellingTime}</p>
+        return (
+           
             <div className="create-ticket-date-picker" style={{ borderColor: values.tickets[index].borderColors.stopSellingTime }}>  
                 <DatePicker
                     className="datePicker"
                     timeIntervals={15}
                     onChange={event => this.props.setSpecificTime(event, index, 'stopSellingTime', values)}
-                    onBlur={()=> this.props.stopSellingSpecificTimeErrors(index, 'stopSellingTime', values)}
-                    selected={values.tickets[index].stopSellingTime}
+                    onCalendarClose={event => this.props.checkForErrors('stopSellingTime', index, false)}
+                    selected={Date.parse(values.tickets[index].stopSellingTime)}
                     placeholderText='Select Date And Time'
                     showTimeSelect
-                    dateFormat="Pp"
+                    dateFormat="d MMM yyyy, HH:mm"
                     required
                 />
             </div>
-        </div>)
+        )
     }
 
     displayDeleteTicketButton(index, values){
+        if(this.props.amendingEvent){return}
         if(values.tickets.length <= 1){return}
         return( 
             <button
@@ -231,28 +282,79 @@ export class CreateTickets extends Component {
         ) 
     }
 
+
     numberToOrdinal(n){
         const s = ['th', 'st', 'nd', 'rd'];
         const v = n % 100;
         return n + (s[(v - 20) % 10] || s[v] || s[0]);
       };
 
+      displayTitle(){
+          if(this.props.amendingEvent){return 'Edit Tickets'}
+          return 'Create Tickets'
+      }
+
+
+      displayGoForwardAndBackButtons(values){
+          if(this.props.amendingEvent){return}
+        return(
+            <div className="create-event-button-container">
+                <button className={this.disableOrEnableButton("create-event-button create-ticket-button")} onClick={this.props.prevStep}>Go Back</button>
+                <button className={this.disableOrEnableButton("create-event-button create-ticket-button")}  onClick={event => this.continue(values)}>Continue</button>   
+            </div>
+        )
+    }
+
+    displayEditEventButtons(i){
+        if(this.props.amendingEvent===false){return}
+        return (
+            <div className="create-tickets-update-and-pause-button-container">
+                <br />
+                <div style={this.spinnerVisibility(i)}   className ='ticket-spinner'>
+                    <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                </div>
+                <div>{this.props.message[i].message}</div>
+                
+                <button className={this.disableOrEnableButton("create-event-button create-ticket-button" )}  onClick={event => this.updateTicket(event, this.props.values, i)}>Update</button> 
+                <button
+                    className={this.disableOrEnableButton("create-event-button create-ticket-button" )} 
+                    onClick={(event)=> this.props.pauseSales(event, i)  }>
+                        {this.props.values.tickets[i].pauseSales ? 'Unpause Sales' : 'Pause Sales'}   
+                </button> 
+            </div>)
+        }
+
+    spinnerVisibility(index){
+
+        if(!this.props.amendingEvent){return {'display': 'none'}  }
+        if(this.props.spin[index].spin){return {'display': 'block'}} 
+        return {'display': 'none'}       
+      }
+
+      disableOrEnableButton(classNames){
+        if(this.props.updating){
+            return `${classNames} disable-button`
+        }
+        return classNames
+    }
+
 
     render() {
 
         const {values} = this.props
+        if(values.tickets === undefined){return null }
 
         return (
-            <div className="create-event-container">
-                <Nav />
+            <div className='create-tickets-wrapper'>
                 <div className="create-ticket-heading">
-                    <header>Create Event</header>
+                    <header>{this.displayTitle()}</header>
                     <hr />
                 </div>    
                 <div className='create-events-tickets-container'>
-                    {values.tickets.map((e, i) => 
-                    <div key={i} className="create-ticket-form" id={`ticket${i}`}>
-                        <form>
+                    {values.tickets.map((e, i) => {
+       
+                        return (
+                        <form key={i} className="create-ticket-form" id={`ticket${i}`}>
                             <div className="create-ticket-number-heading">
                                 <header>{`${this.numberToOrdinal(i+1)} Ticket`}</header>
                                 <hr />
@@ -266,7 +368,9 @@ export class CreateTickets extends Component {
                                     onChange={event => this.props.changeTicketDetails(event, 'ticketType', i)}
                                     placeholder="Ticket Name eg. General Admission"
                                     style={{borderColor: values.tickets[i].borderColors.ticketType}}
-                                />     
+                                    /> 
+                                    
+                                    
                             <p className="create-event-warning" >{values.tickets[i].errors.ticketDescription}</p>
                             <textarea
                                 id="create-event-ticket-description"
@@ -275,8 +379,10 @@ export class CreateTickets extends Component {
                                 onBlur={() => this.props.checkForDescriptionErrors(i)}
                                 onChange={event => this.props.changeTicketDetails(event, 'ticketDescription', i)}
                                 placeholder="Ticket Description (optional)"
-                                style={{borderColor: values.tickets[i].borderColors.ticketDescription}}
-                            />          
+                                style={{borderColor: values.tickets[i].borderColors.ticketDescription}}      
+                            />    
+
+                           
                             <p className="create-event-warning price">{values.tickets[i].errors.price}</p>
                                 <input
                                     required
@@ -288,6 +394,8 @@ export class CreateTickets extends Component {
                                     min={0}
                                     style={{borderColor: values.tickets[i].borderColors.price}}
                                 />
+
+                               
 
                            
                                 
@@ -303,6 +411,7 @@ export class CreateTickets extends Component {
                                 placeholder="Number of Tickets"
                                 style={{borderColor: values.tickets[i].borderColors.numberOfTickets }}
                             />
+                           
                             <p className="create-event-warning startSelling">{values.tickets[i].errors.startSelling}</p>
                             <div className="create-event-radio-container" style={{borderColor: values.tickets[i].borderColors.startSelling  }}>
                                 <div>Start Selling Tickets</div> 
@@ -329,7 +438,6 @@ export class CreateTickets extends Component {
                                         {this.displayPreviousTicketOption(i, values)}
                                     
                                         {this.textForPreviousTicketOption(i, values)}
-                               
                                     </div>
                                     
                                 </div>
@@ -372,10 +480,13 @@ export class CreateTickets extends Component {
                                     </div> 
                                 </div>                              
                             </div>     
+                            <p className="create-event-warning stopSellingTime">{values.tickets[i].errors.stopSellingTime}</p>
                             {this.displaySpecificStopSellingOption(i, values)}  
-                            {this.displayDeleteTicketButton(i, values)}                     
+                            {this.displayEditEventButtons(i)}
+                            {this.displayDeleteTicketButton(i, values)}  
+                                              
                         </form>
-                    </div>
+                    )}
                     )}
                 </div>
 
@@ -383,17 +494,9 @@ export class CreateTickets extends Component {
 
 
                 <div className="create-tickets-button-container">
-                    <button className="create-event-button create-ticket-button green-button"  onClick={this.props.addTicket}>Create Another Ticket</button>
-                
-
-                    <div className="create-event-button-container">
-                        <button className="create-event-button create-ticket-button" onClick={this.props.prevStep}>Go Back</button>
-                        <button className="create-event-button create-ticket-button" onClick={event => this.continue(values)}>Continue</button>   
-                    </div>
+                    <button className={this.disableOrEnableButton("create-event-button create-ticket-button green-button" )}  onClick={this.props.addTicket}>Create Another Ticket</button>
+                    {this.displayGoForwardAndBackButtons(values)}
                 </div>
-
-            
-        <Footer />
     </div>
         )
     }

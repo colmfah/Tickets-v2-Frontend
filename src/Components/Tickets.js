@@ -16,7 +16,8 @@ class Tickets extends React.Component {
       ticketsBought: [],
       waitLists: [],
       usersEvents: []
-    }
+    },
+    dataLoaded: false
   };
 
   componentDidMount() {
@@ -26,8 +27,31 @@ class Tickets extends React.Component {
     };
     axios
       .post(`${process.env.REACT_APP_API}/profile`, objectToSend)
-      .then(res => {this.setState({ user: res.data})})
+      .then(res => {this.setState({ user: res.data, dataLoaded: true})})
       .catch(err => console.log(err));
+  }
+
+  displayTickets = () => {
+    if(this.state.user.ticketsBought.length === 0){return}
+    return (<div className="tickets-wrap">
+      {this.state.user.ticketsBought.map((ticket, index)=> {
+        return( <div key={index}>
+            <PurchasedTicket
+              ticket = {JSON.parse(JSON.stringify(ticket))}
+            />
+          </div>)}
+          )}
+    </div>)
+  }
+
+  displayNoTicketsPurchasedMessage = () => {
+
+    console.log('this.state.dataLoaded', this.state.dataLoaded)
+   
+    if(!this.state.dataLoaded){return}
+    if(this.state.user.ticketsBought.length > 0){return}
+    
+    return (<div className="tickets-wrap center-text">You have not purchased any tickets for upcoming events</div>)
   }
 
 
@@ -36,14 +60,14 @@ class Tickets extends React.Component {
     return (
       <>
         <Nav />
-        <div className="tickets-wrap">
-          {this.state.user.ticketsBought.map((ticket, index)=> {
-            return( <div key={index}>
-                <PurchasedTicket
-                  ticket = {JSON.parse(JSON.stringify(ticket))}
-                />
-              </div>)}
-              )}
+        <div className='my-event-container'>
+          <div className="create-ticket-heading">
+              <header>My Tickets</header>
+              <hr />
+          </div>   
+        {this.displayTickets()}
+        {this.displayNoTicketsPurchasedMessage()}
+          
         </div>
         <Footer />
       </>

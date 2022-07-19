@@ -1,8 +1,6 @@
 
 import React from 'react'
 import Map from "./Map"
-import Nav from "../Nav"
-import Footer from "../Footer";
 import '../../Styles/Cards.css'
 import '../../Styles/Forms.css'
 import '../../Styles/Buttons.css'
@@ -62,10 +60,10 @@ class AddressDetails extends React.Component {
         })
 
         if(elementsWithErrors.length > 0 ){
-            document.getElementsByClassName('create-event-container')[0].scrollIntoView({behavior: "smooth"})
+            document.getElementById(elementsWithErrors[0]).scrollIntoView({behavior: "smooth"})
         }else{
 
-            this.props.nextStep() 
+            this.props.nextStep('addressDetails') 
         }
 
     }
@@ -113,17 +111,33 @@ class AddressDetails extends React.Component {
         this.setState(stateCopy)
     }
 
+    displayGoBackButton(){
+        if(this.props.amendingEvent){return}
+        return (<button className="create-event-button" onClick={event => this.goBack(event)}>Go Back</button>)
+    }
+
+    spinnerVisibility(){
+        if(this.props.spin){return {'display': 'block'}} 
+        return {'display': 'none'}       
+  }
+
+  disableOrEnableButton(){
+    if(this.props.updating){
+        return 'create-event-button disable-button'
+    }
+    return 'create-event-button'
+}
+
 
 	render() {
 
         const {values} = this.props
 
 	  return (
-        <div className="create-event-container">
-            <Nav />        
+        <>
             <form className="create-event-form">
                 <div className="create-event-heading">
-                    <header>Create Event</header>
+                    <header>Address Details</header>
                     <hr />
                 </div>    
                 <p className='create-event-warning' id="venue">{this.state.errors.venue}</p>
@@ -181,13 +195,17 @@ class AddressDetails extends React.Component {
                     zoom={15}
                     getLatLngAfterDrag={this.props.getLatLngAfterDrag}
                 />
+                <br />
+                <div style={this.spinnerVisibility()}   className ='ticket-spinner'>
+                    <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                </div>
+                <div>{this.props.message}</div>
                 <div className="create-event-button-container">
-                    <button className="create-event-button" onClick={event => this.goBack(event)}>Go Back</button>
-                    <button className="create-event-button" onClick={(event)=> this.continue(event, values)}>Continue</button>   
+                    {this.displayGoBackButton() }
+                    <button className={this.disableOrEnableButton()} onClick={(event)=> this.continue(event, values)}>{this.props.buttonText}</button>   
                 </div>
             </form>
-            <Footer />
-	    </div>
+	    </>
 		)
 }
 }

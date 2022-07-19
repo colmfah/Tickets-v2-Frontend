@@ -1,14 +1,18 @@
 .tickets-wrap{
-    padding-top: 75px;
-    padding-bottom: 2.5rem;
+    margin: 50px auto;
+    border: 1px solid #8f897c;
+    border-radius: 5px;
     background-color: #FFFF;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
     align-items: baseline;
-    max-width: 100vw;
-    min-height: 100vh;
+    width: fit-content;
+    max-width: 99vw;
+    padding: clamp(0px, 2%, 100px);
+    column-gap: 75px;
 }
+
 
 
 
@@ -33,23 +37,17 @@
 
 .ticket-buttons {
   text-align: center;
+  margin: auto;
 }
 
 .ticket-card-wrap {
-    color: #fff;
-    font-family: sans-serif;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-    -ms-flex-line-pack: center;
-    align-content: center;
-    background-color: #fff;
- 
-    padding-left: clamp(0px, 3%, 30px);
-    padding-right: clamp(0px, 3%, 30px);
+  color: #fff;
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  background-color: #fff;
+  max-width: 98vw;
   }
 
   .ticket-message-container{
@@ -64,7 +62,11 @@
 
   .ticket-container {
     max-width: 450px;
-    margin: 26px 26px;
+    margin-top: 26px; 
+    margin-bottom: 26px;
+    /* margin-left: clamp(1px, 2%, 26px);
+    margin-right: clamp(1px, 2%, 26px) */
+
   }
 
   .ticket-message{
@@ -155,4 +157,12 @@
     50% {
       transform: scale(1.5);
     }
+  }
+
+  @media only screen and (min-width: 475px) {
+
+    .tickets-wrap{
+      max-width: 90vw;
+    }
+
   }

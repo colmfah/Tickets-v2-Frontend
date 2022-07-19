@@ -10,7 +10,8 @@ class ForgotPassword extends React.Component {
 	state = {
         email: '',
         message: '',
-        displaySpinner: false
+        displaySpinner: false,
+        disableButton: false
 	}
 
     changeField = (e, field) => {
@@ -19,14 +20,21 @@ class ForgotPassword extends React.Component {
         this.setState(stateCopy)
     }
 
+
+
     submit = (e) => {
         e.preventDefault()
         let displaySpinner = true
-        this.setState({displaySpinner})
+        let disableButton = true
+        this.setState({displaySpinner, disableButton})
+  
         axios.post(`${process.env.REACT_APP_API}/resetPassword`, {email: this.state.email}).then(res => {
             let message = res.data.message
             displaySpinner = false
-            this.setState({message, displaySpinner})
+            console.log('res.data.success', res.data.success)
+            if(!res.data.success){disableButton = false}
+            if(res.data.success){setTimeout(() => {disableButton = false; this.setState({disableButton})}, (5*60*1000))}
+            this.setState({message, displaySpinner, disableButton})
         })
     }
 
@@ -41,7 +49,7 @@ class ForgotPassword extends React.Component {
             <Nav />         
             <form className="check-in-form forgot-password-form" onSubmit={(event) => this.submit(event)}>
                 <div className="check-in-heading">
-                    <h2>Forgot Password</h2>
+                    <header>Forgot Password</header>
                     <hr />
                 </div>
                 <input 
@@ -57,12 +65,13 @@ class ForgotPassword extends React.Component {
                     </div>
                     <div className="log-in-message">{this.state.message}</div>
                 </div>
-                <button id="log-in-button">Reset Password</button>
+                <button id={this.state.disableButton ?  'disable-purchase-button': 'purchase-button'}  disabled={this.state.disableButton}>Reset Password</button>
             </form>
             <Footer />
 		</div>
 	)
 }
 }
+
 
 export default ForgotPassword

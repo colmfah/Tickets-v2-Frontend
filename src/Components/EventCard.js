@@ -1,7 +1,5 @@
 import React from "react";
 import moment from "moment";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCalendarAlt, faMapMarker } from '@fortawesome/free-solid-svg-icons'
 import "../Styles/EventCard.css";
 
 
@@ -10,15 +8,22 @@ import "../Styles/EventCard.css";
 
 class EventCard extends React.Component {
   state = {};
+
+  slideDirection(){
+    if(this.props.index%2 === 0){return 'home-details-container home-slide-from-right'}
+    return "home-details-container home-slide-from-left"
+  }
+
   render() {
     return (
     <>
-    <section class="home-event-summary-container home-slide-from-left">
-        <a href="party.html">
-          <div class="home-details-container">
+    
+    <div className="home-details-container">
+          <div className="event-card-image-wrapper">
             <img
               src={this.props.image} alt={this.props.name}
             />
+          </div>
 
             <div className="home-event-text-container">
 
@@ -27,20 +32,21 @@ class EventCard extends React.Component {
               <div className="home-event-date-and-location">
 
                 <div className="home-event-date">
-                   <FontAwesomeIcon icon={faCalendarAlt} className="fontawesome-icon"/> {` ${moment(this.props.startDetails).format('Do MMM')} at ${moment(this.props.startDetails).format('HH:mm')} `}
+                  {` ${moment(this.props.startDetails).format('ddd Do MMM')} at ${moment(this.props.startDetails).format('HH:mm')} `}
                 </div>
 
                 <div className="home-event-location">
-                  <FontAwesomeIcon icon={faMapMarker} className="fontawesome-icon"/>  {` ${this.props.location}`}
+                 {` ${this.props.location}`}
                 </div>
 
               </div>
             </div>
 
   
-          </div>
-        </a>
-      </section>
+        </div>
+    
+     
+    
 
 	</>
     )

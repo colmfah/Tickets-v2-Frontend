@@ -9,7 +9,8 @@ import CreateTickets from './CreateEventComponents/CreateTickets'
 import Cancellations from './CreateEventComponents/Cancellations'
 import Geocode from "react-geocode"
 import AddressDetails from "./CreateEventComponents/AddressDetails";
-
+import Nav from "./Nav";
+import Footer from "./Footer";
 
 
 class CreateEvent extends React.Component {
@@ -66,7 +67,7 @@ class CreateEvent extends React.Component {
 			ticketDescription: '',
 			hold: '',
 			refunds: {optionSelected: '',
-							untilSpecific: '',
+							refundUntil: '',
 							howToResell: 'specificPrice',
 							resellAtSpecificPrice: '',
 							minimumPrice: '',
@@ -99,8 +100,8 @@ class CreateEvent extends React.Component {
 			}
 		}],
 		globalRefundPolicy: true,
-		globalRefundOptions: {optionSelected: '',
-						untilSpecific: '',
+		globalRefundOptions: {optionSelected: 'excessDemand',
+						refundUntil: '',
 						howToResell: '',
 						resellAtSpecificPrice: '',
 						minimumPrice: ''},
@@ -133,7 +134,7 @@ class CreateEvent extends React.Component {
 			ticketDescription: '',
 			hold: '',
 			refunds: {optionSelected: '',
-							untilSpecific: '',
+							refundUntil: '',
 							howToResell: 'specificPrice',
 							resellAtSpecificPrice: '',
 							minimumPrice: ''
@@ -200,17 +201,19 @@ class CreateEvent extends React.Component {
 
 		let displaySpinner = true
 		this.setState({displaySpinner})
-		
 	
 		axios.post(`${process.env.REACT_APP_API}/image`, data)
 			.then(res => {
-				console.log('res.data', res.data)
+				console.log('res', res)
 				displaySpinner = false
 				this.setState({displaySpinner})
-				this.props.history.push(`/events/${res.data._id}`)
+				if(res.data.success){this.props.history.push(`/events/${res.data.userEvent}`)}
+				else{
+					let errorMessage = String(res.data.message)
+					this.setState({errorMessage})
+				}
 				
 				})
-
 				.catch(err => {
 				displaySpinner = false
 				let errorMessage = String(err)
@@ -218,10 +221,8 @@ class CreateEvent extends React.Component {
 			})
 	}
 
-	changeField = (e, field) => {	
-		
-		
-		
+	changeField = (e, field, subfield) => {	
+				
 		let userEvent = this.state.userEvent
 				
 		if (field === "image") {
@@ -234,12 +235,21 @@ class CreateEvent extends React.Component {
 			userEvent[field] = e
 		}
 
-		else {
+		else if(field ==='refunds'){
+			userEvent.globalRefundOptions[subfield] = e.target.value
+		}
+
+		else {			
 	      userEvent[field] = e.target.value;
 		}
-	
 		
 	    this.setState({ userEvent })
+	}
+
+	updateRefundData = (e, field) => {
+		let userEvent = this.state.userEvent
+		field === 'refundUntil' ? userEvent.globalRefundOptions[field] = e : userEvent.globalRefundOptions[field] = e.target.value
+		this.setState({ userEvent })
 	}
 
 	checkForErrors = (field, i, finalCheck) => {	
@@ -249,9 +259,6 @@ class CreateEvent extends React.Component {
         let warning = ''
 
         if(userEvent.tickets[i][field] === ''){
-
-			console.log('userEvent.tickets[i].numberOfTickets.split', userEvent.tickets[i].numberOfTickets.split(''))
-
             
             if(field ==='ticketType'){
                 warning = 'Please Name Your Ticket'
@@ -315,6 +322,7 @@ class CreateEvent extends React.Component {
 
 
 		let userEvent = this.state.userEvent
+		userEvent.tickets[ticketNumber].errors[field2] = ''
 
 		userEvent.tickets[ticketNumber][field1] = e.target.value
 
@@ -462,20 +470,24 @@ class CreateEvent extends React.Component {
 		this.setState({step: step-1})
 	}
 
-	startSellingSpecificTimeErrors = (i, field, values, finalCheck) => {
+	startSellingSpecificTimeErrors = (i, field, values, finalCheck=false) => {
+		console.log('startSellingSpecificTimeErrors')
+		console.log('field', field)
+		if(field !== 'startSellingTime'){return}
      
         
         let userEvent = this.state.userEvent
         let warning = ''
 
-        if(userEvent.tickets[i][field] === ''){
+        if(userEvent.tickets[i].startSellingTime === ''){
 
             warning = 'Please Select When You Want To Start Selling These Tickets'
     
-        }else if(moment(userEvent.tickets[i].startSellingTime).isAfter(moment(values.endDetails))){
+        }else if(moment(userEvent.tickets[i].startSellingTime).isAfter(moment(userEvent.endDetails))){
 
             warning = 'You Cannot Sell Tickets After The Event Ends'
-        }
+		}
+				
 
         userEvent.tickets[i].errors[field] = warning
         let color 
@@ -488,7 +500,9 @@ class CreateEvent extends React.Component {
 
 	}
 	
-	stopSellingSpecificTimeErrors = (i, field, values, finalCheck) => {
+	stopSellingSpecificTimeErrors = (i, field, values, finalCheck=false) => {
+
+		if(field !== 'stopSellingTime'){return}
          
         let userEvent = this.state.userEvent
         let warning = ''
@@ -518,6 +532,7 @@ class CreateEvent extends React.Component {
     }
 
 	setSpecificTime = (e, i, field) =>{
+
 		
 		let userEvent = this.state.userEvent       
         userEvent.tickets[i][field] = e   
@@ -530,6 +545,9 @@ class CreateEvent extends React.Component {
 		return tokenDetails.data.stripeAccountConnected
 	}
 
+	colm = () => {
+		console.log('colm')
+	}
 
 
 
@@ -542,74 +560,104 @@ class CreateEvent extends React.Component {
 
 		  case 1:
 			return(
-				<EventDetails 
-					changeField={this.changeField}	
-					nextStep={this.nextStep}
-					values={values}					
-				/>
+				<div className="create-event-container">
+					<Nav />
+					<EventDetails 
+						changeField={this.changeField}	
+						nextStep={this.nextStep}
+						values={values}	
+						buttonText='Continue'
+						passwordRequired={true}	
+						amendingEvent={false}			
+					/>
+					<Footer />
+				</div>
 			)
 
 			case 2:
 				return(
-					<AddressDetails
-						changeField={this.changeField}	
-						getLatLng={this.getLatLng} 	
-						getLatLngAfterDrag={this.getLatLngAfterDrag} 
-						nextStep={this.nextStep}
-						prevStep={this.prevStep}
-						values={values}
-					/>
+					<div className="create-event-container">
+						<Nav />
+						<AddressDetails
+							changeField={this.changeField}	
+							getLatLng={this.getLatLng} 	
+							getLatLngAfterDrag={this.getLatLngAfterDrag} 
+							nextStep={this.nextStep}
+							prevStep={this.prevStep}
+							values={values}
+							buttonText='Continue'
+							amendingEvent={false}
+						/>
+						<Footer />
+					</div>
 				)
 	
 
 			case 3:
 				return(
-					<Image
-						values={values}
-						nextStep={this.nextStep}
-						prevStep={this.prevStep}
-						changeField={this.changeField}
-					/>
+					<div className="create-event-container">
+						<Nav />
+						<Image
+							values={values}
+							nextStep={this.nextStep}
+							prevStep={this.prevStep}
+							changeField={this.changeField}
+							buttonText={'Update'}
+							titleText={'Change Image'}
+							amendingEvent={false}
+						/>
+						<Footer />
+					</div>
 				)
 			case 4:
 				return(
-					<CreateTickets
-						addTicket={this.addTicket}
-						changeSellingTimes = {this.changeSellingTimes }
-						changeTicketDetails = {this.changeTicketDetails}
-						checkForDescriptionErrors={this.checkForDescriptionErrors}
-						checkForErrors={this.checkForErrors}
-						checkForTimeErrors={this.checkForTimeErrors}
-						updateTickets={this.updateTickets}
-						deleteTicket={this.deleteTicket}
-						// handleBooleanChange={this.handleBooleanChange}
-						nextStep={this.nextStep}
-						prevStep={this.prevStep}
-						setSpecificTime={this.setSpecificTime}
-						startSellingSpecificTimeErrors={this.startSellingSpecificTimeErrors}
-						stopSellingSpecificTimeErrors={this.stopSellingSpecificTimeErrors}
-						values={values}
-					/>
+					<div className="create-event-container">
+						<Nav />
+						<CreateTickets
+							addTicket={this.addTicket}
+							changeSellingTimes = {this.changeSellingTimes }
+							changeTicketDetails = {this.changeTicketDetails}
+							checkForDescriptionErrors={this.checkForDescriptionErrors}
+							checkForErrors={this.checkForErrors}
+							checkForTimeErrors={this.checkForTimeErrors}
+							updateTickets={this.updateTickets}
+							deleteTicket={this.deleteTicket}
+							nextStep={this.nextStep}
+							prevStep={this.prevStep}
+							setSpecificTime={this.setSpecificTime}
+							startSellingSpecificTimeErrors={this.startSellingSpecificTimeErrors}
+							stopSellingSpecificTimeErrors={this.stopSellingSpecificTimeErrors}
+							values={values}
+							amendingEvent={false}
+						/>
+						<Footer />
+					</div>
 				)
 
 			case 5:
 				return(
-				<Cancellations		
-					changeField={this.changeField}
-					handleRefundChange={this.handleRefundChange}
-					nextStep={this.nextStep}
-					prevStep={this.prevStep}
-					submit={this.createEvent}
-					values={values}
-					errorMessage={this.state.errorMessage}
-					message = {this.state.message}
-					displaySpinner = {this.state.displaySpinner}
-				/>
+				<div className="create-event-container">
+					<Nav />
+					<Cancellations		
+						updateRefundData={this.updateRefundData}
+						handleRefundChange={this.handleRefundChange}
+						nextStep={this.nextStep}
+						prevStep={this.prevStep}
+						submit={this.createEvent}
+						values={values}
+						errorMessage={this.state.errorMessage}
+						message = {this.state.message}
+						displaySpinner = {this.state.displaySpinner}
+						amendingEvent={false}
+					/>
+					<Footer />
+				</div>
 			)
 	  }
 
   }
 }
+
 
 export default withRouter(CreateEvent);
 

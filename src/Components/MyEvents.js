@@ -5,6 +5,7 @@ import axios from "axios";
 import EventCard from "./EventCard";
 import { Link } from "react-router-dom";
 import { withRouter } from "react-router-dom";
+import "../Styles/MyEvents.css";
 
 
 class MyEvents extends React.Component {
@@ -26,13 +27,23 @@ class MyEvents extends React.Component {
         this.setState({ user: res.data})})    
   }
 
+  displayNoEventsMessage = () => {
+    if(this.state.user.myEvents.length > 0){return}
+    return (<div className="tickets-wrap center-text">You have not created any events</div>)
+  }
+
 
   render() {
     return (
-      <div className="tickets-wrap">
+      <>
         <Nav />
         <div className="content-wrapper">
+        <div className="my-events-heading">
+              <header>My Events</header>
+              <hr />
+          </div>  
             {this.state.user.myEvents.map((e, i) => {
+              if(e._id === '62d5c866a1b375717566969b'){return}
               return (
                 <Link to={`/myevent/${e._id}`}>
                   <EventCard
@@ -45,9 +56,10 @@ class MyEvents extends React.Component {
                 </Link>
               );
             })}
-          </div>
+        </div>
         <Footer />
-      </div>
+        </>
+      
     )    
   }
 }

@@ -103,6 +103,7 @@
     margin: auto;
     margin-bottom: 50px;
     text-align: center;
+    padding: 0 2%
 }
 
 
@@ -113,17 +114,13 @@
     width: fit-content;
     background-color: #fff;
     margin: auto;
-    margin-top: 100px;
     margin-bottom: 50px;
     padding: clamp(1px, 5%, 30px);
+    max-width: 95vw;
+    color: #293d6a;
 }
 
-.my-event-title h2{
-    color: #293d6a;
-    font-size: clamp(24px, 4vw, 35px);
-    text-align: center;
-    
-}
+
 
 .my-event-title hr, .my-event-heading hr{
     color: #293d6a;
@@ -160,7 +157,12 @@
 }
 
 .my-event-container{
-    padding-bottom: 2.5em
+    padding-bottom: 2.5em;
+    padding-top: 100px;
+}
+
+.my-event-details{
+    margin-top: 50px;
 }
 
 

@@ -62,6 +62,8 @@ class Event extends React.Component {
           },
         },
       ],
+      fixedCharge: '',
+      variableCharge: ''
     },
     currency: {
       USD: "$",
@@ -69,6 +71,7 @@ class Event extends React.Component {
       NZD: "$",
     },
     purchaserEmail: '',
+    cardCountry: 'EU',
     stripeCustomerID: "",
     errorMsg: "",
     lastMinuteTicketCharges: {
@@ -112,8 +115,7 @@ class Event extends React.Component {
       .post(`${process.env.REACT_APP_API}/retrieveEventByID`, objectToSend)
       .then((res) => {
         let allTicketsSoldOut = res.data.userEvent.tickets.every(e=>e.soldOut)
-        if(res.data.userEvent.tickets.length === 0){allTicketsSoldOut = true}
-      
+        if(res.data.userEvent.tickets.length === 0){allTicketsSoldOut = true}      
         this.setState({
           purchaserEmail: res.data.purchaserEmail,
           userEvent: res.data.userEvent,
@@ -143,8 +145,8 @@ class Event extends React.Component {
     if(tickets.length === 0){return 0}
     let totalFeesArray = []
     tickets.forEach(ticket => {
-      let fixedCharge = 0.69
-      let variableCharge = 0.055
+      let fixedCharge = this.state.userEvent.fixedCharge
+      let variableCharge = this.state.userEvent.variableCharge
       let feePerTicket = this.roundToTwo(fixedCharge + (ticket.price*variableCharge))
       let chargeExVat = this.roundToTwo(feePerTicket * ticket.quantityRequested)
       totalFeesArray.push(chargeExVat)
@@ -158,6 +160,11 @@ class Event extends React.Component {
     return tickets
     .map(ticket => ticket.quantityRequete * ticket.chargeForNoShows)
     .reduce((a, b) => a + b);
+  }
+
+  changeCardCountry = (event) => {
+    let cardCountry = event.target.value
+    this.setState({cardCountry})
   }
 
   changeEmail = (event) => {
@@ -221,7 +228,7 @@ class Event extends React.Component {
 
     if(waitListTickets.length > 0){
       checkBoxes.push({
-        text: `I agree that my card can be charged €${this.calculateTotalCharge()} before ${this.waitListExpirationTime(waitListTickets)}`,
+        text: `I agree that my card can be charged €${this.calculateTotalCharge().toFixed(2)} before ${this.waitListExpirationTime(waitListTickets)}`,
         checkBox: "waitList",
       })
     }
@@ -343,6 +350,8 @@ class Event extends React.Component {
       >
         <Elements>
           <CheckoutForm
+            cardCountry = {this.state.cardCountry}
+            changeCardCountry = {this.changeCardCountry}
             changeEmail = {this.changeEmail}
             changeMessageColor={this.changeMessageColor}
             changeQuantity={this.changeQuantity}
@@ -480,6 +489,7 @@ class Event extends React.Component {
     return +(Math.round(num + "e+2")  + "e-2");
   }
 
+
   toggleRefundStatusDisplay = () => {
     let displayRefundStatus = this.state.displayRefundStatus
     displayRefundStatus = !displayRefundStatus
@@ -521,6 +531,12 @@ class Event extends React.Component {
     return checkBoxErrors
   }
 
+  getOrganiserName = () => {
+    if(this.state.userEvent._id === undefined){return}
+    if(this.state.userEvent._id === '62d5c866a1b375717566969b'){return ' In 4 Squash'}
+    return ` ${this.state.userEvent.organiser.name}`
+  }
+
   render() {
     let checkBoxes = this.determineCheckBoxes()
     let checkoutFormConnected = this.getConnectedCheckoutForm()  
@@ -538,15 +554,17 @@ class Event extends React.Component {
             <div className="event-center">
               <header>{this.state.userEvent.title}</header>
               <hr />
-              <p><FontAwesomeIcon icon={faCalendarAlt} className="fontawesome-icon"/>{` ${this.displayStartAndEndTimes()}`} </p>
-              <p>
-                <a href={`https://www.google.com/maps/search/?api=1&query=${this.state.userEvent.lat},${this.state.userEvent.lng}`}
-                  target="_blank"
-                  rel="noopener noreferrer">
-                  <FontAwesomeIcon icon={faMapMarker} className="fontawesome-icon"/>{` ${location}`}
-                </a>
-              </p>
-              <p><FontAwesomeIcon icon={faUser} className="fontawesome-icon" />{` ${this.state.userEvent.organiser.name}`}</p>
+              <div className="event-time-location-organiser">
+                <p><FontAwesomeIcon icon={faCalendarAlt} className="fontawesome-icon"/>{` ${this.displayStartAndEndTimes()}`} </p>
+                <p>
+                  <a href={`https://www.google.com/maps/search/?api=1&query=${this.state.userEvent.lat},${this.state.userEvent.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    <FontAwesomeIcon icon={faMapMarker} className="fontawesome-icon"/>{` ${location}`}
+                  </a>
+                </p>
+                <p><FontAwesomeIcon icon={faUser} className="fontawesome-icon" />{this.getOrganiserName()}</p>
+              </div>
             </div>
           </section>
         </div>

@@ -15,10 +15,9 @@ const ColmTicket = (props) =>{
   let restOfWord = wordArray.join(' ')
   useEffect(() => {setHeight(ref.current.clientHeight)})
 
-
   function getPriceCode(code){
-    let price
-    Number(price) === 0 ? price = 'Free' : price = `€${ticket.price}`
+    let price = ticket.price
+    Number(price) === 0 ? price = 'Free' : price = `€${price.toFixed(2)}`
     code.push(
       <div key={code.length} className={'ticket-detail ticket-detail-price'}>
         <span>{'price'}</span>
@@ -47,10 +46,10 @@ const ColmTicket = (props) =>{
     let refundClassName
     
     if(ticket.refunds.optionSelected === 'excessDemand'){
-        refundStatus = `Limited number of refunds available`
+        refundStatus = `A limited number of refunds will be available if this event sells out`
         refundClassName = `ticket-detail ticket-detail-refund ticket-detail-refund-excess-Demand`
     }else if(ticket.refunds.optionSelected === 'untilSpecific'){
-        refundStatus = `Until ${moment(ticket.refunds.refundUntil).format('Do MMM HH:mm')}`
+        refundStatus = `Refunds available until ${moment(ticket.refunds.refundUntil).format('Do MMMM [at] HH:mm')}`
         refundClassName = `ticket-detail ticket-detail-refund`
     }else if(ticket.refunds.optionSelected === 'noRefunds'){
         refundStatus = 'No Refunds'
@@ -133,6 +132,25 @@ const ColmTicket = (props) =>{
     return code
   }
 
+  function incrementTicketsRequested(){    
+    let quantityRequested = props.ticket.quantityRequested + 1
+    if (quantityRequested > props.ticketsAvailable){quantityRequested = props.ticketsAvailable}
+    props.changeQuantity(props.index,quantityRequested, true)
+  }
+
+  function decrementTicketsRequested(){
+    let quantityRequested = props.ticket.quantityRequested - 1
+    if (quantityRequested < 0){quantityRequested = 0}
+    props.changeQuantity(props.index,quantityRequested, true)
+  }
+
+  function removeZero(){
+    if(props.ticket.quantityRequested !== 0){return}
+    props.changeQuantity(props.index,'', true)
+  }
+  
+
+
     //each func just spits out a bit of code. then another func puts together all the code it wants for each specific ticket
 
 
@@ -151,9 +169,13 @@ const ColmTicket = (props) =>{
                 type="number"
                 max={ticketsAvailable}
                 value={ticket.quantityRequested}
+                onClick={(event) => removeZero()}
                 onChange={(event) => changeQuantity(index,Number(event.target.value), true)}
                 min="0"
               />
+              <br />
+              <button id='input-button' onClick={(event) => incrementTicketsRequested()}>+</button>
+              <button id='input-button' onClick={(event) => decrementTicketsRequested()}>-</button>
             </div>
           </div>
         </div>

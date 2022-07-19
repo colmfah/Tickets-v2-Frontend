@@ -23,6 +23,8 @@ class StripeConnectSignUp extends React.Component {
 		const scope = query.get('scope')
 		const error = query.get('error')
 
+	
+
 		if (error){
 			this.setState({error: true, message: error})
 		} else if (scope && scope !=='read_write'){
@@ -35,6 +37,8 @@ class StripeConnectSignUp extends React.Component {
 				code: code,
 				scope: scope,
 			}
+
+			console.log(`code && scope === 'read_write'`)
 
 			axios.patch(`${process.env.REACT_APP_API}/sellersStripeDetails`, objectToSend).then(res => {
 				this.setState({message: res.data.message})})
@@ -54,14 +58,13 @@ class StripeConnectSignUp extends React.Component {
 						<p>Please click the below button to enable this</p>
 						<p>You will be brought to Stripe's website</p>
 						<p>Please follow the instructions on Stripe's websites</p>
-						<p>When you have completed all steps, you will be redirected back to this website</p>
-					
-
+						<p>When you have completed all steps, you will be redirected back to this website</p>	
 						<a href='https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_LPsNwzXaRz6XqLKvYpdXJB4C6kjQPjxa&scope=read_write' className="stripe-connect dark"><span>Connect with Stripe</span></a>
 				
 						</>
 				: <div>{this.state.message}</div>}
 			</div> 
+		
 		<Footer />
 		</div>
 

@@ -5,6 +5,7 @@ import Nav from "./Nav";
 import Footer from "./Footer";
 import EventCard from "./EventCard";
 
+
 class Events extends React.Component {
   state = {
     events: [],
@@ -31,16 +32,17 @@ class Events extends React.Component {
       <>
         <Nav />
         
-          <div className="content-wrapper">
+          <div className="content-wrapper events-content-wrapper">
             {this.state.events.map((e, i) => {
               return (
-                <Link to={`/events/${e._id}`}>
+                <Link to={`/events/${e._id}`} key={i}>
                   <EventCard
                     name={e.title}
                     location={`${e.venue}, ${e.address1}`}
                     startDetails={e.startDetails}
                     price={e.price}
                     image={e.imageURL}
+                    index={i}
                   />
                 </Link>
               );

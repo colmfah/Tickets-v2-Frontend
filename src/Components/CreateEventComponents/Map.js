@@ -24,17 +24,6 @@ class Map extends React.Component{
         }
     }
 
-    continue = (e) => {
-        e.preventDefault()
-        this.props.nextStep()
-    }
-
-    goBack = (e) => {
-        e.preventDefault()
-        this.props.prevStep()
-    }
-
-
     render(){
    
         const AsyncMap = withScriptjs(
@@ -45,8 +34,8 @@ class Map extends React.Component{
                         defaultZoom={this.props.zoom}
                         defaultCenter=
                         {{
-                            lat: this.props.center.lat,
-                            lng: this.props.center.lng
+                            lat: Number(this.props.center.lat),
+                            lng: Number(this.props.center.lng)
                         }}
                     >
 
@@ -55,7 +44,7 @@ class Map extends React.Component{
                             name={'Your Event Venue'}
                             draggable={true}
                             onDragEnd={ this.props.getLatLngAfterDrag }
-                            position={{ lat: this.props.center.lat, lng: this.props.center.lng }}
+                            position={{ lat: Number(this.props.center.lat), lng: Number(this.props.center.lng )}}
                         />
                     </GoogleMap>
                 )
@@ -83,6 +72,7 @@ class Map extends React.Component{
                     <div className="map">Please drag and drop the location marker if it is not accurate</div>
                 </div>
         } else {
+        
         map = <div className="map" style={{height: this.props.height}} />
         }
    

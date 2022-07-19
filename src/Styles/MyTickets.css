@@ -1,0 +1,10 @@
+.my-tickets-heading{
+    text-align: center;
+    width: fit-content;
+    border: 1px solid #8f897c;
+    border-radius: 5px;
+    padding: 20px 60px;
+    background-color: #fff;
+    margin: auto;
+    max-width: 100%;
+}

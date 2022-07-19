@@ -13,9 +13,10 @@ const PurchasedTicket = (props) =>{
     function cancelRefundRequest(){
         setDisplaySpinner(true)
         setMessage('Please Wait...')
-        let objectToSend = {token: localStorage.getItem("token"),ticketID: ticket._id}
+        let objectToSend = {token: localStorage.getItem("token"), ticket: ticket}
         axios.post(`${process.env.REACT_APP_API}/cancelRefundRequest`, objectToSend)
         .then(res => {
+            console.log('res.data - cancel request', res.data)
             setMessage(res.data.message)
             setDisplaySpinner(false)
             if(!res.data.error){setTicket(res.data.ticket)}  
@@ -24,8 +25,20 @@ const PurchasedTicket = (props) =>{
         )
     }
 
-    function displayRefundButton(){
-        if(ticket.refundRequested){return <button onClick={event => cancelRefundRequest()}>Cancel Refund Request</button>}
+    function displayCancelRefundButton(){
+        if(ticket.refunded){return}
+        if(ticket.refunds.optionSelected==='noRefunds'){return}
+        if(!ticket.refundRequested){return}
+        if(ticket.refunds.optionSelected!=='excessDemand'){return}
+        return <button onClick={event => cancelRefundRequest()}>Cancel Refund Request</button>
+    }
+
+    function displayRequestRefundButton(){
+        if(ticket.refundRequested){return}
+        if(ticket.refunded){return}
+        if(ticket.refunds.optionSelected==='noRefunds'){return}
+        if(displaySpinner){return}
+        if(moment().isAfter(ticket.refunds.refundUntil)){return}
         return <button onClick={event => requestRefund()}>Request Refund</button> 
     }
 
@@ -39,6 +52,12 @@ const PurchasedTicket = (props) =>{
     function getPriceCode(code){
         let price
         Number(price) === 0 ? price = 'Free' : price = `€${ticket.price}`
+        let priceToArray = price.split('.')
+        if(priceToArray.length === 2){
+            //converts €10.5 to €10.50
+            
+            price = `${priceToArray[0]}.${priceToArray[1]}0`  
+        }
         code.push(
         <div key={code.length} className={'ticket-detail ticket-detail-price'}>
             <span>{'price'}</span>
@@ -56,10 +75,10 @@ const PurchasedTicket = (props) =>{
         let refundClassName
         
         if(ticket.refunds.optionSelected === 'excessDemand'){
-            refundStatus = `Limited number of refunds available`
+            refundStatus = `A limited number of refunds will be available if this event sells out`
             refundClassName = `ticket-detail ticket-detail-refund ticket-detail-refund-excess-Demand`
         }else if(ticket.refunds.optionSelected === 'untilSpecific'){
-            refundStatus = `Until ${moment(ticket.refunds.refundUntil).format('Do MMM HH:mm')}`
+            refundStatus = `Refunds available until ${moment(ticket.refunds.refundUntil).format('Do MMMM [at] HH:mm')}`
             refundClassName = `ticket-detail ticket-detail-refund`
         }else if(ticket.refunds.optionSelected === 'noRefunds'){
             refundStatus = 'No Refunds'
@@ -94,7 +113,7 @@ const PurchasedTicket = (props) =>{
     function requestRefund(){
         setDisplaySpinner(true)
         setMessage('Please Wait...')
-        axios.post(`${process.env.REACT_APP_API}/refundRequest`, {ticketID: ticket, minimumPrice: ticket.minimumPrice, token: localStorage.getItem("token")})
+        axios.post(`${process.env.REACT_APP_API}/refundRequest`, {ticket: ticket, minimumPrice: ticket.minimumPrice, token: localStorage.getItem("token")})
         .then(res => {
             setMessage(res.data.message)
             setDisplaySpinner(false)
@@ -106,6 +125,7 @@ const PurchasedTicket = (props) =>{
         if(displaySpinner ){return {'display': 'block'}}
         return {'display': 'none'}
     }
+
 
     //each func just spits out a bit of code. then another func puts together all the code it wants for each specific ticket
 
@@ -138,7 +158,8 @@ const PurchasedTicket = (props) =>{
                         className='QR' 
                         style={{'maxWidth': '95%', 'height': 'auto', 'marginBottom': '12px', 'marginTop': '5px'}}/>
                 </Link>
-                {displayRefundButton()}
+                {displayRequestRefundButton()}
+                {displayCancelRefundButton()}
             </div>
           </div>
         </div>

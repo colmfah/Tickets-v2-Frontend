@@ -13,7 +13,8 @@ class SignUp extends React.Component {
       name: "",
       password: "",
     },
-    displaySpinner: false
+    displaySpinner: false,
+    disableSignUpButton: false
   }
 
   changeField = (e, field) => {
@@ -26,10 +27,16 @@ class SignUp extends React.Component {
     e.preventDefault()
     let displaySpinner = true
     let message = 'Please Wait'
-    this.setState({displaySpinner, message})
+    let disableSignUpButton = true
+    this.setState({displaySpinner, message, disableSignUpButton})
     axios.post(`${process.env.REACT_APP_API}/users`, this.state.user)
-    .then(res => {       
-      this.setState({ message: res.data.message, displaySpinner: false})})
+    .then(res => {
+      message = res.data.message  
+      displaySpinner = false
+      if(!res.data.success){disableSignUpButton = false}
+      if(res.data.success){setTimeout(() => {disableSignUpButton = false; this.setState({disableSignUpButton})}, (5*60*1000))}
+
+      this.setState({ message, displaySpinner, disableSignUpButton})})
     .catch(err => {this.setState({ message: String(err), displaySpinner: false})})
   }
 
@@ -46,7 +53,7 @@ class SignUp extends React.Component {
         <div className="check-in-container">             
           <form className="check-in-form" onSubmit={this.signup}>
             <div className="check-in-heading">
-                <h2>Sign Up</h2>
+                <header>Sign Up</header>
                 <hr />
             </div>
             <input
@@ -77,7 +84,12 @@ class SignUp extends React.Component {
               </div>
               <div className="log-in-message">{this.state.message}</div>
             </div>
-            <button id="log-in-button">Sign Up</button>
+            <button 
+              id={this.state.disableSignUpButton ?  'disable-purchase-button': 'purchase-button'} 
+              disabled={this.state.disableSignUpButton}
+            >
+              Sign Up
+            </button>
             <p className="log-in-links">Already have an account? <Link to="/login">Login</Link> </p>
           </form>
         </div>
@@ -86,5 +98,7 @@ class SignUp extends React.Component {
     )
   }
 }
+
+
 
 export default SignUp

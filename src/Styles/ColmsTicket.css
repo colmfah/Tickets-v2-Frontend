@@ -1,3 +1,16 @@
+#input-button{
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    padding: 0px 0px;
+    font-size: 20px;
+    color: white;
+    font-weight: bolder;
+    background-color: #e84c3d;
+    margin: 5px;
+    margin-top: 10px;
+}
+
 .ticket-details {
     display: flex;
     flex-direction: column;
@@ -74,7 +87,8 @@
 
  /* makes up and down arrows in input box always visible */
 .event-number input[type=number]::-webkit-inner-spin-button {
-    opacity: 1
+    opacity: 0;
+    -webkit-appearance: none
 }
 
  

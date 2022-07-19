@@ -55,9 +55,10 @@ class LogIn extends React.Component {
         <div className="check-in-container">
           <form className="check-in-form" onSubmit={event => this.login(event)}>
             <div className="check-in-heading">
-              <h2>Log In</h2>
+              <header>Log In</header>
               <hr />
             </div>
+            
             <input      
               required
               value={this.state.user.email}
@@ -78,6 +79,7 @@ class LogIn extends React.Component {
               </div>
               <div className="log-in-message">{this.state.message}</div>
             </div>
+
             <button id="log-in-button">Log In</button>
             
             <p className="log-in-links">Don't have an account? <Link to="/signup">Sign Up</Link>  </p>

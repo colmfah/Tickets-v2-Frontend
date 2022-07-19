@@ -1,10 +1,14 @@
 .check-in-container {
-    padding-top: 1px;
+    padding-top: 54px;
     padding-bottom: 2.5rem;
     background-color: #ececec;
     max-width: 100vw;
     min-height: 100vh;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  
 }
 
 .check-in-form{
@@ -15,11 +19,7 @@
     max-width: 95vw;
     min-width: 300px;
     background-color: #fff;
-    margin: auto;
-    /* padding-left: clamp(1px, 5%, 45px);
-    padding-right: clamp(1px, 5%, 45px); */
-    padding-top: 60px;
-    padding-bottom: 60px;
+    padding: 10px;
     color: #293d6a;
     display: flex;
     flex-direction: column;
@@ -49,8 +49,31 @@
     height: fit-content;
     min-height: 100px
 }
+.check-in-event-details {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-.check-in-form button {
+.check-in-event-details header{
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.check-in-date{
+    color: #d8420b;
+}
+
+.check-in-event-details img{
+    margin: 10px;
+}
+
+.check-in-event-details p{
+    font-weight: 600
+}
+
+.check-in-form button, .check-in-scan button {
     background-color: #293d6a;
     color: #fff;
     border-radius: 5px;
@@ -67,9 +90,16 @@
     transition: all 0.2s ease-in-out;
 }
 
-/* .check-in-form button:not(:first-child) {
-    margin-left: 25px;
-} */
+.check-in-button-wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.check-in-button-wrapper button{
+    margin: 5px 10px;
+}
 
 .check-in-form button:hover{
     transform: scale(1.1);
@@ -82,6 +112,7 @@
     flex-wrap: nowrap;
     width: fit-content;
     margin: auto;
+    margin-top: 20px;
 }
 
 .check-in-message{
@@ -89,40 +120,24 @@
 }
 
 .check-in-heading{
-    text-align: center;
     width: fit-content;
-    background-color: #fff;
     margin: auto;
-    max-width: 100%;
 }
 
-.check-in-heading h2{
-    color: #293d6a;
-    font-size: 30px;
-    text-align: center;
-}
 
-.check-in-heading hr{
-    color: #293d6a;
-    font-size: clamp(24px, 4vw, 35px);
-    text-align: center;
+
+
+.check-in-image{
+    max-height: 100px;
     margin: auto;
-    margin-top: 10px;
 }
 
-.check-in-button-container{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    margin-top: 25px;
-}
-
-
-.check-in-form h3{
-    margin-top: 50px
-}
-
-.check-in-event-details{
-    margin-bottom: 30px;
-
+.check-in-scan{
+    border: 1px solid #8f897c;
+    border-radius: 5px;
+    min-width: 300px;
+    background-color: #ffff;
+    color: #293d6a;
+    align-self: center;
+    padding-bottom: 10px;
 }

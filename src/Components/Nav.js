@@ -1,11 +1,15 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { withRouter } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-
 import "../Styles/Nav.css";
 
 class Nav extends React.Component {
+  
+  componentDidMount(){
+    this.setState({componentMounted: true})
+  }
+
+
   tokenCheck = () => {
     let token = localStorage.getItem("token");
     if (token) {
@@ -27,20 +31,34 @@ class Nav extends React.Component {
   render() {
     return (
       <nav>
+        <ul>
+        <div className="nav-spacing">
+          <li className="nav-link-wrapper">
+            <NavLink
+              exact
+              activeClassName="nav-current-page"
+              className="nav-btn"
+              to={`/events`}
+            >
+              Events
+            </NavLink>
+            </li>
+        </div>
+        <div className="nav-spacing">
+          <li className="nav-link-wrapper">
+            <NavLink
+              exact
+              activeClassName="nav-current-page"
+              className="nav-btn"
+              to={`/contactUs`}
+            >
+              Contact Us
+            </NavLink>
+            </li>
+        </div>
         {this.tokenCheck() ? (
-          <ul id="loggedIn">
-          <div className="nav-spacing">
-            <li className="nav-link-wrapper">
-                <NavLink
-                  exact
-                  activeClassName="nav-current-page"
-                  className="nav-btn"
-                  to={`/events`}
-                >
-                  Events
-                </NavLink>
-              </li>
-            </div>
+          <>
+
        
         
             <div className="nav-spacing">
@@ -69,14 +87,14 @@ class Nav extends React.Component {
                         My Tickets
                       </NavLink>
                     </li>
-                    <li className="nav-sub-link nav-link-wrapper">
+                    {/* <li className="nav-sub-link nav-link-wrapper">
                       <NavLink
                         to={`/waitLists`}
                         className="nav-btn"
                       >
                         My WaitLists
                       </NavLink>
-                    </li>
+                    </li> */}
                   
                     <li className="nav-sub-link nav-link-wrapper">
                       <NavLink
@@ -98,22 +116,9 @@ class Nav extends React.Component {
                 </div>
               </li>
             </div>
-          </ul>
+          </>
         ) : (
-          <ul id="loggedOut">
-            <div className="nav-spacing">
-              <li className="nav-link-wrapper">
-                <NavLink
-                  exact
-                  activeClassName="nav-current-page"
-                  className="nav-btn"
-                  to={`/events`}
-                >
-                  Events
-                </NavLink>
-              </li>
-            </div>
-
+          <>
             <div className="nav-spacing">
               <li className="nav-link-wrapper">
                 <NavLink
@@ -139,8 +144,9 @@ class Nav extends React.Component {
                 </NavLink>
               </li>
             </div>
-          </ul>
+          </>
         )}
+        </ul>
       </nav>
     );
   }

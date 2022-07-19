@@ -11,16 +11,16 @@ export class Image extends Component {
 
     state = {
         errorMessage: '',
-        fileName: ''
+        fileName: '',
     }
 
-    continue = (e, values) => {
-        e.preventDefault()
+
+    continue = (e) => {
         let stateCopy = this.state
-        if(stateCopy.errorMessage === '' && values.image !== ''){
-            this.props.nextStep()
+        if(stateCopy.errorMessage === '' && this.props.values.image !== ''){
+            this.props.nextStep('image')
         }   
-        else if(values.image === '' && stateCopy.errorMessage === ''){
+        else if(this.props.values.image === '' && stateCopy.errorMessage === ''){
             stateCopy.errorMessage = `You must upload an image`
             stateCopy.borderColor = 'red'
             this.setState(stateCopy)
@@ -33,11 +33,12 @@ export class Image extends Component {
     }
 
     fileUploaded = (event) => {
-
         let stateCopy = this.state
         let fileType = event.target.files[0].type
         let fileSize = event.target.files[0].size        
         let validFile = false
+
+
   
         if(fileType === 'image/jpeg' || fileType === 'image/png' || fileType === 'image/gif'){ 
             validFile = true      
@@ -52,46 +53,108 @@ export class Image extends Component {
         }else{
             stateCopy.errorMessage = ''
         }
-
+        this.setState(stateCopy)
+          
         if(stateCopy.errorMessage === '') {
-            stateCopy.borderColor = '#00988f'  
             this.props.changeField(event, 'image')
-            stateCopy.fileName = event.target.files[0].name
+            if(this.props.amendingEvent){
+                this.continue(event)
+                return
+            }  
+            stateCopy.borderColor = '#00988f'  
+            stateCopy.fileName = event.target.files[0].name   
+            this.setState(stateCopy)      
         }
 
-        this.setState(stateCopy)
+        
+
+        
     }  
+
+    displayButtons(){
+        if(this.props.amendingEvent){return}
+        return (<div className="create-event-button-container">
+        <button className="create-event-button" onClick={event => this.goBack(event)}>Go Back</button>
+        <button className="create-event-button" onClick={event => this.continue(event, this.props.values)}>Continue</button>   
+    </div>   )
+    }
+
+    spinnerVisibility(){
+        if(this.props.spin){return {'display': 'block'}} 
+        return {'display': 'none'}       
+    }
+
+    resetEditMessages(event){
+        if(!this.props.amendingEvent){return}
+        this.props.resetEditMessages()
+    }
+
+    displayTitle(){
+        if(this.props.amendingEvent){return (
+            <div className="create-event-heading">
+                <header>Change Image</header>
+                <hr />
+            </div>   
+         )}
+    }
+
+    displayImagePreview(){
+        if(this.props.amendingEvent){return (<img src={this.props.imageURL} className='create-event-image-preview'></img>)}
+    }
+
+    disableOrEnableButton(){
+        if(this.props.updating){
+            return true
+        }
+        return false
+    }
+
+    disableOrEnableButton2(){
+        if(this.props.updating){
+            return 'custom-file-input disable-button'
+        }
+        return 'custom-file-input'
+    }
+
+    displayUploadButton(){
+
+        if(this.props.updating){
+            return 'none'
+        }
+        return 'block'
+    }
+    
+ 
 
 
     render() {
         const {values} = this.props
         return (
-            <div className="create-event-container">
-                <Nav />
+            <>
                 <form className="create-event-form">
-                <div className="create-event-heading">
-                    <header>Create Event</header>
-                    <hr />
-                </div>   
-                <label className="custom-file-input">
+                {this.displayTitle()}
+
+                {this.displayImagePreview()}
+                <label className={'custom-file-input'} style={{display: this.displayUploadButton()}}>
                     <input
                         required
                         type="file"
-                        onChange={this.fileUploaded}
-                        title="Upload Image"
-                        placeholder="Upload Image"
+                        onChange={event => this.fileUploaded(event)}
+                        // disabled={this.disableOrEnableButton()}
+                        onClick={event => this.resetEditMessages(event)}
                         style={values.image === '' ?  {borderColor: this.state.borderColor} : {borderColor: this.state.borderColor, color: 'transparent'}}
                     />
                 </label>
                 <p className='create-event-warning' id="error">{this.state.errorMessage}</p>
-                <div id="fileUploadText">   {values.image === '' ? '' : `${this.state.fileName} successfully uploaded` }</div>
-                <div className="create-event-button-container">
-                    <button className="create-event-button" onClick={event => this.goBack(event)}>Go Back</button>
-                    <button className="create-event-button" onClick={event => this.continue(event, values)}>Continue</button>   
-                </div>   
+                <br />
+                <div style={this.spinnerVisibility()}   className ='ticket-spinner'>
+                    <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                </div>
+                <div id="fileUploadText">   {values.image === '' || this.state.fileName === '' ? '' : `${this.state.fileName} successfully uploaded` }</div>
+                <div>{this.props.message}</div>
+                {this.displayButtons()}
                 </form> 
-                <Footer />
-            </div>
+            </>
         )
     }
 }

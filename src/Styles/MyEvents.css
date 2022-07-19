@@ -1,0 +1,28 @@
+.my-events-heading{
+    text-align: center;
+    width: fit-content;
+    border: 1px solid #8f897c;
+    border-radius: 5px;
+    padding: 20px 60px;
+    background-color: #fff;
+    margin: 40px auto;
+    max-width: 100%;
+}
+
+.my-events-heading hr{
+    color: #293d6a;
+    font-size: clamp(24px, 4vw, 35px);
+    text-align: center;
+    margin: auto;
+    margin-bottom: 20px;
+    color: red;
+  
+}
+
+.my-events-heading header{
+    color: #293d6a;
+    font-size: clamp(24px, 4vw, 35px);
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}

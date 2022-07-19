@@ -43,7 +43,7 @@ class ChangePassword extends React.Component {
             <Nav />         
             <form className="check-in-form" onSubmit={(event) => this.submit(event)}>
                 <div className="check-in-heading">
-                    <h2>Change Password</h2>
+                    <header>Change Password</header>
                     <hr />
                 </div>
                 <input 

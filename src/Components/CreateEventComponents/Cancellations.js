@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
 
-import Nav from "../Nav";
+
 
 class Cancellations extends React.Component {
   state = {
@@ -24,18 +24,32 @@ class Cancellations extends React.Component {
   checkForErrors(values){
     this.checkForOptionSelectedError(values)
     this.checkForReSalePriceErrors(values)
+    this.checkForRefundUntilErrors(values)
   };
+
+  checkForRefundUntilErrors(values){
+    if(values.globalRefundOptions.optionSelected!=='untilSpecific'){return}
+    let borderColors = this.state.borderColors;
+    let errors = this.state.errors;
+    let warning = "";
+    if(values.globalRefundOptions.refundUntil === ''){warning = "Please Select Date"} 
+    if(moment(values.globalRefundOptions.refundUntil).isBefore(moment())){warning = "Date Must Be In The Future"}
+    if(moment(values.globalRefundOptions.refundUntil).isAfter(moment(values.endDetails))){warning = "Date Must Be Before Event Ends"}
+    borderColors.untilSpecific = "#00988f"
+    if(warning !== ""){borderColors.untilSpecific = "red"}
+    errors.untilSpecific = warning
+    this.setState({ borderColors, errors })
+
+  }
 
   checkForOptionSelectedError(values){
     let borderColors = this.state.borderColors;
     let errors = this.state.errors;
     let warning = "";
-    console.log('values.globalRefundOptions.optionSelected', values.globalRefundOptions.optionSelected)
     if(values.globalRefundOptions.optionSelected === ''){warning = "Please Select Refund Option"} 
     borderColors.optionSelected = "#00988f"
     if(warning !== ""){borderColors.optionSelected = "red"}
     errors.optionSelected = warning
-    console.log('errors', errors)
     this.setState({ borderColors, errors })
   }
 
@@ -56,18 +70,18 @@ class Cancellations extends React.Component {
     e.preventDefault();
     this.checkForErrors(values)
     let errors = Object.values(this.state.errors).filter(e=> e!== '')
-    console.log('errors', errors)
     if(errors.length > 0){return}
+    if(this.props.amendingEvent){this.props.nextStep('refunds'); return}
     this.props.submit(e);
   };
 
   handleChange = (e, field, values) => {
-    this.props.handleRefundChange(e, field);
     if(field === 'optionSelected'){this.checkForOptionSelectedError(values)}
+    this.props.updateRefundData(e, field)
   };
 
 
-  displayDatePicker(values){
+  displaySpecificDateOption(values){
     if(values.globalRefundOptions.optionSelected !== "untilSpecific" ){return}
       return (
         <div>
@@ -79,11 +93,12 @@ class Cancellations extends React.Component {
             <DatePicker
               className="datePicker"
               timeIntervals={15}
-              selected={values.globalRefundOptions.untilSpecific}
+              selected={Date.parse(values.globalRefundOptions.refundUntil)}
               placeholderText="Select Date"
-              onChange={(event) => this.handleChange(event, "untilSpecific", values)}
+              onChange={(event) => this.handleChange(event, "refundUntil", values)}
+              onCalendarClose={event => this.checkForRefundUntilErrors(values)}
               showTimeSelect
-              dateFormat="Pp"
+              dateFormat="d MMM yyyy, HH:mm"
               required
             />
           </div>
@@ -100,8 +115,7 @@ class Cancellations extends React.Component {
           required
           type="number"
           value={values.globalRefundOptions.minimumPrice}
-          onChange={(event) => this.handleChange(event, "minimumPrice", values)}
-          onBlur={() => this.checkForReSalePriceErrors()}
+          onChange={(event) => {this.handleChange(event, "minimumPrice", values); this.checkForReSalePriceErrors(event)}}
           placeholder="Resale Price (€)"
           min={this.getHighestPrice()}
           style={{borderColor: this.state.borderColors.minimumPrice}}
@@ -115,9 +129,8 @@ class Cancellations extends React.Component {
     let borderColors = this.state.borderColors;
     let errors = this.state.errors;
     let warning = ""
-    console.log('values.globalRefundOptions.minimumPrice ', values.globalRefundOptions.minimumPrice )
     if(values.globalRefundOptions.minimumPrice === ''){warning = "Resale Price Required"} 
-    if(values.globalRefundOptions.minimumPrice < this.getHighestPrice()){warning = `You Can't Sell Refunded Tickets For Less Than Original Price (${this.getHighestPrice()})`} 
+    if(values.globalRefundOptions.minimumPrice < this.getHighestPrice()){warning = `You Can't Sell Refunded Tickets For Less Than Original Price (€${this.getHighestPrice()})`} 
     borderColors.minimumPrice = "#00988f"
     if(warning !== ''){borderColors.minimumPrice = "red"}
     errors.minimumPrice = warning
@@ -132,21 +145,53 @@ class Cancellations extends React.Component {
   spinnerVisibility(){
     if(this.props.displaySpinner ){return {'display': 'block'}}
     return {'display': 'none'}
+  }
+
+  getPageTitle(){
+    if(this.props.amendingEvent){return 'Change Refund Policy'}
+    return 'Refund Policy'
+  }
+
+  disableOrEnableButton(){
+    if(this.props.updating){
+        return 'create-event-button disable-button'
+    }
+    return 'create-event-button'
 }
+
+
+
+
+
+  getButtons(){
+    if(this.props.amendingEvent){return (
+      <button className={this.disableOrEnableButton()} onClick={(event) => this.continue(event, this.props.values)}>
+        Update
+      </button>)
+      }
+
+      return(  
+        <>        
+          <button className="create-event-button" onClick={(event) => this.props.prevStep(event)}>
+            Go Back
+          </button>
+          <button className="create-event-button green-button" onClick={(event) => this.continue(event, this.props.values)}>
+            Submit Event
+          </button>
+      </>)
+  }
 
 
 
 
   render() {
     const { values } = this.props;
-
-
+    if(values.globalRefundOptions === undefined){return null}
     return (
-      <div className="create-event-container">
-        <Nav />
+      <>
         <form className="create-event-form" >                           
           <div className="create-event-heading">
-              <header>Create Event</header>
+              <header>{this.getPageTitle()}</header>
               <hr />
           </div>    
           <p className="create-event-warning">{this.state.errors.optionSelected}</p>
@@ -171,25 +216,32 @@ class Cancellations extends React.Component {
                     />
                     {` No Refunds Allowed`}
                 </div>
+                <div>
+                    <input
+                        type="radio"
+                        checked={values.globalRefundOptions.optionSelected ==='untilSpecific'}
+                        value="untilSpecific"
+                        onChange={(event) => this.handleChange(event, "optionSelected", values)}
+                    />
+                    {` Allow Refunds Until a Specific Time`}
+                </div>
             </div>
           </div>
+
+        {this.displaySpecificDateOption(values)}
     
         {this.displaySpecificPriceOption(values)}
         <p className="create-event-warning">{this.props.errorMessage}</p>
         <div style={this.spinnerVisibility()}   className ='ticket-spinner'>
                 <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-            </div>
+        </div>
+        <div>{this.props.message}</div>
           <div className="create-event-button-container">
-          <button className="create-event-button" onClick={(event) => this.props.prevStep(event)}>
-              Go Back
-            </button>
-            <button className="create-event-button green-button" onClick={(event) => this.continue(event, values)}>
-              Submit Event
-            </button>
+            {this.getButtons()}
           </div>
         </form>
 
-      </div>
+      </>
 
 
 
@@ -250,7 +302,7 @@ class Cancellations extends React.Component {
       //                 <select
       //                     required
       //                     value={values.ticketTypesEquivalent}
-      //                     onChange={event => this.props.changeField(event, 'ticketTypesEquivalent', true)}
+      //                     onChange={event => this.props.updateRefundData(event, 'ticketTypesEquivalent', true)}
       //                 >
       //                     <option value='' disabled>Are all ticket types equivalent to each other when customers enter the event?</option>
       //                     <option value={true}>Yes - eg. Early Bird, General Admission etc.</option>
@@ -262,7 +314,7 @@ class Cancellations extends React.Component {
       //                 <select
       //                 required
       //                 value={values.globalRefundOptions.optionSelected}
-      //                 onChange={event => this.props.handleRefundChange(event, 'optionSelected', 'not relevant')}
+      //                 onChange={event => this.props.updateRefundData(event, 'optionSelected', 'not relevant')}
       //                 >
       //                     <option value='' disabled>Allow customers to cancel tickets?</option>
       //                     <option value="excessDemand">
